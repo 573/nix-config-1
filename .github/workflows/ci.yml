@@ -43,10 +43,11 @@ jobs:
 
       - name: Build command (aarch64)
         if: matrix.system == 'aarch64'
-        run: nix \
-               --log-format bar-with-logs \
-               --option keep-going true \
-               --show-trace \
-               ${{ matrix.nix-command }}
+        run: |
+          nix \
+            --log-format bar-with-logs \
+            --option keep-going true \
+            --show-trace \
+            ${{ matrix.nix-command }}
 
 # vim: set sw=2:
