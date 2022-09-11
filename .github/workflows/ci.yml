@@ -20,13 +20,8 @@ jobs:
       matrix:
         system:
           - aarch64
-        nix-command:
-          - fmt
-          - eval .#apps.$_system.format.program
-          - eval .#apps.$_system.setup.program
-
         include:
-          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure
+          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --argstr system aarch64-linux
             system: aarch64
 
     steps:
@@ -48,41 +43,10 @@ jobs:
 
       - name: Build command (aarch64)
         if: matrix.system == 'aarch64'
-        uses: uraimo/run-on-arch-action@v2
-        with:
-          arch: aarch64
-          distro: alpine_latest
-          githubToken: ${{ github.token }}
-          dockerRunArgs: --volume /nix:/nix
-          install: apk --no-cache add curl git xz
-          env: |
-            _system: ${{ matrix.system }}-linux
-          run: |
-            set -euo pipefail
-
-            mkdir -p /etc/nix
-            echo "max-jobs = auto" >> /etc/nix/nix.conf
-            echo "trusted-users = root" >> /etc/nix/nix.conf
-            echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf
-            echo "build-users-group =" >> /etc/nix/nix.conf
-            export USER=root
-
-            echo "::group::Install nix"
-            sh <(curl -L https://releases.nixos.org/nix/nix-2.9.2/install) --no-channel-add
-            . ${HOME}/.nix-profile/etc/profile.d/nix.sh
-
-            echo "::group::Setup cachix"
-            nix-env --quiet -j8 -iA cachix -f https://cachix.org/api/v1/install
-            cachix use 573-bc
-            cachix use nix-on-droid
-
-            echo "::group::Build command"
-            git config --global --add safe.directory "$(pwd)"
-            nix \
-              --log-format bar-with-logs \
-              --option keep-going true \
-              --show-trace \
-              ${{ matrix.nix-command }}
-
+        run: nix \
+               --log-format bar-with-logs \
+               --option keep-going true \
+               --show-trace \
+               ${{ matrix.nix-command }}
 
 # vim: set sw=2:
