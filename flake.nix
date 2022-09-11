@@ -6,7 +6,7 @@
     #unstable-aarch64.url = "github:NixOS/nixpkgs/unstable-aarch64";
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
-    #master.url = "github:NixOS/nixpkgs/master";
+    master.url = "github:NixOS/nixpkgs/master";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-22.05";
@@ -43,15 +43,15 @@
 
     neovim-flake = {
       url = "github:neovim/neovim?dir=contrib";
-      #inputs.nixpkgs.follows = "neovim-nightly/nixpkgs";
+      inputs.nixpkgs.follows = "unstable";
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    neovim-nightly = {
+    neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
-      #inputs.nixpkgs.follows = "unstable";
+      inputs.nixpkgs.follows = "unstable";
       inputs.flake-compat.follows = "flake-compat";
-      #inputs.neovim-flake.inputs.follows = "unstable";
+      inputs.neovim-flake.follows = "neovim-flake";
     };
 
     fenix = {
@@ -62,7 +62,7 @@
     alejandra = {
       url = "github:kamadorueda/alejandra";
       # follows small
-      };
+    };
 
     telescope-makefile = {
       flake = false;
@@ -89,6 +89,16 @@
       url = "github:numtide/nix-filter";
       inputs.nixpkgs.follows = "unstable";
     };
+
+    nvim-treesitter = {
+      flake = false;
+      url = "github:nvim-treesitter/nvim-treesitter";
+    };
+
+    nvim-cmp = {
+      flake = false;
+      url = "github:hrsh7th/nvim-cmp";
+    };
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -98,10 +108,11 @@
 
       inherit (nixpkgs.lib) listToAttrs;
       inherit (flakeLib) mkNixOnDroid eachSystem;
-    in {
+    in
+    {
       nixOnDroidConfigurations =
         listToAttrs [ (mkNixOnDroid "aarch64-linux" "sams9") ];
-    } // eachSystem ({ mkApp, mkCheck, system, }: {
+    } // eachSystem ({ mkApp, mkCheck, system }: {
       apps = listToAttrs [
         (mkApp "format" {
           file = ./files/apps/format.sh;
@@ -138,7 +149,6 @@
             ${pkgs.statix}/bin/statix check ${./.}
           '';
         })
-
       ];
 
       # use like:

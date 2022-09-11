@@ -21,7 +21,7 @@ jobs:
         system:
           - aarch64
         include:
-          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --argstr system aarch64-linux
+          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure
             system: aarch64
 
     steps:
@@ -35,16 +35,30 @@ jobs:
         with:
           install_url: "https://releases.nixos.org/nix/nix-2.9.2/install"
 
-      - name: Setup cachix
+      - name: Setup cachix (aarch64, self-hosted runner)
         uses: cachix/cachix-action@v10
         with:
           name: 573-bc
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          installCommand: |
+            set -euo pipefail
+            whoami
+            nix --version
+            nix eval --raw nixpkgs#lib.version
+            cachix use gerschtli
+            cachix use nix-community
+            cachix use 573-bc
+            cachix use nix-on-droid
 
       - name: Build command (aarch64)
         if: matrix.system == 'aarch64'
+        env:
+          _system: ${{ matrix.system }}-linux
         run: |
-          nix \
+          echo "::group::Build command"
+
+          cachix watch-exec 573-bc \
+          nix -- \
             --log-format bar-with-logs \
             --option keep-going true \
             --show-trace \

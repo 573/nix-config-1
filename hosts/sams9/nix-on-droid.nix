@@ -4,6 +4,7 @@
   environment.packages = with pkgs; [
     gnutar
     gzip
+    which
   ];
 
   home-manager = {
