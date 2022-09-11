@@ -3,8 +3,6 @@
 let
   homeModulesBuilder = { inputs, rootPath, customLib, ... }:
     [
-      inputs.homeage.homeManagerModules.homeage
-
       {
         lib.custom = customLib;
       }
@@ -26,20 +24,16 @@ let
 in
 
 {
-  mkHome = simpleWrapper ./builders/mkHome.nix;
   mkNixOnDroid = simpleWrapper ./builders/mkNixOnDroid.nix;
-  mkNixos = simpleWrapper ./builders/mkNixos.nix;
 
   eachSystem = builderPerSystem:
     inputs.flake-utils.lib.eachSystem
-      [ "aarch64-linux" "x86_64-linux" ]
+      [ "aarch64-linux" ]
       (system:
         builderPerSystem {
           inherit system;
           mkApp = wrapper ./builders/mkApp.nix system;
           mkCheck = wrapper ./builders/mkCheck.nix system;
-          mkDevShellJdk = wrapper ./builders/mkDevShellJdk.nix system;
-          mkDevShellPhp = wrapper ./builders/mkDevShellPhp.nix system;
         }
       );
 }

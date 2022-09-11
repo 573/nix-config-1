@@ -10,6 +10,6 @@ in
 
 {
   inherit (fileList) getFileList getRecursiveNixFileList;
-  inherit (script) mkScript mkScriptPlain mkScriptPlainNixShell mkZshCompletion;
+  inherit (script) mkScript mkScriptPlain mkScriptPlainNixShell;
   inherit (wrapProgram) wrapProgram;
 }

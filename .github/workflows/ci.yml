@@ -9,7 +9,7 @@ on:
         required: false
         type: string
     secrets:
-      CACHIX_SIGNING_KEY:
+      CACHIX_AUTH_TOKEN:
         required: true
 
 jobs:
@@ -20,49 +20,13 @@ jobs:
       matrix:
         system:
           - aarch64
-          - x86_64
         nix-command:
-          - flake check
           - fmt
           - eval .#apps.$_system.format.program
           - eval .#apps.$_system.setup.program
 
         include:
-          - nix-command: develop .#jdk8 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk11 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk15 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk17 --profile profile
-            system: x86_64
-          - nix-command: develop .#php74 --profile profile
-            system: x86_64
-          - nix-command: develop .#php80 --profile profile
-            system: x86_64
-          - nix-command: develop .#php81 --profile profile
-            system: x86_64
-
-          - nix-command: build .#homeConfigurations."tobias@gamer".activationPackage
-            system: x86_64
-          - nix-command: build .#homeConfigurations."tobhap@M386".activationPackage
-            system: x86_64
-
-          - nix-command: build .#nixOnDroidConfigurations.oneplus5.activationPackage --impure
-            system: aarch64
-
-          - nix-command: build .#nixosConfigurations.argon.config.system.build.toplevel
-            system: aarch64
-          - nix-command: build .#nixosConfigurations.krypton.config.system.build.toplevel
-            system: x86_64
-          - nix-command: build .#nixosConfigurations.neon.config.system.build.toplevel
-            system: x86_64
-          - nix-command: build .#nixosConfigurations.xenon.config.system.build.toplevel
-            system: aarch64
-
-          - nix-command: build .#rpi-firmware
-            system: aarch64
-          - nix-command: build .#rpi-image
+          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure
             system: aarch64
 
     steps:
@@ -79,8 +43,8 @@ jobs:
       - name: Setup cachix
         uses: cachix/cachix-action@v10
         with:
-          name: gerschtli
-          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          name: 573-bc
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build command (aarch64)
         if: matrix.system == 'aarch64'
@@ -109,7 +73,7 @@ jobs:
 
             echo "::group::Setup cachix"
             nix-env --quiet -j8 -iA cachix -f https://cachix.org/api/v1/install
-            cachix use gerschtli
+            cachix use 573-bc
             cachix use nix-on-droid
 
             echo "::group::Build command"
@@ -120,15 +84,5 @@ jobs:
               --show-trace \
               ${{ matrix.nix-command }}
 
-      - name: Build command (x86_64)
-        if: matrix.system == 'x86_64'
-        env:
-          _system: ${{ matrix.system }}-linux
-        run: |
-          nix \
-            --log-format bar-with-logs \
-            --option keep-going true \
-            --show-trace \
-            ${{ matrix.nix-command }}
 
 # vim: set sw=2:

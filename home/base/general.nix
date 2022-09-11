@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
-
 with lib;
-
 let
   cfg = config.custom.base.general;
 
@@ -9,12 +7,14 @@ let
   localeEnglish = "en_US.UTF-8";
 
   sessionVariables = {
-    LC_CTYPE = localeEnglish;
-    LC_NUMERIC = localeEnglish;
-    LC_TIME = localeGerman;
-    LC_COLLATE = localeEnglish;
+    EDITOR = "vim";
+    SHELL = "bash";
+    #LC_CTYPE = localeEnglish;
+    #LC_NUMERIC = localeEnglish;
+    #LC_TIME = localeGerman;
+    #LC_COLLATE = localeEnglish;
     LC_MONETARY = localeEnglish;
-    LC_MESSAGES = localeEnglish;
+    #LC_MESSAGES = localeEnglish;
     LC_PAPER = localeGerman;
     LC_NAME = localeEnglish;
     LC_ADDRESS = localeEnglish;
@@ -35,41 +35,24 @@ let
     PAGER = "${pkgs.less}/bin/less";
   };
 in
-
 {
-
   ###### interface
 
   options = {
-
     custom.base.general = {
       enable = mkEnableOption "basic config" // { default = true; };
 
-      lightWeight = mkEnableOption "light weight config for low performance hosts";
+      lightWeight =
+        mkEnableOption "light weight config for low performance hosts";
 
       minimal = mkEnableOption "minimal config";
     };
-
   };
-
 
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
-
     {
-      custom.programs = {
-        bash.enable = true;
-        htop.enable = true;
-        neovim.enable = true;
-        prompts = {
-          liquidprompt.enable = mkIf (!cfg.lightWeight) true;
-          pure.enable = mkIf cfg.lightWeight true;
-        };
-        tmux.enable = true;
-        zsh.enable = true;
-      };
-
       home = {
         inherit sessionVariables;
 
@@ -111,23 +94,18 @@ in
       custom = {
         misc.util-bins.enable = true;
 
-        programs = {
-          git.enable = true;
-          nnn.enable = true;
-          rsync.enable = true;
-          ssh = {
-            enable = true;
-            modules = [ "vcs" ];
+        /* see ./home/programs
+          programs = {
           };
-        };
+        */
       };
 
       programs = {
         fzf.enable = true;
         home-manager.enable = true;
+        git.enable = true;
+        nnn.enable = true;
       };
     })
-
   ]);
-
 }
