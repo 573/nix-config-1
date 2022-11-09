@@ -243,11 +243,6 @@ in
         profileExtra = mkMerge [ profileExtra cfg.envExtra ];
         initExtra = mkMerge [ initExtra cfg.loginExtra ];
       };
-
-      zsh = {
-        inherit (cfg) envExtra loginExtra;
-        inherit initExtra logoutExtra profileExtra shellAliases;
-      };
     };
 
   };

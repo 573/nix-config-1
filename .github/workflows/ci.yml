@@ -9,8 +9,7 @@ on:
         required: false
         type: string
     secrets:
-      CACHIX_ACTIVATE_TOKEN:
-      CACHIX_SIGNING_KEY:
+      CACHIX_AUTH_TOKEN:
         required: true
 
 jobs:
@@ -21,55 +20,14 @@ jobs:
       matrix:
         system:
           - aarch64
-          - x86_64
         nix-command:
-          - run .#ci-build -- packages.$_system.rpi-firmware
           #- flake check # FIXME: temporarily disabled because of failing nixGL evaluation on aarch64
           - fmt
           - eval .#apps.$_system.ci-build.program
           - eval .#apps.$_system.setup.program
 
         include:
-          - system: x86_64
-            nix-command: flake check
-
-          - nix-command: develop .#jdk8 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk11 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk15 --profile profile
-            system: x86_64
-          - nix-command: develop .#jdk17 --profile profile
-            system: x86_64
-          - nix-command: develop .#php74 --profile profile
-            system: x86_64
-          - nix-command: develop .#php80 --profile profile
-            system: x86_64
-          - nix-command: develop .#php81 --profile profile
-            system: x86_64
-
-          - nix-command: run .#ci-build -- 'homeConfigurations."tobias@gamer".activationPackage'
-            system: x86_64
-          - nix-command: run .#ci-build -- 'homeConfigurations."tobhap@M386".activationPackage'
-            system: x86_64
-
-          - nix-command: run .#ci-build -- nixOnDroidConfigurations.oneplus5.activationPackage
-            system: aarch64
-
-          - nix-command: run .#ci-build -- nixosConfigurations.argon.config.system.build.toplevel
-            system: aarch64
-            deploy-spec: .#cachix-deploy-spec-argon
-          - nix-command: run .#ci-build -- nixosConfigurations.krypton.config.system.build.toplevel
-            system: x86_64
-            deploy-spec: .#cachix-deploy-spec-krypton
-          - nix-command: run .#ci-build -- nixosConfigurations.neon.config.system.build.toplevel
-            system: x86_64
-            deploy-spec: .#cachix-deploy-spec-neon
-          - nix-command: run .#ci-build -- nixosConfigurations.xenon.config.system.build.toplevel
-            system: aarch64
-            deploy-spec: .#cachix-deploy-spec-xenon
-
-          - nix-command: run .#ci-build -- packages.$_system.rpi-image
+          - nix-command: run .#ci-build -- nixOnDroidConfigurations.sams9.activationPackage
             system: aarch64
 
     steps:
@@ -84,13 +42,12 @@ jobs:
           extra_nix_config: |
             keep-going = true
             show-trace = true
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup cachix
         uses: cachix/cachix-action@v12
         with:
-          name: gerschtli
-          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          name: 573-bc
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build command (aarch64)
         if: matrix.system == 'aarch64'
@@ -100,15 +57,11 @@ jobs:
         with:
           arch: aarch64
           distro: alpine_latest
-          githubToken: ${{ github.token }}
           dockerRunArgs: --volume /nix:/nix
           install: apk --no-cache add curl git xz
           env: |
             _system: ${{ matrix.system }}-linux
-            CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN || 'no-value' }}
-            CACHIX_SIGNING_KEY: ${{ secrets.CACHIX_SIGNING_KEY }}
-            DEPLOY_SPEC: ${{ matrix.deploy-spec || 'no-value' }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
             USER: root
           run: |
             set -euo pipefail
@@ -122,7 +75,6 @@ jobs:
             build-users-group =
             keep-going = true
             show-trace = true
-            access-tokens = github.com=$GITHUB_TOKEN
             EOF
 
             echo "::group::Install nix"
@@ -153,12 +105,15 @@ jobs:
             nix profile install nixpkgs#cachix
             cachix use gerschtli
             cachix use nix-on-droid
+            cachix use 573-bc
+            cachix use nix-community
 
 
             echo "::group::Build command"
             git config --global --add safe.directory "$(pwd)"
 
-            nix ${{ matrix.nix-command }}
+            cachix watch-exec 573-bc \
+            nix -- ${{ matrix.nix-command }}
 
 
             ${{ github.ref == 'refs/heads/master' && inputs.branch == '' && matrix.deploy-spec && '
@@ -166,7 +121,7 @@ jobs:
             spec="$(nix build --print-out-paths "$DEPLOY_SPEC")"
 
             echo "::group::Deploy spec"
-            cachix push gerschtli "$spec"
+            cachix push 573-bc "$spec"
             cachix deploy activate "$spec"
             ' || '
             echo "::group::Skip spec deploy"
@@ -187,7 +142,7 @@ jobs:
           spec="$(nix build --print-out-paths "${{ matrix.deploy-spec }}")"
 
           echo "::group::Deploy spec"
-          cachix push gerschtli "$spec"
+          cachix push 573-bc "$spec"
           cachix deploy activate "$spec"
 
 # vim: set sw=2:
