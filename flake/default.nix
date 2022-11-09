@@ -1,8 +1,9 @@
 { inputs, rootPath, forEachSystem }:
 
 let
-  pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs system; });
-  pkgsNixOnDroidFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs system; nixOnDroid = true; });
+  pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; });
+
+  pkgsNixOnDroidFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; nixOnDroid = true; });
 
   customLibFor = forEachSystem (system: import "${rootPath}/lib" {
     pkgs = pkgsFor.${system};
@@ -29,11 +30,7 @@ let
 in
 
 {
-  mkHome = simpleWrapper ./builders/mkHome.nix;
   mkNixOnDroid = simpleWrapper ./builders/mkNixOnDroid.nix;
-  mkNixos = simpleWrapper ./builders/mkNixos.nix;
 
   mkApp = wrapper ./builders/mkApp.nix;
-  mkDevShellJdk = wrapper ./builders/mkDevShellJdk.nix;
-  mkDevShellPhp = wrapper ./builders/mkDevShellPhp.nix;
 }

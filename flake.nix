@@ -2,53 +2,100 @@
   description = "A collection of my system configs and dotfiles.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05-aarch64";
+    #unstable-aarch64.url = "github:NixOS/nixpkgs/unstable-aarch64";
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-    # commit before jdk15 drop
-    # https://github.com/NixOS/nixpkgs/commit/9dde9d8b9ee4b7a4dfbb0ab1204d9f6f4a188360
-    nixpkgs-for-jdk15.url = "github:NixOS/nixpkgs/df175b7f61d852dc599fe248b1a8666c312457bd";
+    #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
+    master.url = "github:NixOS/nixpkgs/4deb94160637058c0f629d5057db988033b76c06"; # "github:NixOS/nixpkgs/master";
+    staging.url = "github:NixOS/nixpkgs/staging"; # "github:NixOS/nixpkgs/2acce7dfdcf382757e6fe219e04668e7a63bf48a";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-22.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
+
     nix-on-droid = {
+      # if all fails, stick to ../../release-22.05 again
       url = "github:t184256/nix-on-droid";
       inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
+    flake-utils.url = "github:numtide/flake-utils";
 
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    agenix-cli = {
-      url = "github:cole-h/agenix-cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    homeage = {
-      url = "github:jordanisaacs/homeage";
-      inputs.nixpkgs.follows = "nixpkgs";
+    virtual-types-nvim = {
+      flake = false;
+      url =
+        "https://github.com/jubnzv/virtual-types.nvim/archive/9ef9f31c58cc9deb914ee728b8bda8f217f9d1c7.tar.gz";
     };
 
-    dmenu = {
-      url = "github:Gerschtli/dmenu";
-      inputs.nixpkgs.follows = "nixpkgs";
+    neovim-flake = {
+      url = "github:neovim/neovim?dir=contrib";
+      inputs.nixpkgs.follows = "unstable";
+      inputs.flake-utils.follows = "flake-utils";
     };
-    dwm = {
-      url = "github:Gerschtli/dwm";
-      inputs.nixpkgs.follows = "nixpkgs";
+
+    neovim-nightly-overlay = {
+      url = "github:nix-community/neovim-nightly-overlay";
+      inputs.nixpkgs.follows = "unstable";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.neovim-flake.follows = "neovim-flake";
     };
-    dwm-status = {
-      url = "github:Gerschtli/dwm-status";
-      inputs.nixpkgs.follows = "nixpkgs";
+
+    code-runner-nvim = {
+      flake = false;
+      url =
+        "https://github.com/CRAG666/code_runner.nvim/archive/7cdeb206520c5afb2bd7655da981a9bcdc3f43f8.tar.gz";
     };
-    teamspeak-update-notifier = {
-      url = "github:Gerschtli/teamspeak-update-notifier";
-      inputs.nixpkgs.follows = "nixpkgs";
+
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "unstable";
+    };
+
+    alejandra = {
+      url = "github:kamadorueda/alejandra";
+      # follows small
+    };
+
+    telescope-makefile = {
+      flake = false;
+      url = "github:ptethng/telescope-makefile";
+    };
+
+    markid = {
+      flake = false;
+      url = "github:David-Kunz/markid";
+    };
+
+    nvim-osc52 = {
+      flake = false;
+      url = "github:ojroques/nvim-osc52";
+    };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "unstable";
+    };
+
+    nix-filter = {
+      url = "github:numtide/nix-filter";
+    };
+
+    nvim-treesitter = {
+      flake = false;
+      url = "github:nvim-treesitter/nvim-treesitter";
+    };
+
+    nvim-cmp = {
+      flake = false;
+      url = "github:hrsh7th/nvim-cmp";
     };
 
     nix-formatter-pack = {
@@ -56,23 +103,22 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixGL = {
-      url = "github:guibou/nixGL";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     nix-index-database.url = "github:Mic92/nix-index-database";
+
+    haskell-tools-nvim = {
+      flake = false;
+      url = "github:MrcJkb/haskell-tools.nvim";
+    };
   };
 
-  outputs = { self, nixpkgs, cachix-deploy-flake, nix-formatter-pack, ... } @ inputs:
+  outputs = { self, nixpkgs, nix-formatter-pack, ... } @ inputs:
     let
       rootPath = toString ./.;
-      forEachSystem = nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ];
+      forEachSystem = nixpkgs.lib.genAttrs [ "aarch64-linux" ];
       flakeLib = import ./flake {
         inherit inputs rootPath forEachSystem;
       };
-
-      cachixDeployLibFor = forEachSystem (system: cachix-deploy-flake.lib nixpkgs.legacyPackages.${system});
 
       formatterPackArgsFor = forEachSystem (system: {
         inherit nixpkgs system;
@@ -88,24 +134,12 @@
         };
       });
 
-      inherit (nixpkgs.lib) listToAttrs mapAttrs' nameValuePair;
-      inherit (flakeLib) mkApp mkDevShellJdk mkDevShellPhp mkHome mkNixOnDroid mkNixos;
+      inherit (nixpkgs.lib) listToAttrs;
+      inherit (flakeLib) mkApp mkNixOnDroid;
     in
     {
-      homeConfigurations = listToAttrs [
-        (mkHome "x86_64-linux" "tobias@gamer")
-        (mkHome "x86_64-linux" "tobhap@M386")
-      ];
-
       nixOnDroidConfigurations = listToAttrs [
-        (mkNixOnDroid "aarch64-linux" "oneplus5")
-      ];
-
-      nixosConfigurations = listToAttrs [
-        (mkNixos "aarch64-linux" "argon")
-        (mkNixos "x86_64-linux" "krypton")
-        (mkNixos "x86_64-linux" "neon")
-        (mkNixos "aarch64-linux" "xenon")
+        (mkNixOnDroid "aarch64-linux" "sams9")
       ];
 
       apps = forEachSystem (system: listToAttrs [
@@ -129,32 +163,9 @@
       # use like:
       # $ direnv-init jdk11
       # $ lorri-init jdk11
-      devShells = forEachSystem (system: listToAttrs [
-        (mkDevShellJdk system "jdk8" { jdk = pkgs: pkgs.jdk8; })
-        (mkDevShellJdk system "jdk11" { jdk = pkgs: pkgs.jdk11; })
-        (mkDevShellJdk system "jdk15" { jdk = pkgs: pkgs.jdk15; })
-        (mkDevShellJdk system "jdk17" { jdk = pkgs: pkgs.jdk17; })
-
-        (mkDevShellPhp system "php74" { phpVersion = "74"; })
-        (mkDevShellPhp system "php80" { phpVersion = "80"; })
-        (mkDevShellPhp system "php81" { phpVersion = "81"; })
-      ]);
+      devShells = listToAttrs [ ];
 
       formatter = forEachSystem (system: nix-formatter-pack.lib.mkFormatter formatterPackArgsFor.${system});
-
-      packages = forEachSystem (system:
-        {
-          rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
-          rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; };
-        } // (
-          mapAttrs'
-            (name: value: nameValuePair "cachix-deploy-spec-${name}" (
-              cachixDeployLibFor.${system}.spec {
-                agents.${name} = value.config.system.build.toplevel;
-              }
-            ))
-            self.nixosConfigurations
-        )
-      );
     };
 }
+

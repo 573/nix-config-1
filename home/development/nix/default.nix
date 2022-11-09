@@ -33,7 +33,6 @@ in
     custom.development.nix = {
       home-manager.enable = mkEnableOption "home-manager aliases";
       nix-on-droid.enable = mkEnableOption "nix-on-droid aliases";
-      nixos.enable = mkEnableOption "nixos aliases";
     };
 
   };
@@ -65,38 +64,14 @@ in
 
     (mkIf cfg.nix-on-droid.enable {
       custom.programs.shell.shellAliases = {
-        nod-switch = "nix-on-droid switch --flake '${config.home.homeDirectory}/.nix-config#oneplus5'";
+        nod-switch = "nix-on-droid switch --flake '${config.home.homeDirectory}/.nix-config#sams9'";
       };
 
       home.packages = [
         (buildWithDiff
           "nod-build"
-          "nix-on-droid build --flake '${config.home.homeDirectory}/.nix-config#oneplus5'"
+          "nix-on-droid build --flake '${config.home.homeDirectory}/.nix-config#sams9'"
           "/nix/var/nix/profiles/nix-on-droid"
-        )
-      ];
-    })
-
-    (mkIf cfg.nixos.enable {
-      home.packages = [
-        (config.lib.custom.mkScript
-          "n-rebuild"
-          ./n-rebuild.sh
-          [ pkgs.ccze ]
-          {
-            buildCmd = "${buildWithDiff
-              "n-rebuild-build"
-              "nixos-rebuild build --flake /root/.nix-config"
-              "/nix/var/nix/profiles/system"
-            }/bin/n-rebuild-build";
-            _doNotClearPath = true;
-          }
-        )
-
-        (config.lib.custom.mkZshCompletion
-          "n-rebuild"
-          ./n-rebuild-completion.zsh
-          { }
         )
       ];
     })

@@ -1,62 +1,47 @@
 { config, lib, pkgs, ... }:
-
 with lib;
-
 let
   cfg = config.custom.base.general;
 
   localeGerman = "de_DE.UTF-8";
   localeEnglish = "en_US.UTF-8";
-in
-
-{
-
+in {
   ###### interface
 
   options = {
-
     custom.base.general = {
       enable = mkEnableOption "basic config" // { default = true; };
 
-      lightWeight = mkEnableOption "light weight config for low performance hosts";
+      lightWeight =
+        mkEnableOption "light weight config for low performance hosts";
 
       minimal = mkEnableOption "minimal config";
     };
-
   };
-
 
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
-
     {
       custom.programs = {
-        bash.enable = true;
+#        bash.enable = true;
         htop.enable = true;
-        neovim.enable = true;
-        prompts = {
-          liquidprompt.enable = mkIf (!cfg.lightWeight) true;
-          pure.enable = mkIf cfg.lightWeight true;
-        };
-        tmux.enable = true;
-        zsh.enable = true;
       };
 
       home = {
         language = {
           base = localeEnglish;
           address = localeEnglish;
-          collate = localeEnglish;
-          ctype = localeEnglish;
+          #collate = localeEnglish;
+          #ctype = localeEnglish;
           measurement = localeGerman;
-          messages = localeEnglish;
+          #messages = localeEnglish;
           monetary = localeEnglish;
           name = localeEnglish;
-          numeric = localeEnglish;
+          #numeric = localeEnglish;
           paper = localeGerman;
           telephone = localeEnglish;
-          time = localeGerman;
+          #time = localeGerman;
         };
 
         packages = with pkgs; [
@@ -94,6 +79,8 @@ in
             "--tabs=4"
           ];
           PAGER = "${pkgs.less}/bin/less";
+          EDITOR = "vim";
+          SHELL = "bash";
         };
 
         stateVersion = "22.05";
@@ -107,24 +94,18 @@ in
       custom = {
         misc.util-bins.enable = true;
 
+        # see ./home/programs
         programs = {
-          git.enable = true;
           nix-index.enable = true;
           nnn.enable = true;
-          rsync.enable = true;
-          ssh = {
-            enable = true;
-            modules = [ "vcs" ];
-          };
         };
       };
 
       programs = {
         fzf.enable = true;
         home-manager.enable = true;
+        git.enable = true;
       };
     })
-
   ]);
-
 }
