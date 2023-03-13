@@ -1,0 +1,118 @@
+name: Build and test flake outputs (using gh caches)
+on:
+  push:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      branch:
+        description: Branch name to build on
+        default: ""
+        required: false
+        type: string
+    secrets:
+      CACHIX_ACTIVATE_TOKEN:
+      CACHIX_AUTH_TOKEN:
+        required: true
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        system:
+          - aarch64
+          - x86_64
+        nix-command:
+          - eval .#apps.$_system.nixos-shell.program
+          - eval .#apps.$_system.setup.program
+          - develop .#rust --impure
+
+        include:
+          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --print-build-logs --log-lines 9999 --accept-flake-config
+            system: aarch64
+            deploy-agent: sams9
+
+          - nix-command: build .#nixosConfigurations.DANIELKNB1.config.system.build.toplevel --accept-flake-config
+            system: x86_64
+            deploy-agent: DANIELKNB1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        continue-on-error: true
+        with:
+          tool-cache: true
+      - name: Experiment (x86_64)
+        if: matrix.system == 'x86_64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nixbuild/nix-quick-install-action@v25
+        with:
+          nix_conf: |
+            substituters = https://cache.nixos.org/ https://nix-community.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            keep-going = true
+            show-trace = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            keep-outputs = true
+
+      - name: Restore and cache Nix store (x86_64)
+        if: matrix.system == 'x86_64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nix-community/cache-nix-action@v2
+        with:
+          gc-enabled-linux: true
+          gc-max-store-size-linux: 8000000000
+          gc-enabled-macos: true
+          gc-max-store-size-macos: 8000000000
+          purge-enabled: true
+          purge-max-age: 86400
+          purge-by-created-time: true
+          purge-by-accessed-time: true
+          # output debug info
+          debug: true
+          # save a new cache every time ci file changes
+          key: cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci.yaml') }}
+          restore-keys: |
+            cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci.yaml') }}-
+            cache-ubuntu-latest-
+
+      # Uncomment to debug this job
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Setup cachix (x86_64)
+        if: matrix.system == 'x86_64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: cachix/cachix-action@v12
+        with:
+          name: 573-bc
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build command (x86_64)
+        if: matrix.system == 'x86_64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        run: |
+            echo "::group::Build command"
+            nix ${{ matrix.nix-command }}
+
+      - name: Deploy cachix-agent spec (x86_64)
+        if: matrix.system == 'x86_64' && github.ref == 'refs/heads/wsl2' && matrix.deploy-agent
+        env:
+          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
+        run: |
+          echo "::group::Build spec"
+          spec="$(nix build --print-out-paths ".#cachix-deploy-spec-${{ matrix.deploy-agent }}")"
+
+          echo "::group::Upload spec"
+          cachix push 573-bc "$spec"
+
+# vim: set sw=2:

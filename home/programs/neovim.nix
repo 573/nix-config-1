@@ -1,193 +1,370 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, rootPath, inputs, ... }:
 
 let
   inherit (lib)
     mkEnableOption
     mkIf
+    mkMerge
     mkOption
     types
     ;
+  inherit (pkgs.stdenvNoCC.hostPlatform) system;
 
   cfg = config.custom.programs.neovim;
 
-  extraConfig = ''
-    "" Encoding
-    set encoding=utf-8
-    set fileencoding=utf-8
-    set fileencodings=utf-8,iso-8859-1
+  # i. e. nix-repl> :p (homeConfigurations."dani@maiziedemacchiato".pkgs.vimUtils.buildVimPluginFrom2Nix { pname = "markid"; src = inputs.markid; version = inputs.markid.rev; }).drvAttrs
+  #	  pluggo = name: pkgs.vimUtils.buildVimPlugin {
+  #	    pname = name;
+  #	    src = inputs."${name}";
+  #	    version = "2023-20-10";
+  #	  };
 
+  pluggo = pname: inputs.unstable.legacyPackages.${system}.vimUtils.buildVimPlugin { inherit pname; src = inputs."${pname}"; version = "0.1"; };
+  /*extraConfig = ''
+               if filereadable($HOME . "/.vimrc")
+                  source ~/.vimrc
+               endif
+               colorscheme lunaperche
+               luafile ${rootPath}/home/misc/nvim-treesitter.lua
+               luafile ${rootPath}/home/misc/trouble-nvim.lua
+               " luafile ${rootPath}/home/misc/null-ls-nvim.lua
+               luafile ${rootPath}/home/misc/nvim-lspconfig.lua
+               luafile ${rootPath}/home/misc/nvim-cmp.lua
+               luafile ${rootPath}/home/misc/luasnip-snippets.lua
+               luafile ${rootPath}/home/misc/comment-nvim.lua
+               luafile ${rootPath}/home/misc/indent-blankline.lua
+               luafile ${rootPath}/home/misc/markid.lua
+               luafile ${rootPath}/home/misc/nvim-treesitter-context.lua
+               luafile ${rootPath}/home/misc/nvim-osc52.lua
+               luafile ${rootPath}/home/misc/telescope-nvim.lua
+               luafile ${rootPath}/home/misc/duck-nvim.lua
+               luafile ${rootPath}/home/misc/nvim-dap.lua
+               luafile ${rootPath}/home/misc/nvim-dap-ui.lua
+        lua require("nvim-tree").setup()
+        lua require("which-key").setup()
+        lua require("lualine").setup()
+               luafile ${rootPath}/home/misc/nvim-wsl-clipboard.lua
 
-    "" Tabs. May be overriten by autocmd rules
-    set tabstop=4
-    set ts=4
-    set softtabstop=0
-    set shiftwidth=4
-    set expandtab
-    set autoindent
-    set smartindent
-
-
-    "" Enable filetype detection:
-    filetype on
-    filetype plugin on
-    filetype indent on
-
-    autocmd Filetype make set noexpandtab
-    autocmd Filetype c set expandtab
-    autocmd Filetype cpp set expandtab
-    autocmd Filetype tex set tabstop=2 shiftwidth=2 textwidth=119
-
-    let g:tex_flavor = 'latex'
-
-
-    "" Remove trailing whitespaces on save
-    autocmd BufWritePre * %s/\s\+$//e
-
-
-    "" Set tab size to 4 in gitcommit
-    autocmd FileType gitcommit setl ts=4
-
-
-    "" Directories for swp files
-    set nobackup
-    set noswapfile
-    set nowb
-
-
-    "" Automatically update a file if it is changed externally
-    set autoread
-
-
-    "" Visual settings
-    syntax on
-    let g:enable_bold_font = 1
-    set background=dark
-    colorscheme hybrid_material
-    set ruler
-    set number
-    set cursorline
-    set cursorcolumn
-    set colorcolumn=121
-
-    "" Enable modelines
-    set modeline
-    set modelines=5
-
-
-    "" Airline
-    set laststatus=2
-
-    let g:airline_powerline_fonts = 1
-    let g:airline_theme='hybrid'
-
-    if !exists('g:airline_symbols')
-        let g:airline_symbols = {}
-    endif
-
-    " unicode symbols
-    let g:airline_left_sep = '»'
-    let g:airline_left_sep = '▶'
-    let g:airline_right_sep = '«'
-    let g:airline_right_sep = '◀'
-    let g:airline_symbols.linenr = '␊'
-    let g:airline_symbols.linenr = '␤'
-    let g:airline_symbols.linenr = '¶'
-    let g:airline_symbols.branch = '⎇'
-    let g:airline_symbols.paste = 'ρ'
-    let g:airline_symbols.paste = 'Þ'
-    let g:airline_symbols.paste = '∥'
-    let g:airline_symbols.whitespace = 'Ξ'
-
-    " airline symbols
-    let g:airline_left_sep = ''
-    let g:airline_left_alt_sep = ''
-    let g:airline_right_sep = ''
-    let g:airline_right_alt_sep = ''
-    let g:airline_symbols.branch = ''
-    let g:airline_symbols.readonly = ''
-    let g:airline_symbols.linenr = ''
-
-
-    "" Mappings
-    let mapleader=","
-
-    " turn off search highlight with ,-<space>
-    nnoremap <leader><space> :nohlsearch<CR>
-
-    :map <leader>iso :w ++enc=iso-8859-1<C-M>
-
-
-    "" Buffers
-
-    " Enable the list of buffers
-    let g:airline#extensions#tabline#enabled = 1
-
-    " Show just the filename
-    let g:airline#extensions#tabline#fnamemod = ':t'
-
-    " This allows buffers to be hidden if you've modified a buffer.
-    " This is almost a must if you wish to use buffers in this way.
-    set hidden
-
-    " To open a new empty buffer
-    " This replaces :tabnew which I used to bind to this mapping
-    nmap <leader>w :enew<cr>
-
-    " Move to the next buffer
-    nmap <leader>n :bnext<CR>
-
-    " Move to the previous buffer
-    nmap <leader>p :bprevious<CR>
-
-    " Close the current buffer and move to the previous one
-    " This replicates the idea of closing a tab
-    nmap <leader>q :bp <BAR> bd #<CR>
-
-    " Show all open buffers and their status
-    nmap <leader>l :ls<CR>
-
-    " Disables formatting in paste mode
-    set pastetoggle=<F3>
-
-
-    "" Auto formatter
-    let g:formatdef_nixpkgs_fmt = '"${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt"'
-    let g:formatters_nix = ['nixpkgs_fmt']
-
-    let g:autoformat_autoindent = 0
-    let g:autoformat_retab = 0
-
-    noremap <F3> :Autoformat<CR>
-    "au BufWrite * :Autoformat
-  '';
-
-  plugins = with pkgs.vimPlugins; [
-    vim-airline
-    vim-airline-themes
-    vim-hybrid-material
-
-    nerdtree
-    csv-vim
-    gitignore-vim
-    rust-vim
-    vim-autoformat
-    vim-json
-    vim-nix
-    vim-tmux
-    vim-toml
+               " let g:languagetool_server_command='$ { pkgs.languagetool }/bin/languagetool-http-server'
+                        	   lua require("gitsigns").setup()
+                        	   lua require("stcursorword").setup()
+  '';*/
+  /*plugins = with pkgs.vimPlugins; [
+    # https://gitlab.com/rycee/home-manager/blob/de3758e3/modules/programs/neovim.nix#L113
+    # null-ls-nvim
+    plenary-nvim
+    nvim-lspconfig
+    trouble-nvim
+    nvim-cmp
+    cmp-cmdline
+    cmp-buffer
+    cmp-path
+    cmp_luasnip
+    cmp-nvim-lsp
+    cmp-omni
+    cmp-emoji
+    cmp-nvim-lua
+    luasnip
+    friendly-snippets
+    lspkind-nvim
+    # LanguageTool-nvim
+    #vim-grammarous
+    comment-nvim
+    nvim-treesitter-context
+    indent-blankline-nvim
+    wildfire-vim
+    nvim-tree-lua
+    nnn-vim
+    asyncrun-vim
+    vim-table-mode
+    telescope-nvim
+    zen-mode-nvim
+    which-key-nvim
     vimtex
-  ];
-in
+    haskell-tools-nvim
+    nvim-osc52
+    lualine-nvim
+    nix-develop-nvim
+    nvim-dap
+    nvim-dap-python
+    neoterm
+    nvim-gdb
+    nvim-dap-ui
+    nvim-treesitter-endwise
+    orgmode
+    neorg
+    pkgs.nvim-treesitter-as-in-manual
+    #pkgs.nvim-treesitter-selection
+    vim-illuminate
+    markid
+    virtual-types-nvim
+    gitsigns-nvim
+    # semantic-highlight-vim
+    (pluggo "stcursorword")
+    (pluggo "murmur.lua")
+    (pluggo "action-hints.nvim")
+    (pluggo "deferred-clipboard.nvim")
+    (pluggo "code_runner.nvim")
+    (pluggo "garbage-day.nvim")
 
+    ]
+  ;*/
+  configuration = {
+    colorschemes.catppuccin.enable = true;
+    extraPlugins = with pkgs; [
+      vimPlugins.nnn-vim
+      vimPlugins.trouble-nvim
+      vimPlugins.vimtex
+      vimPlugins.vim-jack-in
+      vimPlugins.neoterm
+      (pluggo "nvim-dd")
+      (pluggo "faster-nvim")
+      #		(pluggo "deadcolumn-nvim")
+    ];
+    extraConfigLua = ''
+      	        require('dd').setup()
+                      require("trouble").setup({
+                      	-- settings without a patched font or icons
+                      	icons = false,
+                      	fold_open = "v", -- icon used for open folds
+                      	fold_closed = ">", -- icon used for closed folds
+                      	indent_lines = false, -- add an indent guide below the fold icons
+                      	signs = {
+                      		-- icons / text used for a diagnostic
+                      		error = "error",
+                      		warning = "warn",
+                      		hint = "hint",
+                      		information = "info"
+                      	},
+                      	use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+                      })
+    '';
+    plugins = {
+      nvim-osc52.enable = true;
+      treesitter-context.enable = true;
+      rainbow-delimiters.enable = true;
+      which-key.enable = true;
+      conjure.enable = true;
+      lsp = {
+        enable = true;
+        servers = {
+	  # FIXME still uses i. e. v1.2.3 (https://github.com/nix-community/nixvim/blob/83a7ce9846b1b01a34b3e6b25077c1a5044ad7b3/plugins/lsp/language-servers/default.nix#L455) as of nixos-unstable, see https://github.com/NixOS/nixpkgs/pull/305285#
+          nixd.enable = true;
+          ltex.enable = true;
+          texlab.enable = true;
+          lua-ls.enable = true;
+        };
+        keymaps.lspBuf = {
+          "gd" = "definition";
+          "gD" = "references";
+          "gt" = "type_definition";
+          "gi" = "implementation";
+          "K" = "hover";
+        };
+      };
+
+      treesitter = {
+        enable = true;
+        nixGrammars = true;
+        indent = true;
+        # DONT see https://discourse.nixos.org/t/conflicts-between-treesitter-withallgrammars-and-builtin-neovim-parsers-lua-c/33536/3
+        /*grammarPackages = with pkgs.tree-sitter-grammars; [
+          tree-sitter-nix
+          tree-sitter-bash
+          tree-sitter-yaml
+          tree-sitter-json
+          tree-sitter-lua
+          tree-sitter-latex
+          tree-sitter-comment
+        ];*/
+        ensureInstalled = [
+          "nix"
+          "bash"
+          "yaml"
+          "json"
+          "lua"
+          "latex"
+          "comment"
+        ];
+      };
+      gitsigns = {
+        enable = true;
+        currentLineBlame = true;
+      };
+      # # Source: https://github.com/hmajid2301/dotfiles/blob/ab7098387426f73c461950c7c0a4f8fb4c843a2c/home-manager/editors/nvim/plugins/coding/cmp.nix
+      luasnip.enable = true;
+      cmp-buffer = { enable = true; };
+
+      cmp-emoji = { enable = true; };
+
+      cmp-nvim-lsp = { enable = true; };
+
+      cmp-path = { enable = true; };
+
+      cmp_luasnip = { enable = true; };
+
+
+      # FIXME Use `plugins.cmp.settings.sources` option
+      cmp = {
+        enable = true;
+        settings = {
+          sources = [
+            { name = "nvim_lsp"; }
+            { name = "luasnip"; }
+            { name = "buffer"; }
+            { name = "nvim_lua"; }
+            { name = "path"; }
+          ];
+          /*sources = {
+                            		  __raw = ''
+      cmp.config.sources({
+        { name = 'nvim_lsp' },
+        -- { name = 'vsnip' },
+        { name = 'luasnip' },
+        { name = 'nvim_lua' },
+        -- { name = 'ultisnips' },
+        -- { name = 'snippy' },
+      }, {
+        { name = 'buffer' },
+        { name = 'path' },
+      })
+                            		  '';
+                          		  }; */
+
+          formatting = {
+            fields = [ "abbr" "kind" "menu" ];
+            format =
+              # lua
+              ''
+                function(_, item)
+                  local icons = {
+                    Namespace = "󰌗",
+                    Text = "󰉿",
+                    Method = "󰆧",
+                    Function = "󰆧",
+                    Constructor = "",
+                    Field = "󰜢",
+                    Variable = "󰀫",
+                    Class = "󰠱",
+                    Interface = "",
+                    Module = "",
+                    Property = "󰜢",
+                    Unit = "󰑭",
+                    Value = "󰎠",
+                    Enum = "",
+                    Keyword = "󰌋",
+                    Snippet = "",
+                    Color = "󰏘",
+                    File = "󰈚",
+                    Reference = "󰈇",
+                    Folder = "󰉋",
+                    EnumMember = "",
+                    Constant = "󰏿",
+                    Struct = "󰙅",
+                    Event = "",
+                    Operator = "󰆕",
+                    TypeParameter = "󰊄",
+                    Table = "",
+                    Object = "󰅩",
+                    Tag = "",
+                    Array = "[]",
+                    Boolean = "",
+                    Number = "",
+                    Null = "󰟢",
+                    String = "󰉿",
+                    Calendar = "",
+                    Watch = "󰥔",
+                    Package = "",
+                    Copilot = "",
+                    Codeium = "",
+                    TabNine = "",
+                  }
+                  local icon = icons[item.kind] or ""
+                  item.kind = string.format("%s %s", icon, item.kind or "")
+                  return item
+                end
+              '';
+          };
+
+          # DONE Use `plugins.cmp.settings.snippet.expand` option.
+          #snippet = {expand = "luasnip";};
+          snippet.expand = "function(args) require('luasnip').lsp_expand(args.body) end";
+
+          window = {
+            completion = {
+              winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
+              scrollbar = false;
+              side_padding = 0;
+              border = [ "╭" "─" "╮" "│" "╯" "─" "╰" "│" ];
+            };
+
+            documentation = {
+              border = [ "╭" "─" "╮" "│" "╯" "─" "╰" "│" ];
+              winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
+            };
+          };
+
+          mapping = {
+            "<C-n>" = "cmp.mapping.select_next_item()";
+            "<C-p>" = "cmp.mapping.select_prev_item()";
+            "<C-j>" = "cmp.mapping.select_next_item()";
+            "<C-k>" = "cmp.mapping.select_prev_item()";
+            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+            "<C-f>" = "cmp.mapping.scroll_docs(4)";
+            "<C-Space>" = "cmp.mapping.complete()";
+            "<C-e>" = "cmp.mapping.close()";
+            "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })";
+            # as in: https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
+            "<Tab>" = ''
+                            	    cmp.mapping(function(fallback)
+              			  if cmp.visible() then
+              			    cmp.select_next_item()
+              			  elseif require("luasnip").expand_or_jumpable() then
+              			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
+              			  else
+              			    fallback()
+              			  end
+              			end, {'i', 's'})
+                            		  '';
+            "<S-Tab>" = ''
+                            	    cmp.mapping(function(fallback)
+              			  if cmp.visible() then
+              			    cmp.select_prev_item()
+              			  elseif require("luasnip").jumpable(-1) then
+              			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
+              			  else
+              			    fallback()
+              			  end
+              			end, {'i', 's'})
+                            		  '';
+          };
+        };
+      };
+    };
+    enableMan = false;
+  };
+in
 {
 
   ###### interface
 
   options = {
-
     custom.programs.neovim = {
 
       enable = mkEnableOption "neovim config";
+
+      lightWeight =
+        mkEnableOption "light weight config for low performance hosts" // { default = true; };
+
+      #lightweight = mkEnableOption "light weight config for low performance hosts";
+      minimalPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of minimal neovim.
+        '';
+      };
 
       finalPackage = mkOption {
         type = types.nullOr types.package;
@@ -205,20 +382,43 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (mkMerge [
+    {
+      custom.programs.neovim.minimalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim {
+        enableMan = false;
+        colorschemes.gruvbox.enable = true;
+      };
 
-    custom.programs.neovim = { inherit (config.programs.neovim) finalPackage; };
+      home.packages = let inherit (config.custom.programs.neovim) minimalPackage; in [
+        (pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+          mkdir -p $out/bin
+          makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
+        '')
+      ];
+    }
 
-    home.sessionVariables.EDITOR = "nvim";
+    (mkIf (!cfg.lightWeight) {
+      # inputs.nixvim.legacyPackages."${system}".makeNixvim configuration;
+      custom.programs.neovim.finalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim configuration;
 
-    programs.neovim = {
-      inherit extraConfig plugins;
+      home.packages = let inherit (config.custom.programs.neovim) finalPackage; in [
+        finalPackage
+      ];
 
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-    };
-
-  };
-
+      # see https://discourse.nixos.org/t/conflicts-between-treesitter-withallgrammars-and-builtin-neovim-parsers-lua-c/33536/3
+      # FIXME https://github.com/nix-community/nixvim/blob/4f6e90212c7ec56d7c03611fb86befa313e7f61f/plugins/languages/treesitter/treesitter.nix#L12
+      /*      xdg.configFile."nvim/parser".source = "${pkgs.symlinkJoin {
+              	      name = "treesitter-parsers";
+              	      paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
+              			    nix
+              			    bash
+              			    yaml
+              			    json
+              			    lua
+              			    latex
+              			    comment
+              	      ])).dependencies;
+            	    }}/parser"; */
+    })
+  ]);
 }

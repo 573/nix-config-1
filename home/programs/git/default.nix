@@ -111,13 +111,16 @@ in
           [ pkgs.coreutils pkgs.git ]
           { }
       )
+      pkgs.lefthook
     ];
+
+    custom.programs.shell.initExtra = "source ${pkgs.git-issue}/gi-completion.sh";
 
     programs.git = {
       enable = true;
 
-      userName = "Tobias Happ";
-      userEmail = "tobias.happ@gmx.de";
+      userName = "Daniel Kahlenberg";
+      userEmail = "573@users.noreply.github.com";
 
       ignores = ignoreList;
 
@@ -127,6 +130,7 @@ in
         bc = "switch --create";
         bd = "branch --verbose --delete";
         bdd = "branch --verbose -D";
+        bug = externGitAlias "${pkgs.git-bug}/bin/git-bug";
         ca = "commit -q --branch --status --verbose --amend";
         cl = externGitAlias "git clone --recursive --progress";
         cm = "commit --branch --status --verbose";
@@ -138,6 +142,8 @@ in
         dsi = "diff --staged --ignore-all-space";
         fe = "fetch --progress";
         fm = externGitAlias "git fe --all && git fe --all --tags";
+        is = externGitAlias "${pkgs.git-issue}/git-issue.sh";
+        issue = "is";
         lg = "log --stat";
         lp = "log -10 --patch-with-stat";
         ma = "merge --abort";
@@ -171,6 +177,7 @@ in
 
         mma = "merge origin/master";
         rde = "rebase origin/develop";
+        res = externGitAlias "git fetch origin && git reset origin/$(git name-rev --name-only HEAD) --hard";
         rma = "rebase origin/master";
         rup = "rebase upstream/master";
         sde = externGitAlias "git switch develop && git rebase origin/develop";
@@ -239,7 +246,7 @@ in
         core = {
           compression = 9;
           eol = "lf";
-          editor = "${config.custom.programs.neovim.finalPackage}/bin/nvim";
+          editor = "nvim"; # "${config.custom.programs.neovim.finalPackage}/bin/nvim";
           hooksPath = toString hooksPath;
           loosecompression = 9;
           pager = "${pkgs.less}/bin/less -x1,5"; # set tab width to 4 starting at offset of 1 to cope with diff format
@@ -267,7 +274,7 @@ in
         difftool = {
           prompt = true;
 
-          nvim.cmd = "${config.custom.programs.neovim.finalPackage}/bin/nvim -d \"$LOCAL\" \"$REMOTE\"";
+          nvim.cmd = "nvim -R -d \"$LOCAL\" \"$REMOTE\""; # "${config.custom.programs.neovim.finalPackage}/bin/nvim -R -d \"$LOCAL\" \"$REMOTE\"";
         };
 
         fetch = {
@@ -301,7 +308,7 @@ in
           prompt = true;
           writeToTemp = true;
 
-          nvim.cmd = "${config.custom.programs.neovim.finalPackage}/bin/nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'";
+          nvim.cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"; # "${config.custom.programs.neovim.finalPackage}/bin/nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'";
         };
 
         pack.compression = 9;
@@ -386,6 +393,14 @@ in
         }
       ];
     };
+
+    xdg.enable = true;
+    # just run this in a repo with separated git dir:
+    # git config --local core.hooksPath ~/.config/git/hooks
+    xdg.configFile."git/hooks/pre-push".source = pkgs.writeScript "pre-push" ''
+echo >&2 ".git directory separated to keep private, not pushing"
+exit 1
+    '';
 
   };
 

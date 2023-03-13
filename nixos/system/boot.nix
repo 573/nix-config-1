@@ -2,6 +2,7 @@
 
 let
   inherit (lib)
+    mkEnableOption
     mkIf
     mkMerge
     mkOption
@@ -18,6 +19,9 @@ in
   options = {
 
     custom.system.boot = {
+
+      enable = mkEnableOption "Boot mode and device config" // { default = true; };
+
       mode = mkOption {
         type = types.enum [ "efi" "grub" "raspberry" ];
         description = ''
@@ -39,7 +43,7 @@ in
 
   ###### implementation
 
-  config = mkMerge [
+  config = mkIf cfg.enable (mkMerge [
     {
       assertions = [
         {
@@ -91,6 +95,6 @@ in
       }
     )
 
-  ];
-
+  ]
+  );
 }

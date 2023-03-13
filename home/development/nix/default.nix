@@ -64,20 +64,20 @@ in
         (buildWithDiff
           "hm-build"
           "home-manager build --flake '${nixConfigDir}'"
-          "/nix/var/nix/profiles/per-user/${config.home.username}/home-manager"
+          "/home/${config.home.username}/.local/state/nix/profiles/home-manager"
         )
       ];
     })
 
     (mkIf cfg.nix-on-droid.enable {
       custom.programs.shell.shellAliases = {
-        nod-switch = "nix-on-droid switch --flake '${nixConfigDir}#oneplus5'";
+        nod-switch = "nix-on-droid switch --flake '${nixConfigDir}#sams9'";
       };
 
       home.packages = [
         (buildWithDiff
           "nod-build"
-          "nix-on-droid build --flake '${nixConfigDir}#oneplus5'"
+          "nix-on-droid build --flake '${nixConfigDir}#sams9'"
           "/nix/var/nix/profiles/nix-on-droid"
         )
       ];
@@ -88,7 +88,7 @@ in
         (config.lib.custom.mkScript
           "n-rebuild"
           ./n-rebuild.sh
-          [ pkgs.ccze ]
+          [ /*pkgs.ccze*/ ] # FIXME madhouse/ccze repo now private on github, remove dep ?
           {
             inherit nixConfigDir;
             buildCmd = "${buildWithDiff
@@ -98,12 +98,6 @@ in
             }/bin/n-rebuild-build";
             _doNotClearPath = true;
           }
-        )
-
-        (config.lib.custom.mkZshCompletion
-          "n-rebuild"
-          ./n-rebuild-completion.zsh
-          { }
         )
       ];
     })

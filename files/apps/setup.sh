@@ -13,7 +13,7 @@ _clone() {
     local directory="${3}"
 
     if [[ -d "${directory}" ]]; then
-        _log "Not cloning ${name} because ${directory} already exists!"
+        _log "Not cloning ${name} because ${directory} already exists! To install newer revsision remove ${directory} first!"
         return
     fi
 
@@ -26,66 +26,13 @@ if _is_root; then
     exit 1
 fi
 
-# generate ssh key and show
-echo
-ssh-keygen -f ~/.ssh/id_rsa -N "" -q || true
-_log "Copy link to ssh key or ssh key itself, add in github and gitea:"
-echo
-cat "${HOME}/.ssh/id_rsa.pub"
-echo
-curl --silent --form "file=@${HOME}/.ssh/id_rsa.pub" https://file.io | jq --raw-output .link
-echo
-
 # pause script
 read -sr -n 1 -p "$(echo -e "${PURPLE}Press any key to continue...${RESET}")"
 echo
 
 
 # clone repos
-_clone "nix-config" git@github.com:Gerschtli/nix-config.git "${nix_config}"
-
-if _read_boolean "Install atom-config repo?"; then
-    if [[ -e "${HOME}/.atom" ]]; then
-        mv -v "${HOME}/.atom" "${HOME}/.atom.bak"
-    fi
-
-    _clone "atom-config" git@github.com:Gerschtli/atom-config.git "${HOME}/.atom"
-fi
-
-if _read_boolean "Install gnupg-setup repo?"; then
-    _clone "gnupg repo" gitea@git.tobias-happ.de:Gerschtli/gnupg-setup.git "${HOME}/.gnupg-setup"
-
-    if _read_boolean "Install password-store?"; then
-        _clone "password store" gitea@git.tobias-happ.de:Gerschtli/pass.git "${HOME}/.password-store"
-    fi
-fi
-
-if _read_boolean "Install files?"; then
-    _clone "files" git@github.com:Gerschtli/files.git "${HOME}/.files"
-fi
-
-_clone "age-bak" gitea@git.tobias-happ.de:Gerschtli/age-bak.git "${HOME}/.age-bak"
-
-_log "Change permissions of ~/.age-bak..."
-chmod -v 0700 "${HOME}/.age-bak"
-
-if [[ ! -e "${HOME}/.age" ]]; then
-    _log "Link ~/.age to ~/.age-bak..."
-    ln -snv .age-bak "${HOME}/.age"
-fi
-
-if _is_nixos && _read_boolean "Set up age keys for root?"; then
-    _log "Copy ~/.age-bak/key.txt to /root..."
-    sudo mkdir -vp "/root/.age-bak"
-    sudo chmod -v 0700 "/root/.age-bak"
-    sudo cp -v "${HOME}/.age-bak/key.txt" "/root/.age-bak/key.txt"
-    sudo chown root:root "/root/.age-bak/key.txt"
-
-    if ! sudo test -e "/root/.age"; then
-        _log "Link /root/.age to /root/.age-bak..."
-        sudo ln -snv .age-bak "/root/.age"
-    fi
-fi
+_clone "nix-config" https://github.com/573/nix-config-1.git "${nix_config}"
 
 # preparation for non nixos systems
 if nix-env -q --json | jq ".[].pname" | grep '"nix"' > /dev/null; then
@@ -93,36 +40,47 @@ if nix-env -q --json | jq ".[].pname" | grep '"nix"' > /dev/null; then
     nix-env --set-flag priority 1000 nix
 fi
 
-
 # installation
+# TODO putting --accept-flake-config in nixos-rebuild here let's the command silently fail, track this in an issue
 if _is_nixos; then
-    hostname=$(_read_enum "Enter hostname" argon krypton neon xenon)
+    hostname=DANIELKNB1 #$(_read_enum "Enter hostname" DANIELKNB1)
 
-    _log "Run sudo nixos-rebuild switch..."
+    _log "Run sudo nixos-rebuild ..."
     sudo nixos-rebuild \
-      switch \
-      --option extra-substituters "https://gerschtli.cachix.org" \
-      --option extra-trusted-public-keys "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0=" \
-      --keep-going \
-      --flake "${nix_config}#${hostname}" || :
+	boot \
+	--show-trace --verbose \
+	--flake "${nix_config}#${hostname}" || :
 
-    _log "Don't forget to set passwd for tobias and root!"
-    _log "It may be required to set up an age key for root:"
-    _log "  age-keygen -o ~/.age/key.txt"
+    _log "Don't forget to set passwd for ${USER} and root!"
+    _log "In case you need to userdel the nixos user, '\$ wsl -d NixOS -u root' and see https://gist.github.com/573/131629a55c0ef91305532c6f977934e6."
 elif [[ "${USER}" == "nix-on-droid" ]]; then
-    _log "Run nix-on-droid switch..."
-    nix-on-droid switch \
-      --option extra-substituters "https://gerschtli.cachix.org" \
-      --option extra-trusted-public-keys "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0=" \
-      --option extra-substituters "https://nix-on-droid.cachix.org" \
-      --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
-      --flake "${nix_config}#oneplus5"
+    _log "Run nix-on-droid ..."
+#    nix-on-droid build \
+#        --option print-build-logs true \
+#        --option extra-substituters "https://573-bc.cachix.org/" \
+#	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
+#        --option extra-substituters "https://nix-on-droid.cachix.org/" \
+#        --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
+#	--flake "${nix_config}#sams9"
+    nix build \
+        --option extra-substituters "https://573-bc.cachix.org/" \
+	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
+        --option extra-substituters "https://nix-on-droid.cachix.org/" \
+        --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
+        --option extra-substituters "https://nix-community.cachix.org/" \
+        --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" \
+	--option extra-substituters "https://nixvim.cachix.org/" \
+	--option extra-trusted-public-keys "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA=" \
+	--option extra-substituters "https://yazi.cachix.org" \
+	--option extra-trusted-public-keys "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" \
+	"${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
 else
     _log "Build home-manager activationPackage..."
     nix build \
-      --option extra-substituters "https://gerschtli.cachix.org" \
-      --option extra-trusted-public-keys "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0=" \
-      "${nix_config}#homeConfigurations.${USER}@$(hostname).activationPackage"
+        --option extra-substituters "https://573-bc.cachix.org/" \
+	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
+	"${nix_config}#homeConfigurations.${USER}@$(hostname).activationPackage"
+	
 
     _log "Run activate script..."
     HOME_MANAGER_BACKUP_EXT=hm-bak ./result/activate
@@ -133,7 +91,7 @@ fi
 
 # clean up
 if nix-env -q --json | jq ".[].pname" | grep '"nix"' > /dev/null; then
-    _log "Uninstall manual installed nix package..."
+    _log "Uninstall manually installed nix package..."
     nix-env --uninstall nix
 fi
 
