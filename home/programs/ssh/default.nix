@@ -40,7 +40,7 @@ in
       };
 
       modules = mkOption {
-        type = types.listOf (types.enum [ "private" "sedo" "vcs" ]);
+        type = types.listOf (types.enum [ "private" "vcs" ]);
         default = [ ];
         description = "SSH modules to enable.";
       };
@@ -55,7 +55,7 @@ in
   config = mkIf cfg.enable {
 
     custom = {
-      misc.homeage.secrets = map (value: "ssh-${value}") cfg.modules;
+      #misc.homeage.secrets = map (value: "ssh-${value}") cfg.modules;
 
       programs.shell = {
         initExtra = ''
@@ -63,7 +63,7 @@ in
             if [[ -z "$1" ]]; then
               echo "Enter path  as argument!"
             else
-              ssh-keygen -t rsa -b 4096 -f "$1"
+              ssh-keygen -t ed25519 -f "$1"
             fi
           }
 
@@ -93,15 +93,11 @@ in
 
     home.packages = [
       pkgs.openssh
-
-      (config.lib.custom.mkZshCompletion
-        "kadd"
-        ./kadd-completion.zsh
-        { inherit keysDirectory; }
-      )
     ];
 
     programs = {
+      # https://sourcegraph.com/search?q=context:global+file:%5E*.nix%24+content:programs.keychain.&patternType=standard&sm=1&groupBy=repo
+      # https://www.google.com/search?q=+id_ed25519+keychain
       keychain = {
         enable = true;
         agents = [ "ssh" ];

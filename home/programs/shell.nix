@@ -23,8 +23,7 @@ let
         example = "available cargo";
         description = ''
           Condition to be matched before the provided aliases and config are set.
-          The value has to be a bash/zsh expression to be placed into an
-          <code>if</code>.
+          The value has to be a bash/zsh expression to be placed into an `if`.
         '';
       };
 
@@ -32,7 +31,7 @@ let
         default = "";
         type = types.lines;
         description = ''
-          Extra commands that should be run when <varname>condition</varname> is
+          Extra commands that should be run when `condition` is
           met. Commands need to be idempotent as they are potentially executed
           mulitple times.
         '';
@@ -93,16 +92,20 @@ let
   '';
 
   shellAliases = {
-    ls = "ls --color=auto";
+    #ls = "ls --color=auto";
     la = "ls -AFv";
     l1 = "ls -AFh1v";
     ll = "ls -AFhlv";
     llr = "ll /nix/var/nix/gcroots/auto --color=always | grep result";
 
-    cp = "cp -av";
-    mv = "mv -v";
-    rm = "rm -v";
-    ln = "ln -v";
+    cp = "cp -iav";
+    mv = "mv -iv";
+    rm = "rm -iv";
+    ln = "ln -iv";
+
+    cat = "${pkgs.bat}/bin/bat --color=always --style=plain";
+
+    ytmp3 = ''${pkgs.yt-dlp}/bin/yt-dlp -x --continue --add-metadata --embed-thumbnail --audio-format mp3 --audio-quality 0 --metadata-from-title="%(artist)s - %(title)s" --prefer-ffmpeg -o "%(title)s.%(ext)s"'';
 
     grep = "grep --color=auto";
     fgrep = "fgrep --color=auto";
@@ -116,6 +119,8 @@ let
     "....." = "cd ../../../..";
     "......" = "cd ../../../../..";
 
+    fcd = "cd $(${pkgs.fd}/bin/fd --type d | ${pkgs.skim}/bin/sk)";
+
     e = "nvim";
 
     bc = "bc -l";
@@ -124,6 +129,8 @@ let
     du = "du --human-readable --one-file-system --time --time-style=+'%Y-%m-%d' --total";
 
     rg = "rg --ignore-case --sort=path";
+
+    ls = "${pkgs.eza}/bin/eza -alh --icons --git --group-directories-first";
 
     open = "xdg-open";
 
@@ -135,6 +142,14 @@ let
     tree = "tree -F --dirsfirst";
     treea = "tree -a";
     treei = "treea -I '.git|.idea'";
+
+    ghlimits = "${pkgs.coreutils}/bin/date --date @`${pkgs.curl.bin}/bin/curl -s -i https://api.github.com/users/573 | ${pkgs.gnugrep}/bin/grep x-ratelimit-reset | ${pkgs.gawk}/bin/awk '{print $2}'`";
+    dateviaepoch = "date --date @$(echo $EPOCHSECONDS)";
+    nvimscaffold = "echo import os | nvim +\":set autochdir\" - +'file main.py' # https://neovim.io/doc/user/starting.html";
+
+    nvi = "nvim -u NONE -i NONE";
+
+    nix-stray-roots = "nix-store --gc --print-roots | egrep -v '^(/nix/var|/run/\w+-system|\{memory|\{censored|/proc/maps/)'";
   }
   // cfg.shellAliases
   // (optionalAttrs (dynamicShellInit != "") {
@@ -232,8 +247,6 @@ in
         description = ''
           Specify dynamic shell init which has to be reloaded after environment change.
 
-          </para><para>
-
           Note: This only adds config and is not intended to cleanup after context switch
           when to defined conditions are no more true.
         '';
@@ -253,11 +266,6 @@ in
         inherit logoutExtra shellAliases;
         profileExtra = mkMerge [ profileExtra cfg.envExtra ];
         initExtra = mkMerge [ initExtra cfg.loginExtra ];
-      };
-
-      zsh = {
-        inherit (cfg) envExtra loginExtra;
-        inherit initExtra logoutExtra profileExtra shellAliases;
       };
     };
 

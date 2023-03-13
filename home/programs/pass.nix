@@ -8,14 +8,8 @@ let
 
   cfg = config.custom.programs.pass;
 
-  # see dmenucmd in dwm config
-  dmenuCmd = ''dmenu -fn "Ubuntu Mono Nerd Font:size=9" -nb "#222222" -nf "#bbbbbb" -sb "#540303" -sf "#eeeeee"'';
-
-  package = pkgs.pass.overrideAttrs (_old: {
-    postBuild = ''
-      sed -i -e 's@"$dmenu"@${dmenuCmd}@' contrib/dmenu/passmenu
-    '';
-  });
+  # see https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/tools/security/pass/extensions/checkup.nix
+  package = pkgs.pass.withExtensions (exts: [ exts.pass-checkup ]);
 in
 
 {

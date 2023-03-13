@@ -82,17 +82,17 @@ fi
 
 if [[ "${USER}" == "nix-on-droid" ]] && _available nix-on-droid; then
     _log "nix" "build nix-on-droid configuration"
-    nix-on-droid build --flake "${nix_config}#oneplus5"
+    nix-on-droid build --flake "${nix_config}#sams9"
     _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
 
     _log "nix" "switch nix-on-droid configuration"
-    nix-on-droid switch --flake "${nix_config}#oneplus5"
+    nix-on-droid switch --flake "${nix_config}#sams9"
 fi
 
 if ! _is_nixos && _available home-manager; then
     _log "nix" "build home-manager configuration"
     home-manager build --flake "${nix_config}"
-    _show_result_diff "/nix/var/nix/profiles/per-user/${USER}/home-manager"
+    _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
     _log "nix" "switch home-manager configuration"
     home-manager switch --flake "${nix_config}" -b hm-bak
@@ -133,10 +133,10 @@ fi
 
 if ! _has_unit_enabled "nix-gc.timer"; then
     _log "nix" "nix-collect-garbage"
-    "${sudo_for_cleanup}" nix-collect-garbage --delete-older-than 14d 2> /dev/null
+    ${sudo_for_cleanup} nix-collect-garbage --delete-older-than 14d 2> /dev/null
 fi
 
 if ! _has_unit_enabled "nix-optimise.timer" && [[ "${USER}" != "nix-on-droid" ]]; then
-    _log "nix" "nix-store --optimise"
-    "${sudo_for_cleanup}" nix-store --optimise
+    _log "nix" "nix store optimise"
+    ${sudo_for_cleanup} nix store optimise
 fi

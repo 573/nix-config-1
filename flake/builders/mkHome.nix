@@ -12,6 +12,8 @@ inputs.home-manager.lib.homeManagerConfiguration {
   pkgs = pkgsFor.${system};
   extraSpecialArgs = { inherit inputs rootPath; };
 
-  modules = [ "${rootPath}/hosts/${hostname}/home-${username}.nix" ]
-    ++ homeModulesFor.${system};
+  modules = [
+    "${rootPath}/hosts/${hostname}/home-${username}.nix"
+  ]
+  ++ homeModulesFor.${system};
 }

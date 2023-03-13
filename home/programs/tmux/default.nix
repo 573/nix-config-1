@@ -182,7 +182,7 @@ in
     home = {
       file.".urlview" = mkIf cfg.urlview {
         text = ''
-          COMMAND ${pkgs.google-chrome}/bin/google-chrome-stable %s > /dev/null 2>&1
+          COMMAND ${pkgs.w3m-nox}/bin/w3m %s > /dev/null 2>&1
         '';
       };
 

@@ -35,12 +35,14 @@ in
 
   config = mkIf cfg.enable {
 
-    custom.misc.homeage.secrets = [ "cachix-agent-token-${cfg.hostName}" ];
+    # FIXME w/o homeage: https://sourcegraph.com/github.com/nix-community/home-manager@release-23.05/-/blob/modules/services/cachix-agent.nix
+    #custom.misc.homeage.secrets = [ "cachix-agent-token-${cfg.hostName}" ];
 
     services.cachix-agent = {
       enable = true;
       name = cfg.hostName;
-      credentialsFile = config.homeage.file."cachix-agent-token-${cfg.hostName}".path;
+      # FIXME w/o homeage
+      #credentialsFile = config.homeage.file."cachix-agent-token-${cfg.hostName}".path;
     };
 
   };
