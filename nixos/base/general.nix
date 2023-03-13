@@ -6,6 +6,7 @@ let
     mkEnableOption
     mkForce
     mkIf
+    mkMerge
     mkOption
     types
     ;
@@ -17,18 +18,26 @@ in
 
 {
 
-  imports = [ inputs.home-manager.nixosModules.home-manager ];
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+    # Is in 23.05
+    #    "${inputs.latest}/nixos/modules/services/web-apps/photoprism.nix"
+
+    # FIXME Can this be guarded somehow as well ?
+    inputs.nixos-wsl.nixosModules.wsl
+  ];
 
 
   ###### interface
 
   options = {
-
     custom.base.general = {
       enable = mkEnableOption "basic config" // { default = true; };
 
+      wsl = mkEnableOption "nixos-wsl specific config";
+
       hostname = mkOption {
-        type = types.enum [ "argon" "krypton" "neon" "xenon" ];
+        type = types.enum [ "DANIELKNB1" ];
         description = "Host name.";
       };
     };
@@ -38,17 +47,18 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (mkMerge [
+  {
 
     boot.cleanTmpDir = true;
 
     console.keyMap = "de";
 
     custom = {
-      cachix-agent.enable = true;
-
       system.firewall.enable = true;
     };
+
+    documentation.nixos.enable = false;
 
     environment = {
       defaultPackages = [ ];
@@ -64,7 +74,7 @@ in
         useUserPackages
         ;
 
-      users = genAttrs [ "root" "tobias" ] (commonConfig.homeManager.userConfig cfg.hostname);
+      users = genAttrs [ "root" "dkahlenberg" ] (commonConfig.homeManager.userConfig cfg.hostname);
     };
 
     i18n.supportedLocales = [
@@ -88,7 +98,7 @@ in
           trusted-public-keys
           ;
 
-        trusted-users = [ "root" "tobias" ];
+        trusted-users = [ "root" "dkahlenberg" ];
       };
 
       inherit (commonConfig.nix)
@@ -98,30 +108,41 @@ in
         ;
     };
 
-    programs.zsh = {
-      enable = true;
-      enableGlobalCompInit = false;
-      promptInit = "";
-    };
-
     system = {
       configurationRevision = inputs.self.rev or "dirty";
-      stateVersion = "22.11";
+      stateVersion = "23.05";
     };
 
     time.timeZone = "Europe/Berlin";
 
     users.users = {
-      root.shell = pkgs.zsh;
-
-      tobias = {
-        uid = config.custom.ids.uids.tobias;
-        extraGroups = [ "wheel" ];
+      dkahlenberg = {
+        uid = config.custom.ids.uids.dkahlenberg;
+        extraGroups = [ "wheel" "syncthing" ];
         isNormalUser = true;
-        shell = pkgs.zsh;
+      };
+    };
+  }
+
+  (mkIf (cfg.wsl) {
+    wsl = {
+      enable = true;
+      defaultUser = "dkahlenberg";
+      interop = {
+        register = true;
+        preserveArgvZero = true;
+      };
+      # FIXME disabled until https://www.catalog.update.microsoft.com/Search.aspx?q=KB5020030, https://support.microsoft.com/en-us/topic/november-15-2022-kb5020030-os-builds-19042-2311-19043-2311-19044-2311-and-19045-2311-preview-237a9048-f853-4e29-a3a2-62efdbea95e2 https://devblogs.microsoft.com/commandline/the-windows-subsystem-for-linux-in-the-microsoft-store-is-now-generally-available-on-windows-10-and-11/, native systemd needs these versions
+      nativeSystemd = true;
+      docker-native = {
+        enable = true;
       };
     };
 
-  };
+    # https://github.com/nix-community/NixOS-WSL/discussions/71
+    security.sudo.wheelNeedsPassword = true;
+  })
+
+  ]);
 
 }

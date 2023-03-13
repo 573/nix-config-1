@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, rootPath, ... }:
 
 let
   inherit (lib)
@@ -11,172 +11,93 @@ let
   cfg = config.custom.programs.neovim;
 
   extraConfig = ''
-    "" Encoding
-    set encoding=utf-8
-    set fileencoding=utf-8
-    set fileencodings=utf-8,iso-8859-1
+           if filereadable($HOME . "/.vimrc")
+              source ~/.vimrc
+           endif
+           colorscheme lunaperche
+           luafile ${rootPath}/home/misc/nvim-treesitter.lua
+           luafile ${rootPath}/home/misc/trouble-nvim.lua
+           " luafile ${rootPath}/home/misc/null-ls-nvim.lua
+           luafile ${rootPath}/home/misc/nvim-lspconfig.lua
+           luafile ${rootPath}/home/misc/nvim-cmp.lua
+           luafile ${rootPath}/home/misc/luasnip-snippets.lua
+           luafile ${rootPath}/home/misc/comment-nvim.lua
+           luafile ${rootPath}/home/misc/indent-blankline.lua
+           luafile ${rootPath}/home/misc/markid.lua
+           luafile ${rootPath}/home/misc/nvim-treesitter-context.lua
+           luafile ${rootPath}/home/misc/nvim-osc52.lua
+           luafile ${rootPath}/home/misc/telescope-nvim.lua
+           luafile ${rootPath}/home/misc/duck-nvim.lua
+           luafile ${rootPath}/home/misc/nvim-dap.lua
+           luafile ${rootPath}/home/misc/nvim-dap-ui.lua
+    lua require("nvim-tree").setup()
+    lua require("which-key").setup()
+    lua require("lualine").setup()
+           luafile ${rootPath}/home/misc/nvim-wsl-clipboard.lua
 
-
-    "" Tabs. May be overriten by autocmd rules
-    set tabstop=4
-    set ts=4
-    set softtabstop=0
-    set shiftwidth=4
-    set expandtab
-    set autoindent
-    set smartindent
-
-
-    "" Enable filetype detection:
-    filetype on
-    filetype plugin on
-    filetype indent on
-
-    autocmd Filetype make set noexpandtab
-    autocmd Filetype c set expandtab
-    autocmd Filetype cpp set expandtab
-    autocmd Filetype tex set tabstop=2 shiftwidth=2 textwidth=119
-
-    let g:tex_flavor = 'latex'
-
-
-    "" Remove trailing whitespaces on save
-    autocmd BufWritePre * %s/\s\+$//e
-
-
-    "" Set tab size to 4 in gitcommit
-    autocmd FileType gitcommit setl ts=4
-
-
-    "" Directories for swp files
-    set nobackup
-    set noswapfile
-    set nowb
-
-
-    "" Automatically update a file if it is changed externally
-    set autoread
-
-
-    "" Visual settings
-    syntax on
-    let g:enable_bold_font = 1
-    set background=dark
-    colorscheme hybrid_material
-    set ruler
-    set number
-    set cursorline
-    set cursorcolumn
-    set colorcolumn=121
-
-    "" Enable modelines
-    set modeline
-    set modelines=5
-
-
-    "" Airline
-    set laststatus=2
-
-    let g:airline_powerline_fonts = 1
-    let g:airline_theme='hybrid'
-
-    if !exists('g:airline_symbols')
-        let g:airline_symbols = {}
-    endif
-
-    " unicode symbols
-    let g:airline_left_sep = '»'
-    let g:airline_left_sep = '▶'
-    let g:airline_right_sep = '«'
-    let g:airline_right_sep = '◀'
-    let g:airline_symbols.linenr = '␊'
-    let g:airline_symbols.linenr = '␤'
-    let g:airline_symbols.linenr = '¶'
-    let g:airline_symbols.branch = '⎇'
-    let g:airline_symbols.paste = 'ρ'
-    let g:airline_symbols.paste = 'Þ'
-    let g:airline_symbols.paste = '∥'
-    let g:airline_symbols.whitespace = 'Ξ'
-
-    " airline symbols
-    let g:airline_left_sep = ''
-    let g:airline_left_alt_sep = ''
-    let g:airline_right_sep = ''
-    let g:airline_right_alt_sep = ''
-    let g:airline_symbols.branch = ''
-    let g:airline_symbols.readonly = ''
-    let g:airline_symbols.linenr = ''
-
-
-    "" Mappings
-    let mapleader=","
-
-    " turn off search highlight with ,-<space>
-    nnoremap <leader><space> :nohlsearch<CR>
-
-    :map <leader>iso :w ++enc=iso-8859-1<C-M>
-
-
-    "" Buffers
-
-    " Enable the list of buffers
-    let g:airline#extensions#tabline#enabled = 1
-
-    " Show just the filename
-    let g:airline#extensions#tabline#fnamemod = ':t'
-
-    " This allows buffers to be hidden if you've modified a buffer.
-    " This is almost a must if you wish to use buffers in this way.
-    set hidden
-
-    " To open a new empty buffer
-    " This replaces :tabnew which I used to bind to this mapping
-    nmap <leader>w :enew<cr>
-
-    " Move to the next buffer
-    nmap <leader>n :bnext<CR>
-
-    " Move to the previous buffer
-    nmap <leader>p :bprevious<CR>
-
-    " Close the current buffer and move to the previous one
-    " This replicates the idea of closing a tab
-    nmap <leader>q :bp <BAR> bd #<CR>
-
-    " Show all open buffers and their status
-    nmap <leader>l :ls<CR>
-
-    " Disables formatting in paste mode
-    set pastetoggle=<F3>
-
-
-    "" Auto formatter
-    let g:formatdef_nixpkgs_fmt = '"${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt"'
-    let g:formatters_nix = ['nixpkgs_fmt']
-
-    let g:autoformat_autoindent = 0
-    let g:autoformat_retab = 0
-
-    noremap <F3> :Autoformat<CR>
-    "au BufWrite * :Autoformat
+           " let g:languagetool_server_command='$ { pkgs.languagetool }/bin/languagetool-http-server'
   '';
 
-  plugins = with pkgs.vimPlugins; [
-    vim-airline
-    vim-airline-themes
-    vim-hybrid-material
-
-    nerdtree
-    csv-vim
-    gitignore-vim
-    rust-vim
-    vim-autoformat
-    vim-json
-    vim-nix
-    vim-tmux
-    vim-toml
+  plugins = (with pkgs.vimPlugins; [
+    # https://gitlab.com/rycee/home-manager/blob/de3758e3/modules/programs/neovim.nix#L113
+    # null-ls-nvim
+    plenary-nvim
+    nvim-lspconfig
+    trouble-nvim
+    nvim-cmp
+    cmp-cmdline
+    cmp-buffer
+    cmp-path
+    cmp_luasnip
+    cmp-nvim-lsp
+    cmp-omni
+    cmp-emoji
+    cmp-nvim-lua
+    luasnip
+    friendly-snippets
+    lspkind-nvim
+    # LanguageTool-nvim
+    #vim-grammarous
+    comment-nvim
+    nvim-treesitter-context
+    indent-blankline-nvim
+    wildfire-vim
+    nvim-tree-lua
+    nnn-vim
+    asyncrun-vim
+    vim-table-mode
+    telescope-nvim
+    zen-mode-nvim
+    which-key-nvim
     vimtex
-  ];
+    haskell-tools-nvim
+    nvim-osc52
+    lualine-nvim
+    nix-develop-nvim
+    nvim-dap
+    nvim-dap-python
+    neoterm
+    nvim-gdb
+    nvim-dap-ui
+    nvim-treesitter-endwise
+    orgmode
+    neorg
+    pkgs.nvim-treesitter-full-latest
+    #pkgs.nvim-treesitter-selection
+  ])
+  ++ (with pkgs; [
+    markid
+    telescope-makefile
+    code-runner-nvim
+    virtual-types-nvim
+    #fsread-nvim
+    deferred-clipboard-nvim
+    statusline-action-hints-nvim
+    #murmur-lua-nvim
+    filetype-nvim
+    duck-nvim
+    #nvim-lspconfig
+  ]);
 in
 
 {

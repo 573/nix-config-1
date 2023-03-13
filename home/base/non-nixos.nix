@@ -26,12 +26,14 @@ in
 
       installNix = mkEnableOption "nix installation" // { default = true; };
 
+
       builders = mkOption {
         type = types.listOf types.string;
         default = [ ];
         description = "Nix remote builders.";
       };
     };
+
 
   };
 
@@ -43,6 +45,19 @@ in
     home = {
       packages = mkIf cfg.installNix [ config.nix.package ];
       sessionVariables.NIX_PATH = concatStringsSep ":" commonConfig.nix.nixPath;
+      sessionVariables =
+        #let
+        #  # TODO see https://github.com/Gerschtli/nix-config/commit/e96975f6c86e4f96ca919488ed1a396177b0ae2a
+        #  # -        "/nix/var/nix/profiles/per-user/${config.home.username}/home-manager"
+        #  # +        "/home/${config.home.username}/.local/state/nix/profiles/home-manager"
+        #  profiles = [ "/nix/var/nix/profiles/default" "$HOME/.nix-profile" ];
+        #  dataDirs =
+        #    lib.concatStringsSep ":" (map (profile: "${profile}/share") profiles);
+        #in
+        {
+          #XDG_DATA_DIRS = "${dataDirs}\${XDG_DATA_DIRS:+:}$XDG_DATA_DIRS";
+          #MANPAGER = "less -FirSwX";
+        };
     };
 
     nix = {
@@ -71,7 +86,6 @@ in
     '';
 
     targets.genericLinux.enable = true;
-
   };
 
 }

@@ -48,23 +48,15 @@ in
 
     custom.ids = {
       uids = mapIds {
-        backup = 500;
-        storage = 501;
-        # ip-watcher = 502;
-        teamspeak-update-notifier = 503;
-
-        tobias = 1000;
-        steini = 1001;
+        # WORKAROUND After first installation needs fix bc had uid 1000 earlier, see https://github.com/NixOS/nixpkgs/issues/12170
+        # i. e. uid 1000 gid 1000 or gid 100
+        # https://github.com/nix-community/NixOS-WSL/pull/85
+        # default user gets 1000 in modules/wsl-distro.nix
+        # see nixos/base/nixoswsl.nix, line 
+        dkahlenberg = 1000;
       };
 
-      gids = mapIds {
-        backup = 500;
-        storage = 501;
-        # ip-watcher = 502;
-        teamspeak-update-notifier = 503;
-
-        # secret-files = 600;
-      };
+      gids = mapIds { };
     };
 
   };

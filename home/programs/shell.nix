@@ -99,10 +99,10 @@ let
     ll = "ls -AFhlv";
     llr = "ll /nix/var/nix/gcroots/auto --color=always | grep result";
 
-    cp = "cp -av";
-    mv = "mv -v";
-    rm = "rm -v";
-    ln = "ln -v";
+    cp = "cp -iav";
+    mv = "mv -iv";
+    rm = "rm -iv";
+    ln = "ln -iv";
 
     grep = "grep --color=auto";
     fgrep = "fgrep --color=auto";
@@ -135,6 +135,12 @@ let
     tree = "tree -F --dirsfirst";
     treea = "tree -a";
     treei = "treea -I '.git|.idea'";
+
+    ghlimits = "curl -i https://api.github.com/users/573 | grep x-ratelimit-reset";
+    dateviaepoch = "date --date @$(echo $EPOCHSECONDS)";
+    nvimscaffold = "echo import os | nvim +\":set autochdir\" - +'file main.py' # https://neovim.io/doc/user/starting.html";
+
+    nvi = "nvim -u NONE -i NONE";
   }
   // cfg.shellAliases
   // (optionalAttrs (dynamicShellInit != "") {
@@ -253,11 +259,6 @@ in
         inherit logoutExtra shellAliases;
         profileExtra = mkMerge [ profileExtra cfg.envExtra ];
         initExtra = mkMerge [ initExtra cfg.loginExtra ];
-      };
-
-      zsh = {
-        inherit (cfg) envExtra loginExtra;
-        inherit initExtra logoutExtra profileExtra shellAliases;
       };
     };
 

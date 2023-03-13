@@ -116,8 +116,8 @@ in
     programs.git = {
       enable = true;
 
-      userName = "Tobias Happ";
-      userEmail = "tobias.happ@gmx.de";
+      userName = "Daniel Kahlenberg";
+      userEmail = "573@users.noreply.github.com";
 
       ignores = ignoreList;
 
@@ -267,7 +267,7 @@ in
         difftool = {
           prompt = true;
 
-          nvim.cmd = "${config.custom.programs.neovim.finalPackage}/bin/nvim -d \"$LOCAL\" \"$REMOTE\"";
+          nvim.cmd = "${config.custom.programs.neovim.finalPackage}/bin/nvim -R -d \"$LOCAL\" \"$REMOTE\"";
         };
 
         fetch = {

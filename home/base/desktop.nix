@@ -47,35 +47,18 @@ in
     custom = {
       development.direnv.enable = true;
 
-      programs = {
-        atom.enable = true;
-        idea-ultimate.enable = true;
-
-        pass = mkIf cfg.private {
-          enable = true;
-          browserpass = true;
-        };
-
-        ssh.modules = [ "private" ];
-        tmux.urlview = true;
-      };
+      programs = { };
     };
 
     home.packages = with pkgs; [
       chrome
-      gh
       gimp
       libreoffice
-      nomacs
       pdftk
-      postman
       qpdfview
       spotify
       sshfs
     ] ++ (optionals cfg.private [
-      audacity
-      musescore
-      thunderbird
     ]);
 
   };
