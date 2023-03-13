@@ -21,15 +21,15 @@ in
       enable = mkEnableOption "work related config";
 
       directory = mkOption {
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
         default = null;
         description = ''
-          Directory in <literal>~/projects</literal> where git projects are saved.
+          Directory in `~/projects` where git projects are saved.
         '';
       };
 
       mailAddress = mkOption {
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
         default = null;
         description = ''
           Work related mail address (used for git config).

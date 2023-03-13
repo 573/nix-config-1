@@ -24,9 +24,35 @@ in
 
   config = mkIf cfg.enable {
 
-    users.users.tobias.extraGroups = [ "docker" ];
+      virtualisation.docker = {
+        enable = true;
+        #       enableNvidia = true;
 
-    virtualisation.docker.enable = true;
+        storageDriver = "overlay2";
+        # https://github.com/NVIDIA/nvidia-docker/issues/942
+        #virtualisation.docker.enableNvidia = true;
+        # TODO Encapsulate in work.enable the case where rootless is not used
+        rootless = {
+          enable = true;
+          # for the "whole" discussion of it (rootless or not) i. e. https://discourse.nixos.org/t/docker-rootless-with-nvidia-support/37069
+          setSocketVariable = true; # false for driver exact support
+          /*	daemon.settings = {
+                                				runtimes = {
+                                      					nvidia = {
+                              			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
+                            			};
+                                				};
+            };
+                                    	    */
+        };
+      };
+
+      # https://github.com/nix-community/NixOS-WSL/blob/0fa9268bf9a903498cb567e6d4d01eb945f36f6e/tests/docker/docker-native.nix#L9
+
+    users.users.nixos.extraGroups = [ "docker" ];
+
+      # https://discourse.nixos.org/t/gpu-enabled-docker-containers-in-nixos/23870/2
+      systemd.enableUnifiedCgroupHierarchy = false;
 
   };
 

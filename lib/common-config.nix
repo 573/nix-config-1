@@ -8,7 +8,7 @@ _:
       backupFileExtension = "hm-bak";
       extraSpecialArgs = { inherit inputs rootPath; };
       sharedModules = homeModules;
-      useGlobalPkgs = true;
+      useGlobalPkgs = true; # disables options nixpkgs.*
       useUserPackages = true;
     };
 
@@ -17,22 +17,45 @@ _:
 
   nix = {
     settings = {
+      # TODO https://discourse.nixos.org/t/merged-list-contains-duplicates/38004
       substituters = [
-        "https://cache.nixos.org"
-        "https://gerschtli.cachix.org"
-        "https://nix-on-droid.cachix.org"
+        "https://573-bc.cachix.org/"
+        "https://cache.nixos.org/"
+        "https://nix-on-droid.cachix.org/"
+        "https://arm.cachix.org/"
+        "https://cachix.cachix.org/"
+        "https://coq.cachix.org/"
+        "https://devenv.cachix.org"
+        "https://gerschtli.cachix.org/"
+        "https://haskell-language-server.cachix.org/"
+        "https://nix-community.cachix.org/"
+        "https://nixpkgs-ruby.cachix.org/"
+        "https://nixvim.cachix.org/"
+        "https://yazi.cachix.org"
       ];
       trusted-public-keys = lib.mkForce [
+        "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0="
         "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
+        "arm.cachix.org-1:K3XjAeWPgWkFtSS9ge5LJSLw3xgnNqyOaG7MDecmTQ8="
+        "cachix.cachix.org-1:eWNHQldwUO7G2VkjpnjDbWwy4KQ/HNxht7H4SSoMckM="
+        "coq.cachix.org-1:5QW/wwEnD+l2jvN6QRbRRsa4hBHG3QiQQ26cxu1F5tI="
+        "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+        "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0="
+        "haskell-language-server.cachix.org-1:juFfHrwkOxqIOZShtC4YC1uT1bBcq2RSvC7OMKx0Nz8="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "nixpkgs-ruby.cachix.org-1:vrcdi50fTolOxWCZZkw0jakOnUI1T19oYJ+PRYdK4SM="
+        "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA="
+        "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
       ];
-      experimental-features = [ "nix-command" "flakes" ];
-      log-lines = 30;
-      flake-registry = null;
+      experimental-features = [ "nix-command" "flakes" "configurable-impure-env" "auto-allocate-uids" ];
+      log-lines = 35;
+      # discourse:nix-flake-update-timeout/17215/5
+      #flake-registry = null;
+      flake-registry = "${inputs.flake-registry}/flake-registry.json";
     };
 
-    package = pkgs.nixVersions.nix_2_13;
+    package = pkgs.nixVersions.nix_2_19;
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       nix-config.flake = inputs.self;

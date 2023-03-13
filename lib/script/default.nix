@@ -24,23 +24,25 @@ let
             + optionalString (envs ? _doNotClearPath && envs._doNotClearPath) ":\${PATH}";
       })
       ''
-        file=${destPath}
-        mkdir --parents "$(dirname "$file")"
+                file=${destPath}
+                mkdir --parents "$(dirname "$file")"
 
-        cat ${preamble} "${file}" > "$file"
-        substituteAllInPlace "$file"
+        #variables = { } // optionalAttrs (isLinux && isAarch64) { emacs = "emacs -nw"; };
 
-        ${pkgs.shellcheck}/bin/shellcheck \
-          --check-sourced \
-          --enable all \
-          --exclude SC2310,SC2312 \
-          --external-sources \
-          --shell bash \
-          "$file"
+                cat ${preamble} "${file}" > "$file"
+                substituteAllInPlace "$file"
 
-        ${optionalString executable ''
-          chmod +x "$file"
-        ''}
+                ${pkgs.shellcheck}/bin/shellcheck \
+                  --check-sourced \
+                  --enable all \
+                  --exclude SC2310,SC2312 \
+                  --external-sources \
+                  --shell bash \
+                  "$file"
+
+                ${optionalString executable ''
+                  chmod +x "$file"
+                ''}
       '';
 in
 

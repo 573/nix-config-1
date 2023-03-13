@@ -1,8 +1,8 @@
 { lib, pkgs }:
 
 {
-  wrapProgram = { name, desktopFileName ? name, source, path, packages ? [ ], flags ? [ ], fixGL ? false }:
-    if packages == [ ] && flags == [ ] && !fixGL
+  wrapProgram = let inherit (lib) stringLength; in { name, desktopFileName ? name, source, path, packages ? [ ], editor ? "", flags ? [ ], fixGL ? false }:
+    if packages == [ ] && flags == [ ] && !fixGL && stringLength editor == 0
     then source
     else
       pkgs.symlinkJoin {
@@ -17,6 +17,7 @@
               filter
               hasPrefix
               splitString
+              stringLength
               readFile
               ;
 
@@ -30,22 +31,27 @@
             wrapProgramArgsForFixGL = concatMapStringsSep " " (line: "--run ${escapeShellArg line}") filteredLines;
           in
           ''
-            # desktop entry
-            if [[ -L "${out}/share/applications" ]]; then
-              rm "${out}/share/applications"
-              mkdir "${out}/share/applications"
-            else
-              rm "${out + desktopEntryPath}"
-            fi
+                                    # desktop entry
+                                    if [[ -L "${out}/share/applications" ]]; then
+                                      rm "${out}/share/applications"
+                                      mkdir "${out}/share/applications"
+                                    else
+                                      if [[ -f "${out + desktopEntryPath}" ]]; then
+                                        rm "${out + desktopEntryPath}"
+                        	      fi
+                                    fi
 
-            sed -e "s|Exec=${source + path}|Exec=${out + path}|" \
-              "${source + desktopEntryPath}" \
-              > "${out + desktopEntryPath}"
+                                      if [[ -f "${source + desktopEntryPath}" ]]; then
+                                    sed -e "s|Exec=${source + path}|Exec=${out + path}|" \
+                                      "${source + desktopEntryPath}" \
+                                      > "${out + desktopEntryPath}"
+                        	      fi
 
-            wrapProgram "${out + path}" \
-              ${lib.optionalString fixGL wrapProgramArgsForFixGL} \
-              ${lib.optionalString (packages != []) ''--prefix PATH : "${lib.makeBinPath packages}"''} \
-              ${lib.optionalString (flags != []) ''--add-flags "${toString flags}"''}
+                                    wrapProgram "${out + path}" \
+                                      ${lib.optionalString fixGL wrapProgramArgsForFixGL} \
+                                      ${lib.optionalString (packages != []) ''--prefix PATH : "${lib.makeBinPath packages}"''} \
+            			  ${lib.optionalString (stringLength editor != 0) ''--prefix EDITOR : "${editor}"''} \
+                                      ${lib.optionalString (flags != []) ''--add-flags "${toString flags}"''}
           '';
       };
 }

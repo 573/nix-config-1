@@ -49,6 +49,13 @@ in
         (with pkgs; [ age git gnugrep gnused nvd ])
         { _doNotClearPath = true; }
       )
+
+      (config.lib.custom.mkScript
+        "kvm_display_handler_layout"
+        ./kvm_display_handler_layout.sh
+        (with pkgs; [ xorg.xrandr ])
+        { _doNotClearPath = true; }
+      )
     ];
 
   };

@@ -1,0 +1,175 @@
+name: Build and test flake outputs (using gh caches)
+on:
+  push:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      branch:
+        description: Branch name to build on
+        default: ""
+        required: false
+        type: string
+    secrets:
+      CACHIX_ACTIVATE_TOKEN:
+      CACHIX_AUTH_TOKEN:
+        required: true
+
+jobs:
+  nix:
+    strategy:
+      fail-fast: false
+      matrix:
+        yamlbasename:
+          - ci_experimental.yml
+        os:
+          - ubuntu-latest
+        system:
+          - aarch64
+          - x86_64
+        shell:
+          - devShells.$_system.ruby
+        nix-command:
+          - flake info
+
+        include:
+          - legacy-openssl: false
+          - legacy-openssl: true
+            shell: devShells.$_system.ruby
+            command: ruby --version
+
+          - nix-command: eval .#apps.$_system.nixos-shell.program
+            system: aarch64
+
+          - nix-command: eval .#apps.$_system.setup.program
+            system: aarch64
+
+          - nix-command: eval .#apps.$_system.nixos-shell.program
+            system: x86_64
+
+          - nix-command: eval .#apps.$_system.setup.program
+            system: x86_64
+
+          - nix-command: build .#homeConfigurations."dani@maiziedemacchiato".activationPackage
+            system: x86_64
+            deploy-agent: maiziedemacchiato
+
+          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --print-build-logs --log-lines 9999
+            system: aarch64
+            deploy-agent: sams9
+
+          - nix-command: build .#nixosConfigurations.DANIELKNB1.config.system.build.toplevel
+            system: x86_64
+            deploy-agent: DANIELKNB1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Free Disk Space (Ubuntu)
+        if: contains(matrix.nix-command, 'activationPackage') || contains(matrix.nix-command, 'toplevel') || contains(matrix.nix-command, 'ruby') || contains(matrix.nix-command, 'haskellShell')
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: jlumbroso/free-disk-space@main
+        continue-on-error: true
+        with:
+          tool-cache: true
+
+      - name: Set Swap Space
+        uses: actionhippie/swap-space@master
+        with:
+          size: 20G
+
+      - name: Install qemu-user-static (aarch64)
+        if: matrix.system == 'aarch64'
+        env:
+          _system: ${{ matrix.system }}-linux
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo apt-get update --allow-releaseinfo-change
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
+      - name: Quick install
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nixbuild/nix-quick-install-action@v26
+        with:
+          nix_conf: |
+            substituters = https://cache.nixos.org/ https://nix-community.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            keep-going = true
+            show-trace = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            keep-outputs = true
+            ${{ matrix.system == 'aarch64' && 'system = aarch64-linux # enables binfmt on that machine, see https://nixos.wiki/wiki/NixOS_on_ARM#Compiling_through_binfmt_QEMU' || '' }}
+
+      - name: Restore and cache Nix store
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nix-community/cache-nix-action@v5
+        with:
+          # save a new cache every time ci file changes
+          primary-key: cache-${{ matrix.os }}-${{ hashFiles('.github/workflows/ci.yaml') }}
+          restore-prefixes-first-match: cache-${{ matrix.os }}-
+          # do purge caches
+          purge: true
+          # purge all versions of the cache
+          purge-prefixes: cache-${{ matrix.os }}-
+          # created more than 0 seconds ago relative to the start of the `Post Restore` phase
+          purge-created: 0
+          # except the version with the `primary-key`, if it exists
+          purge-primary-key: never
+          # and collect garbage in the Nix store until it reaches this size in bytes
+          gc-max-store-size: 8000000000
+
+      - name: Setup cachix
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: cachix/cachix-action@v12
+        with:
+          name: 573-bc
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: My shells
+        env:
+          _system: ${{ matrix.system }}-linux
+          NIXPKGS_ALLOW_INSECURE: ${{ matrix.legacy-openssl == true && 1 || 0 }}
+          NIXPKGS_ALLOW_BROKEN: ${{ matrix.legacy-openssl == true && 1 || 0 }}
+        uses: nicknovitski/nix-develop@v1.1.0
+        with:
+          arguments: .#${{ (matrix.shell == '') && format('formatter.{0}', env._system) || matrix.shell }} --impure
+      - run: |
+            echo "::group::Development shells command"
+            cachix use 573-bc
+            cachix use nix-on-droid
+            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'ruby')) && 'cachix watch-exec 573-bc -- \' || '' }}
+            ${{ (matrix.command == '') && 'echo "ignore this pls"' || matrix.command }}
+
+      - name: Build command
+        env:
+          _system: ${{ matrix.system }}-linux
+        timeout-minutes: 360 # Consider increasing timeout
+        run: |
+            echo "::group::Build command"
+            cachix use 573-bc
+            cachix use nix-on-droid
+            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'homeConfigurations')) && 'cachix watch-exec 573-bc -- \' || '' }}
+            nix ${{ (matrix.nix-command == '') && 'flake info' || matrix.nix-command }}
+
+      - name: Deploy cachix-agent spec
+        if: github.ref == 'refs/heads/wsl2' && matrix.deploy-agent
+        env:
+          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
+          TEST: ${{ matrix.system == 'aarch64' && '--impure' || '' }}
+        run: |
+            echo "::group::Build spec"
+            spec="$(nix build --print-out-paths ".#cachix-deploy-spec-${{ matrix.deploy-agent }}" ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'develop')) && '--impure' || '' }})"
+
+            echo "::group::Upload spec"
+            cachix push 573-bc "$spec"
+
+# vim: set sw=2:

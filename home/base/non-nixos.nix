@@ -3,7 +3,6 @@
 let
   inherit (lib)
     concatStringsSep
-    mkAfter
     mkEnableOption
     mkIf
     mkOption
@@ -27,11 +26,12 @@ in
       installNix = mkEnableOption "nix installation" // { default = true; };
 
       builders = mkOption {
-        type = types.listOf types.string;
+        type = types.listOf types.str;
         default = [ ];
         description = "Nix remote builders.";
       };
     };
+
 
   };
 
@@ -66,12 +66,7 @@ in
         ;
     };
 
-    programs.zsh.envExtra = mkAfter ''
-      hash -f
-    '';
 
     targets.genericLinux.enable = true;
-
   };
-
 }

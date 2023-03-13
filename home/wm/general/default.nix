@@ -54,7 +54,7 @@ in
   config = mkIf cfg.enable {
 
     custom = {
-      programs.alacritty.enable = true;
+      #programs.alacritty.enable = true;
 
       wm.general = { inherit lockScreenPackage; };
     };
