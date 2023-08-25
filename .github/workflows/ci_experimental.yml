@@ -20,18 +20,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        system:
-          - aarch64
-          - x86_64
-        nix-command:
-          - eval .#apps.$_system.nixos-shell.program
-          - eval .#apps.$_system.setup.program
-          - develop .#rust --impure
+        # system:
+          # - aarch64
+          # - x86_64
+        # nix-command: []
+          # - eval .#apps.$_system.nixos-shell.program
+          # - eval .#apps.$_system.setup.program
+          # - develop .#rust --impure
 
         include:
-          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --print-build-logs --log-lines 9999 --accept-flake-config
-            system: aarch64
-            deploy-agent: sams9
+          # - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --print-build-logs --log-lines 9999 --accept-flake-config
+          #   system: aarch64
+          #   deploy-agent: sams9
 
           - nix-command: build .#nixosConfigurations.DANIELKNB1.config.system.build.toplevel --accept-flake-config
             system: x86_64
@@ -104,15 +104,15 @@ jobs:
             echo "::group::Build command"
             nix ${{ matrix.nix-command }}
 
-      - name: Deploy cachix-agent spec (x86_64)
-        if: matrix.system == 'x86_64' && github.ref == 'refs/heads/wsl2' && matrix.deploy-agent
-        env:
-          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
-        run: |
-          echo "::group::Build spec"
-          spec="$(nix build --print-out-paths ".#cachix-deploy-spec-${{ matrix.deploy-agent }}")"
+      # - name: Deploy cachix-agent spec (x86_64)
+      #   if: matrix.system == 'x86_64' && github.ref == 'refs/heads/wsl2' && matrix.deploy-agent
+      #   env:
+      #     CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
+      #   run: |
+      #     echo "::group::Build spec"
+      #     spec="$(nix build --print-out-paths ".#cachix-deploy-spec-${{ matrix.deploy-agent }}")"
 
-          echo "::group::Upload spec"
-          cachix push 573-bc "$spec"
+      #     echo "::group::Upload spec"
+      #     cachix push 573-bc "$spec"
 
 # vim: set sw=2:
