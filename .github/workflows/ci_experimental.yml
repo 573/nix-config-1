@@ -78,9 +78,8 @@ jobs:
           # output debug info
           debug: true
           # save a new cache every time ci file changes
-          key: cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci.yaml') }}
+          key: cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci_experimental.yml') }}
           restore-keys: |
-            cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci.yaml') }}-
             cache-ubuntu-latest-
 
       # Uncomment to debug this job
