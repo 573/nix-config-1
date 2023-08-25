@@ -68,9 +68,9 @@ jobs:
         uses: nix-community/cache-nix-action@v2
         with:
           gc-enabled-linux: true
-          gc-max-store-size-linux: 8000000000
+          gc-max-store-size-linux: 13000000000
           gc-enabled-macos: true
-          gc-max-store-size-macos: 8000000000
+          gc-max-store-size-macos: 13000000000
           purge-enabled: true
           purge-max-age: 86400
           purge-by-created-time: true
