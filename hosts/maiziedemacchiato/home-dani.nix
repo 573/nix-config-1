@@ -1,5 +1,8 @@
 { config, lib, pkgs, inputs, rootPath, ... }:
-
+let
+  inherit (lib)
+    mkDefault;
+in
 {
   custom = {
     base = {
@@ -164,7 +167,7 @@
     sessionVariables = {
       # see: https://github.com/NixOS/nixpkgs/issues/38991#issuecomment-400657551
       LOCALE_ARCHIVE_2_11 = "/usr/bin/locale/locale-archive";
-      LOCALE_ARCHIVE_2_27 = "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
+      LOCALE_ARCHIVE_2_27 = mkDefault "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
     };
   };
 
