@@ -111,6 +111,8 @@ in
         (set-default 'org-startup-truncated nil)
         ;; TODO [F12 is impractial] Add F12 to toggle line wrap
         ;;(global-set-key (kbd "<f12>") 'toggle-truncate-lines)
+
+        (add-hook 'before-save-hook nil)
       '';
 
       extraPackages = epkgs: with epkgs;

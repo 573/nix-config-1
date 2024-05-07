@@ -141,7 +141,7 @@ let
     '';
     plugins = {
       nvim-osc52.enable = true;
-      treesitter-context.enable = true;
+      #treesitter-context.enable = true;
       rainbow-delimiters.enable = true;
       which-key.enable = true;
       conjure.enable = true;
