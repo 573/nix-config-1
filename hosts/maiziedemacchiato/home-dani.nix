@@ -24,6 +24,8 @@ in
       '';
 
       hledger.enable = true;
+
+      audio.enable = true;
     };
   };
 

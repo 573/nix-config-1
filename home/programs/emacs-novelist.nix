@@ -95,6 +95,7 @@ let
         :init
 
         (load-theme 'moe-light t))
+        (add-hook 'before-save-hook nil)
     '';
     preferLocalBuild = true;
     allowSubstitutes = false;

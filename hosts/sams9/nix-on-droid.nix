@@ -65,6 +65,7 @@ in
         echo "Starting sshd in non-daemonized way on port 8022"
         ${openssh}/bin/sshd -f "${sshdDirectory}/sshd_config" -D
       '')
+      kalker
     ];
   };
 
