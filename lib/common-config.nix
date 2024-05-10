@@ -56,6 +56,8 @@ _:
     };
 
     package = pkgs.nixVersions.nix_2_19;
+    # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
+    # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       nix-config.flake = inputs.self;
