@@ -188,7 +188,8 @@
     nixos-wsl = {
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
-      url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
+      #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
+      url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
       inputs.flake-utils.follows = "flake-utils";
