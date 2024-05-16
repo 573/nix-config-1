@@ -77,6 +77,83 @@ let
     pname = "default.el";
     version = "0";
     src = pkgs.writeText "default.el" ''
+(use-package gcmh
+  :ensure t
+  :diminish
+  :init (setq gc-cons-threshold (* 80 1024 1024))
+  :hook (emacs-startup . gcmh-mode))
+
+(use-package which-key
+  :hook (on-first-input . which-key-mode))
+
+(use-package no-littering
+  :ensure t
+  :init
+  (setq no-littering-etc-directory "~/.cache/emacs/etc/"
+        no-littering-var-directory "~/.cache/emacs/var/")
+  (when (fboundp 'startup-redirect-eln-cache)
+    (startup-redirect-eln-cache
+     (convert-standard-filename
+      (expand-file-name  "eln-cache/" no-littering-var-directory)))))
+
+(use-package bind-key
+  :demand t
+  :bind
+  (:prefix-map rab/files-map
+   :prefix "C-c f")
+  :bind
+  (:prefix-map rab/toggles-map
+   :prefix "C-c t"))
+
+(use-package diminish :ensure t)
+
+(use-package corfu
+  :ensure t
+  :hook (on-first-buffer . global-corfu-mode))
+
+(use-package emacs-lock
+  :config
+  (with-current-buffer "*scratch*"
+    (emacs-lock-mode 'kill)))
+
+(use-package ibuffer
+  :bind
+  ([remap list-buffers] . ibuffer))
+
+(use-package persist-state
+  :ensure t
+  :hook
+  (on-first-input . persist-state-mode))
+
+(use-package suggest
+  :ensure t)
+
+(setopt create-lockfiles nil)
+
+
+(use-package emacs
+  :bind
+  ([remap capitalize-word] . capitalize-dwim)
+  ([remap downcase-word] . downcase-dwim)
+  ([remap upcase-word] . upcase-dwim))
+
+(use-package titlecase
+  :ensure t
+  :defer t)
+
+(setopt cursor-type 'bar)
+
+(use-package  org-novelist
+  :ensure nil
+;;  :load-path "~/Downloads/"  ; The directory containing 'org-novelist.el'
+  :custom
+;; Setting de-DE leads to subtle errors (no localised files)
+    (org-novelist-language-tag "en-GB")  ; The interface language for Org Novelist to use. It defaults to 'en-GB' when not set
+    (org-novelist-author "Daniel Kahlenberg")  ; The default author name to use when exporting a story. Each story can also override this setting
+    (org-novelist-author-email "573@users.noreply.github.com")  ; The default author contact email to use when exporting a story. Each story can also override this setting
+    (org-novelist-automatic-referencing-p nil))
+    '';
+    /*''
               (add-to-list 'load-path "${inputs.sensible-defaults.outPath}")
               (add-to-list 'load-path "${inputs.sane-defaults.outPath}")
               ${builtins.readFile "${rootPath}/home/misc/minimal.el"}
@@ -95,8 +172,7 @@ let
         :init
 
         (load-theme 'moe-light t))
-        (add-hook 'before-save-hook nil)
-    '';
+    '';*/
     preferLocalBuild = true;
     allowSubstitutes = false;
     buildPhase = "";
@@ -142,17 +218,27 @@ in
         my-default-el
         moe-theme
         org-novelist
-        better-defaults
+        #better-defaults
         bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
         use-package
-        writeroom-mode
+        #writeroom-mode
         which-key
         # https://cestlaz.github.io/posts/using-emacs-16-undo-tree/
         undo-tree
-        smooth-scrolling
-        sensible-defaults
-        sane-defaults
-        jinx
+        #smooth-scrolling
+        #sensible-defaults
+        #sane-defaults
+        #jinx
+	titlecase
+	suggest
+	persist-state
+	ibuffer-vc
+	emacs
+	corfu
+	diminish
+	bind-key
+	no-littering
+	gcmh
       ];
       config = "";
     });
@@ -162,6 +248,9 @@ in
     programs.info.enable = true;
 
     home.packages = with pkgs; [
+    nuspell
+    hunspellDicts.en_US
+    hunspellDicts.de_DE
       (pkgs.runCommand "emacs-novelist" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
         mkdir -p $out/bin	
         makeWrapper ${config.custom.programs.emacs-novelist.finalPackage.outPath}/bin/emacs $out/bin/emacs-novelist --argv0 emacs    
