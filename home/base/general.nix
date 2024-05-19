@@ -18,6 +18,8 @@ in
       wsl = mkEnableOption "config for NixOS-WSL instances";
 
       minimal = mkEnableOption "minimal config";
+
+      termux = mkEnableOption "config for the non-nixos termux android app";
     };
   };
 
@@ -26,7 +28,7 @@ in
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
-    {
+    (mkIf (!cfg.termux) {
       custom.programs = {
         emacs-novelist.enable = true;
         bash.enable = true;
@@ -139,14 +141,13 @@ in
           #working#MANPAGER = "${config.custom.programs.neovim.finalPackage}/bin/nvim -u NONE -i NONE '+runtime plugin/man.lua' -c Man! -o -";
         };
 
-        stateVersion = "23.11";
       };
 
       programs.fzf.enable = true;
 
       # FIXME: set to sd-switch once it works for krypton
       systemd.user.startServices = "legacy";
-    }
+    })
 
     (mkIf cfg.wsl {
       custom.programs.shell.shellAliases = {
@@ -155,6 +156,20 @@ in
       };
 
       # programs.starship.enable = true; # long lines are distorted
+    })
+
+    {
+        home.stateVersion = "23.11";
+    }
+
+    (mkIf cfg.termux {
+      custom = {
+        base.general = {
+          lightWeight = true;
+          minimal = true;
+	};
+        programs.emacs-novelist.enable = true;
+      };
     })
 
     (mkIf (!cfg.lightWeight) {

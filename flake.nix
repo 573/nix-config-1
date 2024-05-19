@@ -385,6 +385,7 @@
     in
     {
       homeConfigurations = listToAttrs [
+        (mkHome "aarch64-linux" "u0_a210@localhost")
         (mkHome "x86_64-linux" "dani@maiziedemacchiato")
       ];
 
