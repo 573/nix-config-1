@@ -39,6 +39,10 @@ in
       # above works, but FIXME does not work (again) in unstable yet
       #(args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
     )
+    (args@{ config, lib, pkgs, ... }:
+      import "${inputs.unstable.outPath}/nixos/modules/services/hardware/nvidia-container-toolkit"
+        (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
+    )
   ];
 
 

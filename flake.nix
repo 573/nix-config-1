@@ -92,12 +92,12 @@
       url = "https://github.com/jubnzv/virtual-types.nvim/archive/9ef9f31c58cc9deb914ee728b8bda8f217f9d1c7.tar.gz";
     };
 
-    neovim-flake = {
-      url = "github:neovim/neovim?dir=contrib"; # &rev=d321deb4a9b05e9d81b79ac166274f4a6e7981bf"; # the commit used in neovim-nightly-overlay itself, i. e. https://github.com/nix-community/neovim-nightly-overlay/commit/e5a94bb91c94dc079e7c714494a0be7814b51c6d
+    /*neovim-flake = {
+      url = "github:nix-community/neovim-nightly-overlay"; # &rev=d321deb4a9b05e9d81b79ac166274f4a6e7981bf"; # the commit used in neovim-nightly-overlay itself, i. e. https://github.com/nix-community/neovim-nightly-overlay/commit/e5a94bb91c94dc079e7c714494a0be7814b51c6d
       # FIXME Gerschtli rather follows nixpkgs for all inputs, should I too ?
       #inputs.nixpkgs.follows = "unstable";
       #inputs.flake-utils.follows = "flake-utils";
-    };
+    };*/
 
     # TODO https://github.com/nix-community/neovim-nightly-overlay/blob/89fdda1/flake.nix#L39
     neovim-nightly-overlay = {
@@ -189,7 +189,7 @@
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
-      url = "github:nix-community/nixos-wsl";
+      url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
       inputs.flake-utils.follows = "flake-utils";

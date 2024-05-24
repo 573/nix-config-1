@@ -24,6 +24,8 @@ let
     #})
   ;
 
+  inherit (emacs.pkgs) withPackages; # crucial to use the right version here as epkgs get byte-compiled for this exact emacs
+
   emacsWithPackagesFromUsePackage =
     if isLinux && isAarch64
     then inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
@@ -201,7 +203,36 @@ in
           Package of final emacs-novelist.
         '';
       };
+      initialPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of package=emacs.
+        '';
+      };
 
+      homePackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package in home.packages.
+        '';
+      };
+      listOfPkgs = mkOption {
+        # unnecessary but I want to learn about building emacs-packages-deps
+	# so I could i. e. nix derivation show /nix/store/c8vwsxnbqfp09bg6gwhxvvz3f0hpym6y-emacs-moe-theme-20231006.639.drv | grep '"path"'
+        default = null;
+	internal = true;
+        description = ''
+          list of Extra packages available to Emacs.
+	  nix eval --json .#nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.emacs-novelist.listOfPkgs  --json
+	  nix build ...
+	   0.0 MiB DL] building emacs-packages-deps
+	  nix derivation show ...
+        '';
+      };
     };
 
   };
@@ -209,16 +240,12 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
-    # Or as in https://github.com/szermatt/mistty/issues/14
-    custom.programs.emacs-novelist.finalPackage = (emacsWithPackagesFromUsePackage {
-      alwaysEnsure = true;
-      package = emacs;
-      extraEmacsPackages = epkgs: with epkgs; [
+  config = let 
+    fun = epkgs: with epkgs; [
         my-default-el
-        moe-theme
         org-novelist
-        #better-defaults
+	        moe-theme
+	#better-defaults
         bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
         use-package
         #writeroom-mode
@@ -233,15 +260,32 @@ in
 	suggest
 	persist-state
 	ibuffer-vc
-	emacs
+	epkgs.emacs
 	corfu
 	diminish
 	bind-key
 	no-littering
 	gcmh
       ];
+  in mkIf cfg.enable {
+  # don't know how to avoid redundancy here
+    custom.programs.emacs-novelist.listOfPkgs = withPackages fun;
+
+custom.programs.emacs-novelist.initialPackage = emacs;
+
+    # Or as in https://github.com/szermatt/mistty/issues/14
+    custom.programs.emacs-novelist.finalPackage = (emacsWithPackagesFromUsePackage {
+      alwaysEnsure = true;
+      package = config.custom.programs.emacs-novelist.initialPackage;
+      extraEmacsPackages = fun;
       config = "";
     });
+
+     custom.programs.emacs-novelist.homePackage = 
+      (pkgs.runCommand "emacs-novelist" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+        mkdir -p $out/bin	
+        makeWrapper ${config.custom.programs.emacs-novelist.finalPackage.outPath}/bin/emacs $out/bin/emacs-novelist --argv0 emacs    
+      '');
 
     custom.programs.shell.shellAliases = { } // optionalAttrs (isLinux && isAarch64) { emacs-novelist = "emacs-novelist -nw"; };
 
@@ -251,10 +295,7 @@ in
     nuspell
     hunspellDicts.en_US
     hunspellDicts.de_DE
-      (pkgs.runCommand "emacs-novelist" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-        mkdir -p $out/bin	
-        makeWrapper ${config.custom.programs.emacs-novelist.finalPackage.outPath}/bin/emacs $out/bin/emacs-novelist --argv0 emacs    
-      '')
+    config.custom.programs.emacs-novelist.homePackage
     ];
   };
 }

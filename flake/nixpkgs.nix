@@ -94,7 +94,7 @@ import inputs.nixpkgs {
 
           inherit (inputs.agenix-cli.packages.${system}) agenix-cli;
           inherit (latest) tailscale csvlens oxker;
-          inherit (unstable) cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd;
+          inherit (unstable) cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25;
           inherit (unstable.cudaPackages) cudatoolkit;
 
           # see https://github.com/NixOS/nixpkgs/issues/271989, I think this comes down to not having the correct udev rules in place

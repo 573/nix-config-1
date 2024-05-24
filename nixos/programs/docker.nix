@@ -23,9 +23,13 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-
-      virtualisation.docker = {
+hardware.nvidia-container-toolkit.enable = true; # renamed here: https://github.com/NixOS/nixpkgs/commit/471ff2c33c99bf88eb87430df2251f73d94181d0
+# https://github.com/nix-community/NixOS-WSL/issues/433
+# https://github.com/nix-community/NixOS-WSL/pull/478
+      virtualisation = {
+      docker = {
         enable = true;
+	package = pkgs.docker_25;
         #       enableNvidia = true;
 
         storageDriver = "overlay2";
@@ -45,6 +49,7 @@ in
             };
                                     	    */
         };
+      };
       };
 
       # https://github.com/nix-community/NixOS-WSL/blob/0fa9268bf9a903498cb567e6d4d01eb945f36f6e/tests/docker/docker-native.nix#L9
