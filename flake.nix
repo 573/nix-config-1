@@ -791,11 +791,11 @@
 
   nixConfig = {
     # FIXME requires --accept-flake-config but might be better for nix develop
-    extra-substituters = [
-        "https://arm.cachix.org/"
-    ];
-    extra-trusted-public-keys = [
-        "arm.cachix.org-1:K3XjAeWPgWkFtSS9ge5LJSLw3xgnNqyOaG7MDecmTQ8="
-    ];
+    #extra-substituters = [
+    #    "https://arm.cachix.org/"
+    #];
+    #extra-trusted-public-keys = [
+    #    "arm.cachix.org-1:K3XjAeWPgWkFtSS9ge5LJSLw3xgnNqyOaG7MDecmTQ8="
+    #];
   };
 }
