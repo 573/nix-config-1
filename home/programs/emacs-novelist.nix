@@ -109,7 +109,7 @@ let
 
 (use-package diminish :ensure t)
 
-(use-package corfu
+(use-package corfu-terminal
   :ensure t
   :hook (on-first-buffer . global-corfu-mode))
 
@@ -154,6 +154,20 @@ let
     (org-novelist-author "Daniel Kahlenberg")  ; The default author name to use when exporting a story. Each story can also override this setting
     (org-novelist-author-email "573@users.noreply.github.com")  ; The default author contact email to use when exporting a story. Each story can also override this setting
     (org-novelist-automatic-referencing-p nil))
+
+(defun my/initial-layout ()
+  "Create my initial screen layout."
+  (interactive)
+  ;; 2. having org-mode launch in scratch buffer from the beginning, and
+  (switch-to-buffer "*scratch*")
+  (org-mode)
+  ;; (org-indent-mode)
+  ;; 3. to have olivetti mode enabled too.
+  (olivetti-mode)
+  ;; (delete-other-windows)
+  )
+
+(my/initial-layout)
     '';
     /*''
               (add-to-list 'load-path "${inputs.sensible-defaults.outPath}")
@@ -261,11 +275,12 @@ in
 	persist-state
 	ibuffer-vc
 	epkgs.emacs
-	corfu
+	corfu-terminal
 	diminish
 	bind-key
 	no-littering
 	gcmh
+	olivetti
       ];
   in mkIf cfg.enable {
   # don't know how to avoid redundancy here

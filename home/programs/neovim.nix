@@ -395,6 +395,8 @@ in
           makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
         '')
       ];
+
+      home.sessionVariables.EDITOR = "vi";
     }
 
     (mkIf (!cfg.lightWeight) {
