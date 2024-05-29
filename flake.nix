@@ -196,11 +196,11 @@
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/babae500c2bca610eb38e17a1ef1bf0f70beb29e";
+      url = "github:nix-community/emacs-overlay/6d2e14666ff067074bb80e32ae9d1383743c6487";
     };
 
     emacs-overlay-cached = {
-      url = "github:nix-community/emacs-overlay/7fe510de8909d248df2d32d758303a325b3738f9";
+      url = "github:nix-community/emacs-overlay/6d2e14666ff067074bb80e32ae9d1383743c6487";
       #url = "github:nix-community/emacs-overlay/2308be4351ab8a152248a48baebf22649c83a487";
     };
 

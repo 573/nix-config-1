@@ -78,6 +78,12 @@ Firmware of Raspberry Pi needs to be updated manually on a regular basis with th
 1. Copy `result/*` to firmware partition (ensure that old ones are deleted)
 1. Unmount and reboot
 
+##### Troubleshoot
+
+When emacs is modified i. e. packages are changed, there may occur discrepancies i. e.
+packages missing being noticed at runtime which often is related to so first check the
+flake input `emacs-overlay`, might refer to a dated version.
+
 [age]: https://age-encryption.org/
 [agenix]: https://github.com/ryantm/agenix
 [cachix-deploy]: https://docs.cachix.org/deploy/
