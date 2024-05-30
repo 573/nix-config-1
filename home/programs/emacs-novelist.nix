@@ -145,6 +145,10 @@ let
 
 (setopt cursor-type 'bar)
 
+(use-package olivetti
+  :demand t
+  :ensure t)
+
 (use-package  org-novelist
   :ensure nil
 ;;  :load-path "~/Downloads/"  ; The directory containing 'org-novelist.el'
