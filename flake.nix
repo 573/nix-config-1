@@ -70,6 +70,10 @@
       inputs.nix-formatter-pack.follows = "nix-formatter-pack";
       inputs.nmd.follows = "nmd";
     };
+    org-extra-emphasis = {
+    url = "github:QiangF/org-extra-emphasis";
+    flake = false;
+    };
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";

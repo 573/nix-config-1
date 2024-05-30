@@ -45,6 +45,19 @@ let
       description = "Org Novelist is a system for writing novel-length fiction using Emacs Org mode.";
     };
   });
+  org-extra-emphasis = (pkgs.emacsPackages.trivialBuild rec {
+    pname = "org-extra-emphasis";
+    version = "1";
+    src = "${inputs.org-extra-emphasis}";
+    installPhase = ''
+      target=$out/share/emacs/site-lisp/$pname/${pname}.el
+      mkdir -p "$(dirname "$target")"
+      cp *.el "$target"
+    '';
+    meta = with lib; {
+      description = "Extra Emphasis markers for Emacs Org mode. https://irreal.org/blog/?p=10649";
+    };
+  });
 
   # https://raw.githubusercontent.com/hrs/sensible-defaults.el/main/sensible-defaults.el
   sensible-defaults = (pkgs.emacsPackages.trivialBuild rec {
@@ -147,6 +160,13 @@ let
 
 (use-package olivetti
   :demand t
+  :init
+  (setq olivetti-body-width 40)
+  (setq olivetti-style 'fancy)
+  (setq olivetti-minimum-body-width 30)
+  :ensure t)
+
+(use-package org-extra-emphasis
   :ensure t)
 
 (use-package  org-novelist
@@ -158,6 +178,11 @@ let
     (org-novelist-author "Daniel Kahlenberg")  ; The default author name to use when exporting a story. Each story can also override this setting
     (org-novelist-author-email "573@users.noreply.github.com")  ; The default author contact email to use when exporting a story. Each story can also override this setting
     (org-novelist-automatic-referencing-p nil))
+
+;; https://irreal.org/blog/?p=2029
+(add-to-list 'org-structure-template-alist
+             '("n" "#+BEGIN_COMMENT\n?\n#+END_COMMENT"
+               "<comment>\n?\n</comment>"))
 
 (defun my/initial-layout ()
   "Create my initial screen layout."
@@ -285,6 +310,7 @@ in
 	no-littering
 	gcmh
 	olivetti
+	org-extra-emphasis
       ];
   in mkIf cfg.enable {
   # don't know how to avoid redundancy here

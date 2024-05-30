@@ -3314,6 +3314,22 @@
         "type": "github"
       }
     },
+    "org-extra-emphasis": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701399546,
+        "narHash": "sha256-D2Vzrbh1FKIYAHu9Ujga7aaPGw7A6D77N6TsUb+z+2U=",
+        "owner": "QiangF",
+        "repo": "org-extra-emphasis",
+        "rev": "d5849bb4f5327273b5a51fa6ce0cf623c58bbb16",
+        "type": "github"
+      },
+      "original": {
+        "owner": "QiangF",
+        "repo": "org-extra-emphasis",
+        "type": "github"
+      }
+    },
     "org-novelist": {
       "flake": false,
       "locked": {
@@ -3727,6 +3743,7 @@
         "nvim-dd": "nvim-dd",
         "ocaml-dev-template": "ocaml-dev-template",
         "ocaml-overlay": "ocaml-overlay",
+        "org-extra-emphasis": "org-extra-emphasis",
         "org-novelist": "org-novelist",
         "pypi-deps-db": "pypi-deps-db",
         "ruby-nix": "ruby-nix",
