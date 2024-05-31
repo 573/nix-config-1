@@ -45,6 +45,7 @@ let
       description = "Org Novelist is a system for writing novel-length fiction using Emacs Org mode.";
     };
   });
+  # TODO https://emacsnotes.wordpress.com/2022/06/29/use-org-extra-emphasis-when-you-need-more-emphasis-markers-in-emacs-org-mode/
   org-extra-emphasis = (pkgs.emacsPackages.trivialBuild rec {
     pname = "org-extra-emphasis";
     version = "1";
@@ -166,9 +167,6 @@ let
   (setq olivetti-minimum-body-width 30)
   :ensure t)
 
-(use-package org-extra-emphasis
-  :ensure t)
-
 (use-package  org-novelist
   :ensure nil
 ;;  :load-path "~/Downloads/"  ; The directory containing 'org-novelist.el'
@@ -179,11 +177,9 @@ let
     (org-novelist-author-email "573@users.noreply.github.com")  ; The default author contact email to use when exporting a story. Each story can also override this setting
     (org-novelist-automatic-referencing-p nil))
 
-;; https://irreal.org/blog/?p=2029
-(add-to-list 'org-structure-template-alist
-             '("n" "#+BEGIN_COMMENT\n?\n#+END_COMMENT"
-               "<comment>\n?\n</comment>"))
+;; inserting notes as comment blocks in org https://irreal.org/blog/?p=2029 has it's own command now see https://emacs.stackexchange.com/a/46992
 
+;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
 (defun my/initial-layout ()
   "Create my initial screen layout."
   (interactive)
@@ -192,7 +188,7 @@ let
   (org-mode)
   ;; (org-indent-mode)
   ;; 3. to have olivetti mode enabled too.
-  (olivetti-mode)
+  ;; (olivetti-mode)
   ;; (delete-other-windows)
   )
 

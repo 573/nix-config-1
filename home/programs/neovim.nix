@@ -387,7 +387,17 @@ in
       custom.programs.neovim.minimalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim {
         enableMan = false;
         colorschemes.gruvbox.enable = true;
+    extraPlugins = with pkgs; [
+      vimPlugins.nnn-vim
+      vimPlugins.neoterm
+      (pluggo "faster-nvim")
+      #		(pluggo "deadcolumn-nvim")
+    ];
+    plugins = {
+      nvim-osc52.enable = true;
+      which-key.enable = true;
       };
+       };
 
       home.packages = let inherit (config.custom.programs.neovim) minimalPackage; in [
         (pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''

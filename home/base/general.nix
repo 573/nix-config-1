@@ -132,6 +132,8 @@ in
           ];
           PAGER = "${pkgs.less}/bin/less";
           SHELL = "bash";
+	  EDITOR = "vi";
+	  VISUAL = "vi";
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html
