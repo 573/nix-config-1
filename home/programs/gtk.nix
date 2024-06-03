@@ -7,7 +7,7 @@ let
     mkIf
     ;
 
-  cfg = config.custom.programs.docker;
+  cfg = config.custom.programs.gtk;
 in
 
 {
@@ -16,7 +16,7 @@ in
 
   options = {
 
-    custom.programs.docker.enable = mkEnableOption "docker config";
+    custom.programs.gtk.enable = mkEnableOption "gtk config";
 
   };
 
@@ -24,6 +24,9 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-  };
+home.packages = with pkgs; [
+  arc-theme # see archlinux wiki on gtk_theme
+];
+};
 
 }

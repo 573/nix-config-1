@@ -21,6 +21,7 @@ in
     $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${config.user.home}/.ssh"
     $DRY_RUN_CMD cat "${rootPath}/files/keys/id_ed25519.daniel.pub" > "${config.user.home}/.ssh/authorized_keys"
     $DRY_RUN_CMD cat "${rootPath}/files/keys/id_ed25519.danielwdws.pub" >> "${config.user.home}/.ssh/authorized_keys"
+    $DRY_RUN_CMD echo "eu.nixbuild.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM" >> "${config.user.home}/.ssh/known_hosts"
 
     if [[ ! -d "${sshdDirectory}" ]]; then
       $DRY_RUN_CMD rm $VERBOSE_ARG --recursive --force "${sshdTmpDirectory}"
