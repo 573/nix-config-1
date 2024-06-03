@@ -246,7 +246,7 @@ in
         core = {
           compression = 9;
           eol = "lf";
-          editor = "nvim"; # "${config.custom.programs.neovim.finalPackage}/bin/nvim";
+          editor = "vi"; # "${config.custom.programs.neovim.finalPackage}/bin/vi";
           hooksPath = toString hooksPath;
           loosecompression = 9;
           pager = "${pkgs.less}/bin/less -x1,5"; # set tab width to 4 starting at offset of 1 to cope with diff format
@@ -258,7 +258,7 @@ in
         diff = {
           mnemonicprefix = true;
           renames = "copies";
-          tool = "nvim";
+          tool = "vi";
 
           age.textconv = toString (
             config.lib.custom.mkScriptPlain
@@ -274,7 +274,7 @@ in
         difftool = {
           prompt = true;
 
-          nvim.cmd = "nvim -R -d \"$LOCAL\" \"$REMOTE\""; # "${config.custom.programs.neovim.finalPackage}/bin/nvim -R -d \"$LOCAL\" \"$REMOTE\"";
+          vi.cmd = "vi -R -d \"$LOCAL\" \"$REMOTE\""; # "${config.custom.programs.neovim.finalPackage}/bin/vi -R -d \"$LOCAL\" \"$REMOTE\"";
         };
 
         fetch = {
@@ -299,7 +299,7 @@ in
 
         merge = {
           log = true;
-          tool = "nvim";
+          tool = "vi";
           verbosity = 5;
         };
 
@@ -308,7 +308,7 @@ in
           prompt = true;
           writeToTemp = true;
 
-          nvim.cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"; # "${config.custom.programs.neovim.finalPackage}/bin/nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'";
+          vi.cmd = "vi -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"; # "${config.custom.programs.neovim.finalPackage}/bin/vi -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'";
         };
 
         pack.compression = 9;
