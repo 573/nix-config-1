@@ -37,26 +37,12 @@ in
     IdentityFile /root/.ssh/my-nixbuild-key
 '';
 
-programs.ssh.knownHosts = {
-  nixbuild = {
-    hostNames = [ "eu.nixbuild.net" ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
-  };
-};
-
 #environment.systemPackages = with pkgs; [
 #  rlwrap
 #];
 
-nix = {
-  distributedBuilds = true;
-  buildMachines = [
-    { hostName = "eu.nixbuild.net";
-      system = "aarch64-linux";
-      maxJobs = 100;
-      supportedFeatures = [ "benchmark" "big-parallel" ];
-    }
-  ];
+nix.settings = {
+  builders = "eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel";
 };
   };
 

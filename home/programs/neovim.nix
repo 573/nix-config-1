@@ -46,8 +46,8 @@ let
                luafile ${rootPath}/home/misc/nvim-wsl-clipboard.lua
 
                " let g:languagetool_server_command='$ { pkgs.languagetool }/bin/languagetool-http-server'
-                        	   lua require("gitsigns").setup()
-                        	   lua require("stcursorword").setup()
+                            	   lua require("gitsigns").setup()
+                            	   lua require("stcursorword").setup()
   '';*/
   /*plugins = with pkgs.vimPlugins; [
     # https://gitlab.com/rycee/home-manager/blob/de3758e3/modules/programs/neovim.nix#L113
@@ -148,7 +148,7 @@ let
       lsp = {
         enable = true;
         servers = {
-	  # FIXME still uses i. e. v1.2.3 (https://github.com/nix-community/nixvim/blob/83a7ce9846b1b01a34b3e6b25077c1a5044ad7b3/plugins/lsp/language-servers/default.nix#L455) as of nixos-unstable, see https://github.com/NixOS/nixpkgs/pull/305285#
+          # FIXME still uses i. e. v1.2.3 (https://github.com/nix-community/nixvim/blob/83a7ce9846b1b01a34b3e6b25077c1a5044ad7b3/plugins/lsp/language-servers/default.nix#L455) as of nixos-unstable, see https://github.com/NixOS/nixpkgs/pull/305285#
           nixd.enable = true;
           ltex.enable = true;
           texlab.enable = true;
@@ -216,7 +216,7 @@ let
             { name = "path"; }
           ];
           /*sources = {
-                            		  __raw = ''
+                                		  __raw = ''
       cmp.config.sources({
         { name = 'nvim_lsp' },
         -- { name = 'vsnip' },
@@ -228,8 +228,8 @@ let
         { name = 'buffer' },
         { name = 'path' },
       })
-                            		  '';
-                          		  }; */
+                                		  '';
+                              		  }; */
 
           formatting = {
             fields = [ "abbr" "kind" "menu" ];
@@ -387,17 +387,160 @@ in
       custom.programs.neovim.minimalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim {
         enableMan = false;
         colorschemes.gruvbox.enable = true;
-    extraPlugins = with pkgs; [
-      vimPlugins.nnn-vim
-      vimPlugins.neoterm
-      (pluggo "faster-nvim")
-      #		(pluggo "deadcolumn-nvim")
-    ];
-    plugins = {
-      nvim-osc52.enable = true;
-      which-key.enable = true;
+        extraPlugins = with pkgs; [
+          vimPlugins.nnn-vim
+          vimPlugins.neoterm
+          (pluggo "faster-nvim")
+          #		(pluggo "deadcolumn-nvim")
+        ];
+        extraPackages = with pkgs; [
+          nixpkgs-fmt
+        ];
+        plugins = {
+          nvim-osc52.enable = true;
+          which-key.enable = true;
+          luasnip.enable = true;
+          lsp = {
+            enable = true;
+            servers = {
+              nixd.enable = true;
+              ltex.enable = true;
+              texlab.enable = true;
+              lua-ls.enable = true;
+            };
+            keymaps.lspBuf = {
+              "gd" = "definition";
+              "gD" = "references";
+              "gt" = "type_definition";
+              "gi" = "implementation";
+              "K" = "hover";
+            };
+          };
+          #      conform-nvim = { enable = true;
+          #        formattersByFt = {
+          #	  nix = [ "nixpkgs-fmt" ];
+          #	};
+          #      };
+          cmp-buffer = { enable = true; };
+          cmp-emoji = { enable = true; };
+          cmp-nvim-lsp = { enable = true; };
+          cmp-path = { enable = true; };
+          cmp_luasnip = { enable = true; };
+          cmp = {
+            enable = true;
+            settings = {
+              sources = [
+                { name = "nvim_lsp"; }
+                { name = "luasnip"; }
+                { name = "buffer"; }
+                { name = "nvim_lua"; }
+                { name = "path"; }
+              ];
+              formatting = {
+                fields = [ "abbr" "kind" "menu" ];
+                format =
+                  # lua
+                  ''
+                    function(_, item)
+                      local icons = {
+                        Namespace = "󰌗",
+                        Text = "󰉿",
+                        Method = "󰆧",
+                        Function = "󰆧",
+                        Constructor = "",
+                        Field = "󰜢",
+                        Variable = "󰀫",
+                        Class = "󰠱",
+                        Interface = "",
+                        Module = "",
+                        Property = "󰜢",
+                        Unit = "󰑭",
+                        Value = "󰎠",
+                        Enum = "",
+                        Keyword = "󰌋",
+                        Snippet = "",
+                        Color = "󰏘",
+                        File = "󰈚",
+                        Reference = "󰈇",
+                        Folder = "󰉋",
+                        EnumMember = "",
+                        Constant = "󰏿",
+                        Struct = "󰙅",
+                        Event = "",
+                        Operator = "󰆕",
+                        TypeParameter = "󰊄",
+                        Table = "",
+                        Object = "󰅩",
+                        Tag = "",
+                        Array = "[]",
+                        Boolean = "",
+                        Number = "",
+                        Null = "󰟢",
+                        String = "󰉿",
+                        Calendar = "",
+                        Watch = "󰥔",
+                        Package = "",
+                        Copilot = "",
+                        Codeium = "",
+                        TabNine = "",
+                      }
+                      local icon = icons[item.kind] or ""
+                      item.kind = string.format("%s %s", icon, item.kind or "")
+                      return item
+                    end
+                  '';
+              };
+              snippet.expand = "function(args) require('luasnip').lsp_expand(args.body) end";
+              window = {
+                completion = {
+                  winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
+                  scrollbar = false;
+                  side_padding = 0;
+                  border = [ "╭" "─" "╮" "│" "╯" "─" "╰" "│" ];
+                };
+                documentation = {
+                  border = [ "╭" "─" "╮" "│" "╯" "─" "╰" "│" ];
+                  winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
+                };
+              };
+              mapping = {
+                "<C-n>" = "cmp.mapping.select_next_item()";
+                "<C-p>" = "cmp.mapping.select_prev_item()";
+                "<C-j>" = "cmp.mapping.select_next_item()";
+                "<C-k>" = "cmp.mapping.select_prev_item()";
+                "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+                "<C-f>" = "cmp.mapping.scroll_docs(4)";
+                "<C-Space>" = "cmp.mapping.complete()";
+                "<C-e>" = "cmp.mapping.close()";
+                "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })";
+                # as in: https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
+                "<Tab>" = ''
+                                	    cmp.mapping(function(fallback)
+                  			  if cmp.visible() then
+                  			    cmp.select_next_item()
+                  			  elseif require("luasnip").expand_or_jumpable() then
+                  			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
+                  			  else
+                  			    fallback()
+                  			  end
+                  			end, {'i', 's'})
+                                		  '';
+                "<S-Tab>" = ''
+                                	    cmp.mapping(function(fallback)
+                  			  if cmp.visible() then
+                  			    cmp.select_prev_item()
+                  			  elseif require("luasnip").jumpable(-1) then
+                  			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
+                  			  else
+                  			    fallback()
+                  			  end
+                  			end, {'i', 's'})
+                                		  '';
+              };
+            };
+          };
+        };
       };
-       };
 
       home.packages = let inherit (config.custom.programs.neovim) minimalPackage; in [
         (pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
@@ -420,17 +563,17 @@ in
       # see https://discourse.nixos.org/t/conflicts-between-treesitter-withallgrammars-and-builtin-neovim-parsers-lua-c/33536/3
       # FIXME https://github.com/nix-community/nixvim/blob/4f6e90212c7ec56d7c03611fb86befa313e7f61f/plugins/languages/treesitter/treesitter.nix#L12
       /*      xdg.configFile."nvim/parser".source = "${pkgs.symlinkJoin {
-              	      name = "treesitter-parsers";
-              	      paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
-              			    nix
-              			    bash
-              			    yaml
-              			    json
-              			    lua
-              			    latex
-              			    comment
-              	      ])).dependencies;
-            	    }}/parser"; */
+                     	      name = "treesitter-parsers";
+                     	      paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
+                     			    nix
+                     			    bash
+                     			    yaml
+                     			    json
+                     			    lua
+                     			    latex
+                     			    comment
+                     	      ])).dependencies;
+                 	    }}/parser"; */
     })
   ]);
 }
