@@ -26,7 +26,7 @@ in
     # use root's .ssh here as nix-daemon runs with root permissions
     programs.ssh.extraConfig = ''
       Host eu.nixbuild.net
-        PubkeyAcceptedKeyTypes ssh-ed25519i
+        PubkeyAcceptedKeyTypes ssh-ed25519
         ServerAliveInterval 60
         IPQoS throughput
         IdentityFile /root/.ssh/my-nixbuild-key

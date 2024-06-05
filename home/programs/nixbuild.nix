@@ -1,10 +1,10 @@
-
 { config, lib, pkgs, ... }:
 
 let
   inherit (lib)
     mkEnableOption
     mkIf
+    mkMerge
     ;
 
   cfg = config.custom.programs.nixbuild;
@@ -22,28 +22,26 @@ in
 
 
   ###### implementation
+  config = mkIf cfg.enable
+    (mkMerge [
+      (mkIf (cfg.custom.base.non-nixos) {
+        programs.ssh.extraConfig = ''
+          Host eu.nixbuild.net
+            PubkeyAcceptedKeyTypes ssh-ed25519	
+            ServerAliveInterval 60
+            IPQoS throughput
+            IdentityFile /root/.ssh/my-nixbuild-key
+        '';
 
-  config = mkIf cfg.enable {
-    home.packages = with pkgs; [
-      rlwrap
-    ];
+        nix.settings = {
+          builders = "eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel";
+        };
+      })
 
-  # use root's .ssh here as nix-daemon runs with root permissions
-  programs.ssh.extraConfig = ''
-  Host eu.nixbuild.net
-    PubkeyAcceptedKeyTypes ssh-ed25519i
-    ServerAliveInterval 60
-    IPQoS throughput
-    IdentityFile /root/.ssh/my-nixbuild-key
-'';
-
-#environment.systemPackages = with pkgs; [
-#  rlwrap
-#];
-
-nix.settings = {
-  builders = "eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel";
-};
-  };
-
+      {
+        home.packages = with pkgs; [
+          rlwrap
+        ];
+      }
+    ]);
 }
