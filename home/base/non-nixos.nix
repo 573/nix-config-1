@@ -43,6 +43,7 @@ in
     home = {
       packages = mkIf cfg.installNix [ config.nix.package ];
       sessionVariables.NIX_PATH = concatStringsSep ":" commonConfig.nix.nixPath;
+      sessionVariables.TERMINFO = "${pkgs.ncurses}/share/terminfo";
     };
 
     nix = {
