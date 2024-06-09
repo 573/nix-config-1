@@ -211,7 +211,7 @@ in
           rsync.enable = true;
 	  ssh = {
             enable = true;
-            modules = [ "vcs" ];
+          #  modules = [ "vcs" ];
           };
         };
       };

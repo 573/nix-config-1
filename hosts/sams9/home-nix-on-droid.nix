@@ -31,11 +31,11 @@
         #      '';
       };
 
-      ssh = {
-        cleanKeysOnShellStartup = false;
-        controlMaster = "no";
-        modules = [ "private" ];
-      };
+#      ssh = {
+#        cleanKeysOnShellStartup = false;
+#        controlMaster = "no";
+#        modules = [ "private" ];
+#      };
 
       # FIXME: tmux does not start
       tmux.enable = lib.mkForce false;
