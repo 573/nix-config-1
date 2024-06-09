@@ -157,6 +157,7 @@ in
 
         	setxkbmap -model pc104 -layout us -variant altgr-intl
       '')
+      libreoffice
       #gtt
     ];
 

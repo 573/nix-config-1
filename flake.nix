@@ -27,6 +27,8 @@
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
     ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/e1ee359d16a1886f0771cc433a00827da98d861c";
 
+    libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
+
     # https://github.com/NixOS/nixpkgs/pull/274799
     # https://lazamar.co.uk/nix-versions/?channel=nixos-22.11&package=simple-scan
     # https://discourse.nixos.org/t/binary-cache-for-staging/23813/4

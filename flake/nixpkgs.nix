@@ -29,6 +29,8 @@ import inputs.nixpkgs {
           inherit (prev.lib) remove flatten;
           # inherit rootPath;
           unstable = inputs.unstable.legacyPackages.${system}; #import inputs.unstable { inherit config system; };
+
+
           latest = inputs.latest.legacyPackages.${system}; #import inputs.latest { inherit config system; }; #import inputs.nixos-2305 { inherit config system; };
           nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
@@ -96,6 +98,7 @@ import inputs.nixpkgs {
           inherit (latest) tailscale csvlens oxker;
           inherit (unstable) cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25;
           inherit (unstable.cudaPackages) cudatoolkit;
+	  inherit (inputs.libreoffice-postscript.legacyPackages.${system}) libreoffice;
 
           # see https://github.com/NixOS/nixpkgs/issues/271989, I think this comes down to not having the correct udev rules in place
           # on the host os for the home-manager managed nix, thus on a non-nixos currently (release-23-11) there is no scanner
