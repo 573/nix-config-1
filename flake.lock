@@ -1894,6 +1894,22 @@
         "type": "github"
       }
     },
+    "libreoffice-postscript": {
+      "locked": {
+        "lastModified": 1712270947,
+        "narHash": "sha256-kkhFCvVED5EYk4qmWALSbSOoWusjDAJUGUQPeLKmL5Y=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "eb090f7b923b1226e8beb954ce7c8da99030f4a8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "eb090f7b923b1226e8beb954ce7c8da99030f4a8",
+        "type": "github"
+      }
+    },
     "mach-nix": {
       "inputs": {
         "flake-utils": "flake-utils_14",
@@ -3719,6 +3735,7 @@
         "impermanence": "impermanence",
         "jupyenv": "jupyenv",
         "latest": "latest",
+        "libreoffice-postscript": "libreoffice-postscript",
         "mach-nix": "mach-nix",
         "mistty": "mistty",
         "nano-emacs": "nano-emacs",

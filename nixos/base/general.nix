@@ -161,6 +161,8 @@ in
 
         wslConf.user.default = "nixos";
 
+        startMenuLaunchers = true;
+
         # FIXME disabled until https://www.catalog.update.microsoft.com/Search.aspx?q=KB5020030, https://support.microsoft.com/en-us/topic/november-15-2022-kb5020030-os-builds-19042-2311-19043-2311-19044-2311-and-19045-2311-preview-237a9048-f853-4e29-a3a2-62efdbea95e2 https://devblogs.microsoft.com/commandline/the-windows-subsystem-for-linux-in-the-microsoft-store-is-now-generally-available-on-windows-10-and-11/, native systemd needs these versions
         # FIXME Disabled due to Windows Update 21.11.23
         nativeSystemd = true;
