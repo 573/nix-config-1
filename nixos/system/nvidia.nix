@@ -24,6 +24,10 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
+      hardware.opengl = {
+        enable = true;
+        driSupport32Bit = true;
+      };
       # TODO Separate nvidia.nix
       /*  hardware.opengl = {
         driSupport = true;

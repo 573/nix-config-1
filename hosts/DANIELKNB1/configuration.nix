@@ -3,11 +3,13 @@
 {
   # FIXME currently disabled due to Windows-Update 21.11.23
   # https://mynixos.com/nixpkgs/option/boot.binfmt.emulatedSystems
-  boot.binfmt.emulatedSystems = [ "aarch64-linux"]; /* [ "armv7l-linux" ]; */ # list type misleading here as either or is only possible
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ]; /* [ "armv7l-linux" ]; */ # list type misleading here as either or is only possible
 
   custom = {
     base.general.wsl = true;
     programs.docker.enable = true;
+    wsl.usbip.autoAttach = [ "1-2" ];
+    system.nvidia.enable = true;
   };
 
   systemd.tmpfiles.rules = [

@@ -41,7 +41,7 @@ in
     home.sessionVariables = {
       NNN_OPTS = concatStringsSep "" [
         "H" # show hidden files
-        "d" # detail mode
+#        "d" # detail mode
         "e" # text in $VISUAL/$EDITOR/vi
         "o" # open files only on Enter
       ];

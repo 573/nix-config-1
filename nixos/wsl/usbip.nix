@@ -3,74 +3,83 @@
 , pkgs
 , ...
 }:
-with lib; let
-  /* https://github.com/NixOS/nixpkgs/issues/191128#issuecomment-1514224101
-    nix hash to-sri --type sha256 $(nix-prefetch-url https://raw.githubusercontent.com/dorssel/usbipd-win/v3.2.0
-    /Usbipd/wsl-scripts/auto-attach.sh)
-  */
-  #usbipd-win-auto-attach = pkgs.fetchurl {
-  #  url = "https://raw.githubusercontent.com/dorssel/usbipd-win/v3.2.0/Usbipd/wsl-scripts/auto-attach.sh";
-  #  hash = "sha256-KJ0tEuY+hDJbBQtJj8nSNk17FHqdpDWTpy9/DLqUFaM=";
-  #};
+let
+  inherit
+    (lib)
+    mkIf
+    mkEnableOption
+    optionalAttrs
+    ;
 
-  cfg = config.custom.wsl.usbip;
-  # Source: https://lgug2z.com/articles/yubikey-passthrough-on-wsl2-with-full-fido2-support/
-in
-{
-  options.custom.wsl.usbip = with types; {
-    enable = mkEnableOption "Customisation of USB/IP integration to support Scanner and Yubikey";
+  usbipd-win-auto-attach = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/dorssel/usbipd-win/v4.2.0/Usbipd/WSL/auto-attach.sh";
+    hash = "sha256-AiXbRWwOy48mxQxxpWPtog7AAwL3mU3ZSHxrVuVk8/s=";
   };
 
-  # TODO Plan, enable these customisations when upstream is enabled, as in https://github.com/nix-community/NixOS-WSL/pull/203
-  config = mkIf (config.wsl.enable && config.wsl.usbip.enable && cfg.enable) {
+  cfg = config.custom.wsl.usbip;
+in
+{
+  options.custom.wsl.usbip = {
+    enable = mkEnableOption "Customisation of USB/IP integration" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
 
-    #users.groups.scanner.members = [ "dkahlenberg" ]; # see https://nixos.wiki/wiki/Scanners and https://github.com/nix-community/NixOS-WSL/commit/7f6189c658963fce68ab38fa9200729a6328f280 usbip
-    users.users.nixos.extraGroups = [ "scanner" "lp" ];
-
-    environment.systemPackages = [
-      #pkgs.gscan2pdf
-      pkgs.simple-scan
-      pkgs.sane-backends.out
-      pkgs.usbutils.out
-      pkgs.yubikey-manager
-      pkgs.libfido2
-    ];
-
-    # https://www.google.com/search?client=firefox-b-d&q=sane-plustek+nixos
-    # http://www.sane-project.org/lists/sane-mfgs-cvs.html
-    # https://github.com/NixOS/nixpkgs/issues/33579
-    hardware.sane = {
-      enable = true;
+    autoAttach = lib.mkOption {
+      type = with lib.types; listOf str;
+      default = [ ];
+      example = [ "4-1" ];
+      description = "Auto attach devices with provided Bus IDs.";
     };
 
-    #environment.etc."sane.d/lide_30.conf".text = "usb 0x04a9 0x220e";
-    # see https://www.reddit.com/r/NixOS/comments/ijje39/difficulties_with_scangearmp2_cannon_scanner/
-    # and https://sourcegraph.com/search?q=context:global+file:%5E*.nix%24+content:environment.etc.%22sane&patternType=standard&sm=1&groupBy=repo
-    # and https://forum.ubuntuusers.de/post/6301022/
-    environment.etc."sane.d/dll.d/plustek.conf".text = ''
-      # sane-dll entry for canon Lide 30
-      [usb] 0x04a9 0x220e
-      device auto
-    '';
-
-    # See https://sourcegraph.com/github.com/michalrus/dotfiles/-/blob/machines/_shared_/features/canoscan-lide-20/default.nix?L34:11 and nixos/base/general.nix
-
-    services.pcscd.enable = true;
-
-    services.udev = {
-      enable = true;
-      packages = [ pkgs.yubikey-personalization ];
-      # TODO Here it is different though (scanner): https://unix.stackexchange.com/questions/184367/scanimage-does-not-find-scanner-unless-sudoed-but-shows-up-with-sane-find-scan
-      extraRules = optionalString config.custom.wsl.usbip.enable ''
-                SUBSYSTEM=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0010|0110|0111|0114|0116|0401|0403|0405|0407|0410", MODE="0666"
-        	ATTR{idVendor}=="04a9", ATTR{idProduct}=="220e", MODE="0664", GROUP="scanner", ENV{libsane_matched}="yes"
+    snippetIpAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "$(grep nameserver /etc/resolv.conf | cut -d' ' -f2)";
+      example = "127.0.0.1";
+      description = ''
+        not working is (https://github.com/nix-community/NixOS-WSL/commit/f5a6c03518b839113a9e61888e0adbd489c3118f#diff-773365379831e0cce53043c065981efbf0c76f33ca575955ab512cb762c19742R24):
+        $(ip route list | sed -nE 's/(default)? via (.*) dev eth0 proto kernel/\2/p') 
+        This snippet is used to obtain the address of the Windows host.
       '';
-      # TODO Still needed ?
-      # ATTR{idVendor}=="04a9", ATTR{idProduct}=="220e", MODE="0666", GROUP="scanner"
-      #''
-      #  SUBSYSTEM=="usb", MODE="0666"
-      #  KERNEL=="hidraw*", SUBSYSTEM=="hidraw", TAG+="uaccess", MODE="0666"
-      #'';
+    };
+  };
+
+  config = mkIf (cfg.enable) {
+
+    environment.systemPackages = [
+      pkgs.linuxPackages.usbip
+      pkgs.usbutils.out
+    ];
+
+    services.udev.enable = true;
+
+    systemd = {
+      services."usbip-auto-attach@" = {
+        description = "Auto attach device having busid %i with usbip";
+        #after = [ "wsl-vpnkit-auto.target" ]; FIXME how
+	# https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.after&from=0&size=50&sort=relevance&type=packages&query=systemd.services
+	# "If the specified units are started at the same time as this unit, delay this unit until they have started."
+        # name being network there https://github.com/nix-community/NixOS-WSL/blob/f5a6c03/modules/usbip.nix
+	after = [ "wsl-vpnkit.target" ];
+
+        scriptArgs = "%i";
+        path = with pkgs; [
+          iproute2
+          linuxPackages.usbip
+        ];
+
+        script = ''
+          	  busid="$1"
+          	  ip="${cfg.snippetIpAddress}"
+
+          	  echo "Starting auto attach for busid $busid on $ip."
+          	  source ${usbipd-win-auto-attach} "$ip" "$busid"
+          	'';
+      };
+
+       # https://search.nixos.org/options?channel=24.05&show=systemd.targets.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.targets
+       # https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.services
+       # "systemd.services.<name>.wants"
+      # "Start the specified units when this unit is started."
+      # name being multi-user there https://github.com/nix-community/NixOS-WSL/blob/f5a6c03/modules/usbip.nix
+      targets.wsl-vpnkit.wants = map (busid: "usbip-auto-attach@${busid}.service") cfg.autoAttach;
     };
   };
 }
