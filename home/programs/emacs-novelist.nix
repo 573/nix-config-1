@@ -32,30 +32,67 @@ let
     else inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage
   ;
 
-  org-novelist = (pkgs.emacsPackages.trivialBuild rec {
+  org-novelist = (emacs.pkgs.trivialBuild rec {
     pname = "org-novelist";
     version = "0";
-    src = "${inputs.org-novelist}";
+    src = "${inputs.org-novelist.outPath}";
     installPhase = ''
       target=$out/share/emacs/site-lisp/$pname/${pname}.el
       mkdir -p "$(dirname "$target")"
-      cp *.el "$target"
+      cp "$src/${pname}.el" "$(dirname "$target")"
     '';
-    meta = with lib; {
+    meta = {
       description = "Org Novelist is a system for writing novel-length fiction using Emacs Org mode.";
     };
   });
+
+  ox-odt = (emacs.pkgs.trivialBuild rec {
+    pname = "ox-odt";
+    version = "9.2.2";
+    src = "${inputs.org-mode-ox-odt.outPath}";
+#    installPhase = ''
+#      target=$out/share/emacs/site-lisp/$pname/${pname}.el
+#      mkdir -p "$(dirname "$target")"
+#      cp "$src" "$(dirname "$target")"
+#    '';
+    meta = {
+      description = "This is a fork of Org's ODT backend and adds many useful improvements to that backend. This fork is authoritative because it is maintained by the original author of that backend.";
+    };
+  });
+
+ ox-html-markdown-style-footnotes = (emacs.pkgs.trivialBuild rec {
+    pname = "ox-html-markdown-style-footnotes";
+  version = "0.2.0";
+    src = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/jeffkreeftmeijer/ox-html-markdown-style-footnotes.el/0.2.0/ox-html-markdown-style-footnotes.el";
+    sha256 = "sha256-S+lzFpGY44OgXAeM9Qzdhvceh8DvvOFiw5tgXoXDrsQ=";
+  };
+
+  
+  meta = with lib; {
+    description = "Markdown-style footnotes for ox-html.el";
+    homepage = "https://jeffkreeftmeijer.com/ox-html-markdown-style-footnotes/";
+    license = licenses.gpl3;
+    platforms = platforms.all;
+  };
+  });
+
   # TODO https://emacsnotes.wordpress.com/2022/06/29/use-org-extra-emphasis-when-you-need-more-emphasis-markers-in-emacs-org-mode/
-  org-extra-emphasis = (pkgs.emacsPackages.trivialBuild rec {
+  org-extra-emphasis = (emacs.pkgs.trivialBuild rec {
     pname = "org-extra-emphasis";
     version = "1";
-    src = "${inputs.org-extra-emphasis}";
-    installPhase = ''
-      target=$out/share/emacs/site-lisp/$pname/${pname}.el
-      mkdir -p "$(dirname "$target")"
-      cp *.el "$target"
-    '';
-    meta = with lib; {
+    src = "${inputs.org-extra-emphasis.outPath}";
+    # elisp dependencies
+  #propagatedUserEnvPkgs = [
+  #  ox-odt
+  #];
+  #buildInputs = propagatedUserEnvPkgs;
+ #   installPhase = ''
+ #     target=$out/share/emacs/site-lisp/$pname/${pname}.el
+ #     mkdir -p "$(dirname "$target")"
+ #     cp "$src/${pname}.el" "$(dirname "$target")"
+ #   '';
+    meta = {
       description = "Extra Emphasis markers for Emacs Org mode. https://irreal.org/blog/?p=10649";
     };
   });
@@ -178,6 +215,8 @@ let
     (org-novelist-automatic-referencing-p nil))
 
 ;; inserting notes as comment blocks in org https://irreal.org/blog/?p=2029 has it's own command now see https://emacs.stackexchange.com/a/46992
+
+  (require 'org-extra-emphasis)
 
 ;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
 (defun my/initial-layout ()
@@ -307,6 +346,8 @@ in
 	gcmh
 	olivetti
 	org-extra-emphasis
+	ox-odt
+	ox-html-markdown-style-footnotes
       ];
   in mkIf cfg.enable {
   # don't know how to avoid redundancy here

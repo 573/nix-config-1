@@ -3346,6 +3346,22 @@
         "type": "github"
       }
     },
+    "org-mode-ox-odt": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1714202503,
+        "narHash": "sha256-/AXechWnUYiGYw/zkVRhUFwhcfknTzrC4oSWoa80wRw=",
+        "owner": "kjambunathan",
+        "repo": "org-mode-ox-odt",
+        "rev": "89d3b728c98d3382a8e6a0abb8befb03d27d537b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kjambunathan",
+        "repo": "org-mode-ox-odt",
+        "type": "github"
+      }
+    },
     "org-novelist": {
       "flake": false,
       "locked": {
@@ -3761,6 +3777,7 @@
         "ocaml-dev-template": "ocaml-dev-template",
         "ocaml-overlay": "ocaml-overlay",
         "org-extra-emphasis": "org-extra-emphasis",
+        "org-mode-ox-odt": "org-mode-ox-odt",
         "org-novelist": "org-novelist",
         "pypi-deps-db": "pypi-deps-db",
         "ruby-nix": "ruby-nix",

@@ -76,6 +76,10 @@
     url = "github:QiangF/org-extra-emphasis";
     flake = false;
     };
+org-mode-ox-odt = {
+  url = "github:kjambunathan/org-mode-ox-odt";
+  flake = false;
+};
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
