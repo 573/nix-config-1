@@ -80,6 +80,9 @@ org-mode-ox-odt = {
   url = "github:kjambunathan/org-mode-ox-odt";
   flake = false;
 };
+
+      flatpaks.url = "github:gmodena/nix-flatpak/main";
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";

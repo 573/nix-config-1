@@ -1325,6 +1325,22 @@
         "type": "github"
       }
     },
+    "flatpaks": {
+      "locked": {
+        "lastModified": 1711997375,
+        "narHash": "sha256-KvU4gOtuFMS9Il67glRGtdNfguAINT9pCaXtvCL8uI8=",
+        "owner": "gmodena",
+        "repo": "nix-flatpak",
+        "rev": "45bf66f7068db79b552da864c0e87452be624d6c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gmodena",
+        "ref": "main",
+        "repo": "nix-flatpak",
+        "type": "github"
+      }
+    },
     "fsread-nvim": {
       "flake": false,
       "locked": {
@@ -3735,6 +3751,7 @@
         "flake-parts": "flake-parts",
         "flake-registry": "flake-registry",
         "flake-utils": "flake-utils_8",
+        "flatpaks": "flatpaks",
         "fsread-nvim": "fsread-nvim",
         "garbage-day.nvim": "garbage-day.nvim",
         "ghc-nixpkgs-unstable": "ghc-nixpkgs-unstable",

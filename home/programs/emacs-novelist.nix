@@ -46,19 +46,26 @@ let
     };
   });
 
-  ox-odt = (emacs.pkgs.trivialBuild rec {
-    pname = "ox-odt";
-    version = "9.2.2";
-    src = "${inputs.org-mode-ox-odt.outPath}";
-#    installPhase = ''
-#      target=$out/share/emacs/site-lisp/$pname/${pname}.el
-#      mkdir -p "$(dirname "$target")"
-#      cp "$src" "$(dirname "$target")"
-#    '';
-    meta = {
-      description = "This is a fork of Org's ODT backend and adds many useful improvements to that backend. This fork is authoritative because it is maintained by the original author of that backend.";
-    };
-  });
+  ox-odt = emacs.pkgs.melpaBuild {
+        pname = "ox-odt";
+        # nix-style unstable version 0-unstable-20240427 can be used after
+        # https://github.com/NixOS/nixpkgs/pull/316726 reaches you
+        version = "20240427.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "kjambunathan";
+          repo = "org-mode-ox-odt";
+          rev = "89d3b728c98d3382a8e6a0abb8befb03d27d537b";
+          hash = "sha256-/AXechWnUYiGYw/zkVRhUFwhcfknTzrC4oSWoa80wRw=";
+        };
+        # not needed after https://github.com/NixOS/nixpkgs/pull/316107 reaches you
+        commit = "foo";
+
+        # use :files to include only related files
+        # https://github.com/melpa/melpa?tab=readme-ov-file#recipe-format
+        recipe = pkgs.writeText "recipe" ''
+          (ox-odt :fetcher git :url "")
+        '';
+      };
 
  ox-html-markdown-style-footnotes = (emacs.pkgs.trivialBuild rec {
     pname = "ox-html-markdown-style-footnotes";
@@ -216,6 +223,7 @@ let
 
 ;; inserting notes as comment blocks in org https://irreal.org/blog/?p=2029 has it's own command now see https://emacs.stackexchange.com/a/46992
 
+;;  (require 'ox-odt)
   (require 'org-extra-emphasis)
 
 ;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
@@ -345,7 +353,7 @@ in
 	no-littering
 	gcmh
 	olivetti
-	org-extra-emphasis
+	org-extra-emphasis # https://emacsnotes.wordpress.com/2022/06/29/use-org-extra-emphasis-when-you-need-more-emphasis-markers-in-emacs-org-mode/, also install pdflatex etc.
 	ox-odt
 	ox-html-markdown-style-footnotes
       ];
