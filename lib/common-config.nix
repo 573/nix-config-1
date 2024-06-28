@@ -55,7 +55,7 @@ _:
       flake-registry = "${inputs.flake-registry}/flake-registry.json";
     };
 
-    package = pkgs.nixVersions.nix_2_19;
+    package = pkgs.nixVersions.latest;
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
     registry = {

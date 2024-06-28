@@ -107,7 +107,7 @@ in
     };
 
   # FIXME: update when released
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.05";
 
   terminal.font =
     let
