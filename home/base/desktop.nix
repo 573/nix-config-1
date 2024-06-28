@@ -163,7 +163,7 @@ in
       #pwvucontrol
       chrome
       ausweisapp
-      gimp
+      #gimp
       #skanpage
       #simple-scan # for now use print instead of save as long as file picker not fixed, also: scanner not detected, was in 22.11 though, also file picker crash when saving file
       ##gscan2pdf
@@ -171,7 +171,7 @@ in
       #libreoffice
       pdftk
       qpdfview
-      spotify
+      #spotify
       #sshfs
       # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
       obconf
@@ -196,7 +196,7 @@ in
       #xine-lib
       mediathekview
       xclip
-      anbox
+      #anbox
     ] ++ (optionals cfg.private [
     ]);
 

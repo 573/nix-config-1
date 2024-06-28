@@ -146,7 +146,7 @@ in
       (nerdfonts.override { fonts = [ "UbuntuMono" ]; })
       source-code-pro
       ubuntu_font_family
-      spotify-player
+      #spotify-player
       (writeScriptBin "keyboard-de" ''
         #!${runtimeShell}
 

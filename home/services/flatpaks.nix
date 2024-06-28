@@ -26,7 +26,8 @@ in
   config = mkIf cfg.enable {
 
     services.flatpak.packages = [
-      "im.riot.Riot"
+#      "im.riot.Riot"
+#      "com.github.KRTirtho.Spotube"
     ];
 
   };

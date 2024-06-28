@@ -52,6 +52,11 @@
   #  )
   #];
 
+  home.file.".mob".text = ''
+      MOB_TIMER_USER="Daniel"
+      MOB_DONE_SQUASH="squash-wip"
+    '';
+
   home.packages = with pkgs; [
     #alejandra
     shellharden

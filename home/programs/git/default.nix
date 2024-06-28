@@ -200,6 +200,7 @@ in
 
         advice = {
           detachedHead = false;
+          forceDeleteBranch = false;
           pushNonFastForward = false;
           statusHints = false;
         };

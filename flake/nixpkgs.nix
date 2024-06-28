@@ -32,6 +32,7 @@ import inputs.nixpkgs {
 
 
           latest = inputs.latest.legacyPackages.${system}; #import inputs.latest { inherit config system; }; #import inputs.nixos-2305 { inherit config system; };
+          nixos-2311 = inputs.nixos-2311.legacyPackages.${system}; #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
           nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
           # TODO https://github.com/onekey-sec/unblob/blob/4e900ff/flake.nix#L21
@@ -97,6 +98,7 @@ import inputs.nixpkgs {
           inherit (inputs.agenix-cli.packages.${system}) agenix-cli;
           inherit (latest) tailscale csvlens oxker;
           inherit (unstable) cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25;
+	  #inherit (nixos-2311) ;
           inherit (unstable.cudaPackages) cudatoolkit;
 	  inherit (inputs.libreoffice-postscript.legacyPackages.${system}) libreoffice;
 
@@ -274,7 +276,7 @@ import inputs.nixpkgs {
             // {
               inherit
                 (unstable.nixVersions)
-                nix_2_19;
+                latest;
             };
           nodePackages =
             prev.nodePackages
