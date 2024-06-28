@@ -77,6 +77,7 @@ elif [[ "${USER}" == "nix-on-droid" ]]; then
 else
     _log "Build home-manager activationPackage..."
     nix build \
+	--option extra-experimental-features discard-references \
         --option extra-substituters "https://573-bc.cachix.org/" \
 	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
 	"${nix_config}#homeConfigurations.${USER}@$(hostname).activationPackage"

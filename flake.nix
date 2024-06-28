@@ -10,7 +10,7 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
@@ -22,6 +22,7 @@
     # or rather (bc I basically only need simple-scan and sane-backends) : https://lazamar.co.uk/nix-versions/?package=sane-backends&version=1.0.32&fullName=sane-backends-1.0.32&keyName=sane-backends&revision=1732ee9120e43c1df33a33004315741d0173d0b2&channel=nixos-22.11#instructions ?
     nixos-2211.url = "github:NixOS/nixpkgs/nixos-22.11";
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
+    nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
@@ -46,7 +47,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

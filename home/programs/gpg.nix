@@ -41,7 +41,7 @@ in
       enable = true;
       defaultCacheTtl = 300;
 
-      pinentryFlavor = mkIf cfg.curses "curses";
+      pinentryPackage = if cfg.curses then pkgs.pinentry-curses else pkgs.pinentry-gtk2;
     };
 
   };

@@ -27,6 +27,7 @@ in
 
     services.flatpak.packages = [
       "im.riot.Riot"
+      "com.github.KRTirtho.Spotube"
     ];
 
   };
