@@ -84,7 +84,7 @@ in
     packages = with pkgs; [
       #my-neovim
       #ranger
-      photoprism
+      #photoprism
       #alejandra
       shellharden
       shfmt
