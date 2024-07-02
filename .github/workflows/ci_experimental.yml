@@ -96,7 +96,7 @@ jobs:
       - name: Quick install
         env:
           _system: ${{ matrix.system }}-linux
-        uses: nixbuild/nix-quick-install-action@v26
+        uses: nixbuild/nix-quick-install-action@v28
         with:
           nix_conf: |
             substituters = https://cache.nixos.org/ https://nix-community.cachix.org
@@ -129,7 +129,7 @@ jobs:
       - name: Setup cachix
         env:
           _system: ${{ matrix.system }}-linux
-        uses: cachix/cachix-action@v12
+        uses: cachix/cachix-action@v15
         with:
           name: 573-bc
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
