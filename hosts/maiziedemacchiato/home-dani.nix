@@ -93,7 +93,7 @@ in
       #statix
       #nixfmt
       stylua
-      shellcheck
+      #shellcheck
       #yt-dlp
       micro
       #ranger

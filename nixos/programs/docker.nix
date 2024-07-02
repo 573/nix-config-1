@@ -10,11 +10,11 @@ let
 in
 
 {
-  imports = [
-    (args@{ pkgs, ... }:
-      import "${inputs.unstable.outPath}/nixos/modules/services/hardware/nvidia-container-toolkit"
-        (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; }))
-  ];
+#  imports = [
+#    (args@{ pkgs, ... }:
+#      import "${inputs.unstable.outPath}/nixos/modules/services/hardware/nvidia-container-toolkit"
+#        (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; }))
+#  ];
 
   ###### interface
 

@@ -74,7 +74,7 @@
     nodePackages.vscode-json-languageserver-bin
     xsel
     #nodejs_latest
-    shellcheck
+    #shellcheck
     chafa
     #cachix
     #nil
@@ -85,7 +85,7 @@
     #lolcat
     epr
     #my-emacs
-    pandoc
+    #pandoc
     #rustenv
     # this version fails, use version before https://github.com/573/nix-config-1/actions/runs/6589493931/job/17904090802
     #yt-dlp
