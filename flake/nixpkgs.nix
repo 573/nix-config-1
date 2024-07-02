@@ -236,9 +236,10 @@ import inputs.nixpkgs {
           #  inherit (unstable) elixir-ls;
           #in elixir-ls;
 
-          yt-dlp =
-            prev.yt-dlp.overrideAttrs
-              (_: { src = inputs.yt-dlp; });
+          #yt-dlp =
+          #  prev.yt-dlp.overrideAttrs
+          #    (_: { src = inputs.yt-dlp; }); # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
+                                              # >   - requests<3,>=2.32.2 not satisfied by version 2.31.0
 
           #python3Packages =
           #  prev.python311Packages
