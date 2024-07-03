@@ -210,11 +210,11 @@ org-mode-ox-odt = {
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/6d2e14666ff067074bb80e32ae9d1383743c6487";
+      url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
     };
 
     emacs-overlay-cached = {
-      url = "github:nix-community/emacs-overlay/6d2e14666ff067074bb80e32ae9d1383743c6487";
+      url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
       #url = "github:nix-community/emacs-overlay/2308be4351ab8a152248a48baebf22649c83a487";
     };
 

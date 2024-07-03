@@ -30,7 +30,7 @@ in
   config = mkIf cfg.enable (mkMerge [
     (mkIf (!cfg.termux) {
       custom.programs = {
-        #emacs-novelist.enable = true;
+        emacs-novelist.enable = true;
         bash.enable = true;
         htop.enable = true;
         nix-index.enable = true;
