@@ -15,7 +15,7 @@
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
 #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    unstable.url = "github:NixOS/nixpkgs/nixos-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
+    unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
     # latest is not cached, also github:NixOS/nixpkgs points to master/latest so no branch spec needed
     latest.url = "github:NixOS/nixpkgs"; # "github:NixOS/nixpkgs/master";
@@ -67,7 +67,7 @@
       # - nixpkgs master branch
       # - home-managers master branch overridden aforementioneds nixpkgs (that is currently nixos-unstable)
       # - nix-formatter-packs master branch overridden aforementioneds nixpkgs (that is currently release-22.11)
-      url = "github:nix-community/nix-on-droid/release-23.11";
+      url = "github:nix-community/nix-on-droid";
       inputs.home-manager.follows = "home-manager"; # I'm overriding master@de3758e31a3a1bc79d569f5deb5dac39791bf9b6 (Sep 23, 2022) here
       inputs.nixpkgs.follows = "nixpkgs"; # I'm overriding master@9c64b91d14268cf20ea07ea7930479a75325af9f (Sep 24, 2022) here
       inputs.nix-formatter-pack.follows = "nix-formatter-pack";
@@ -308,7 +308,7 @@ org-mode-ox-odt = {
       flake = false;
     };
 
-    firefox-addons = { url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons"; inputs.nixpkgs.follows = "nixpkgs"; };
+    firefox-addons = { url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons"; };
 
     mistty = {
       url = "github:szermatt/mistty";
@@ -767,7 +767,7 @@ org-mode-ox-odt = {
 
       nixosModules.nixos-shell-vm = import ./files/nix/nixos-shell-vm.nix rootPath;
 
-
+/*
       packages =
         let
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
@@ -799,8 +799,10 @@ org-mode-ox-odt = {
 
 	    x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
 	  }
-          (nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
-            ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ]);
+          #(nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
+          #  ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ])
+	  ;
+	  */
 
     };
 

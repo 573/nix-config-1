@@ -30,7 +30,8 @@ in
   ];
 
   options.custom.wsl.scanner = {
-    enable = mkEnableOption "i" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable = mkEnableOption "i" #// optionalAttrs (config.custom.base.general.wsl) { default = true; }
+    ;
   };
 
   config = mkIf (cfg.enable) {

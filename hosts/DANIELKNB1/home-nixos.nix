@@ -66,12 +66,12 @@
     #statix
     #nixfmt
     lua-language-server
-    nodePackages.bash-language-server
-    nodePackages.vim-language-server
+ #   nodePackages.bash-language-server
+#    nodePackages.vim-language-server
     #deno
     stylua
     sqlite
-    nodePackages.vscode-json-languageserver-bin
+  #  nodePackages.vscode-json-languageserver-bin
     xsel
     #nodejs_latest
     #shellcheck

@@ -4,7 +4,7 @@ let
   inherit (lib)
     mkEnableOption
     mkIf
-    optionals
+    attrValues
     ;
   inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.desktop;
@@ -137,7 +137,7 @@ in
       inactiveInterval = 1;
     };*/
 
-    programs.firefox = {
+    /*programs.firefox = {
       enable = true;
       profiles.dani = {
         bookmarks = { };
@@ -150,55 +150,44 @@ in
         ];
       };
       package = pkgs.firefox;
-    };
+    };*/
 
     # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
     home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 
-    home.packages = with pkgs; [
-      #pw-viz
+    home.packages = [chrome
+      ausweisapp] ++ (attrValues {
+      
+      inherit
+        (pkgs)
       pavucontrol
-      #pwvucontrol
-      chrome
-      ausweisapp
-      #gimp
-      #skanpage
-      #simple-scan # for now use print instead of save as long as file picker not fixed, also: scanner not detected, was in 22.11 though, also file picker crash when saving file
-      ##gscan2pdf
-      #swingsane # crashes with perms denied
-      #libreoffice
       pdftk
       qpdfview
-      #spotify
-      #sshfs
       # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
       obconf
-      # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
-      #xorg.xset
-      xorg.xev
-      lxde.lxsession
       # DONT home-manager on non-nixos can't manage system files i. e. /etc/pam.d/* see https://github.com/NixOS/nixpkgs/issues/157112
       #xss-lock # reason for slock not being on this list: https://gist.github.com/573/5ce58db3b72913648968968dbfa59d86
       # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
       #xsecurelock # lxdm not shown
       xscreensaver
       droidcam # host-install v4l2loopback
-      #mpv
-      #libdvdread
-      #libdvdcss
-      #libdvdnav
-      #mplayer
       vlc
-      #xorg.libXpresent
-      #xine-ui
-      #xine-lib
       mediathekview
       xclip
-      #anbox
-    ] ++ (optionals cfg.private [
-    ]);
+      ;
+      inherit
+      (pkgs.xorg)
+      # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
+      #xorg.xset
+      xev
+      ;
+      inherit
+      (pkgs.lxde)
+      lxsession
+      ;
+    });
 
     home.file.".Xkbmap".text = ''
       -model pc104 -layout us -variant altgr-intl
