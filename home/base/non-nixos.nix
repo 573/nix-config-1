@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }@configArgs:
+{ config, lib, pkgs, ... }@configArgs:
 
 let
   inherit (lib)
@@ -6,6 +6,7 @@ let
     mkEnableOption
     mkIf
     mkOption
+    optionals
     types
     ;
 
@@ -23,7 +24,8 @@ in
     custom.base.non-nixos = {
       enable = mkEnableOption "config for non NixOS systems";
 
-      installNix = mkEnableOption "nix installation" // { default = true; };
+      installNix = mkEnableOption "nix installation" // { default = true; }
+      ;
 
       builders = mkOption {
         type = types.listOf types.str;
@@ -43,7 +45,7 @@ in
   config = mkIf cfg.enable {
 
     home = {
-      packages = mkIf cfg.installNix [ config.nix.package ];
+      packages = optionals cfg.installNix [ config.nix.package ];
       sessionVariables.NIX_PATH = concatStringsSep ":" commonConfig.nix.nixPath;
       sessionVariables.TERMINFO = "${pkgs.ncurses}/share/terminfo";
     };

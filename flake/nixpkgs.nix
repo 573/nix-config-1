@@ -2,7 +2,6 @@
 , rootPath
 , system
 , nixOnDroid ? false
-,
 }:
 let
   config = {
@@ -28,11 +27,14 @@ import inputs.nixpkgs {
           inherit (prev.stdenv.hostPlatform) system;
           inherit (prev.lib) remove flatten;
           # inherit rootPath;
-          unstable = inputs.unstable.legacyPackages.${system}; #import inputs.unstable { inherit config system; };
+          unstable = #inputs.unstable.legacyPackages.${system}; 
+	  import inputs.unstable { inherit config system; };
 
 
           latest = inputs.latest.legacyPackages.${system}; #import inputs.latest { inherit config system; }; #import inputs.nixos-2305 { inherit config system; };
-          nixos-2311 = inputs.nixos-2311.legacyPackages.${system}; #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
+          nixos-2311 = #inputs.nixos-2311.legacyPackages.${system}; 
+	  import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
+
           nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
           # TODO https://github.com/onekey-sec/unblob/blob/4e900ff/flake.nix#L21
@@ -638,6 +640,9 @@ import inputs.nixpkgs {
       # DONT when enabling this overlay as in my setup it will start i. e. to build chromium-unwrapped for whatever reason for my nix-on-droid machine: inputs.ruby-nix.overlays.ruby # DONT do not enable TODO review my setup
       #inputs.ocaml-overlay.overlays."${system}"
     ]*/
-    ++ inputs.nixpkgs.lib.optional nixOnDroid
-      inputs.nix-on-droid.overlays.default;
+    ++ inputs.nixpkgs.lib.optionals nixOnDroid [
+      inputs.nix-on-droid.overlays.default
+      # prevent uploads to remote builder
+      (final: prev: prev.prefer-remote-fetch final prev)
+    ];
 }

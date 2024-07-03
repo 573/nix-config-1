@@ -84,11 +84,11 @@ org-mode-ox-odt = {
 
       flatpaks.url = "github:gmodena/nix-flatpak/main";
 
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+    #agenix = {
+    #  url = "github:ryantm/agenix";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #  inputs.home-manager.follows = "home-manager";
+    #};
     agenix-cli = {
       url = "github:cole-h/agenix-cli";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -99,7 +99,7 @@ org-mode-ox-odt = {
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    flake-utils.url = "github:numtide/flake-utils";
+    #flake-utils.url = "github:numtide/flake-utils";
 
     "virtual-types.nvim" = {
       flake = false;
@@ -156,7 +156,7 @@ org-mode-ox-odt = {
 
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
-      inputs.flake-utils.follows = "flake-utils";
+      #inputs.flake-utils.follows = "flake-utils";
       inputs.nixpkgs.follows = "unstable";
     };
 
@@ -200,13 +200,14 @@ org-mode-ox-odt = {
 
     # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
     nixos-wsl = {
+      url ="github:nix-community/nixos-wsl";
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
-      url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head";
+      #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
-      inputs.flake-utils.follows = "flake-utils";
+      #inputs.flake-utils.follows = "flake-utils";
     };
 
     emacs-overlay = {
