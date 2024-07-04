@@ -15,6 +15,7 @@
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
 #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # seems plausible: https://github.com/NixOS/flake-registry/blob/895a65f8d5acf848136ee8fe8e8f736f0d27df96/flake-registry.json#L301-L311
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
     # latest is not cached, also github:NixOS/nixpkgs points to master/latest so no branch spec needed
@@ -84,11 +85,12 @@ org-mode-ox-odt = {
 
       flatpaks.url = "github:gmodena/nix-flatpak/main";
 
-    #agenix = {
-    #  url = "github:ryantm/agenix";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #  inputs.home-manager.follows = "home-manager";
-    #};
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     agenix-cli = {
       url = "github:cole-h/agenix-cli";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -308,7 +310,7 @@ org-mode-ox-odt = {
       flake = false;
     };
 
-    firefox-addons = { url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons"; };
+    firefox-addons = { url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons"; inputs.nixpkgs.follows = "nixpkgs"; };
 
     mistty = {
       url = "github:szermatt/mistty";
@@ -767,7 +769,6 @@ org-mode-ox-odt = {
 
       nixosModules.nixos-shell-vm = import ./files/nix/nixos-shell-vm.nix rootPath;
 
-/*
       packages =
         let
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
@@ -799,11 +800,9 @@ org-mode-ox-odt = {
 
 	    x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
 	  }
-          #(nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
-          #  ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ])
+          (nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
+            ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ])
 	  ;
-	  */
-
     };
 
   nixConfig = {

@@ -137,7 +137,7 @@ in
       inactiveInterval = 1;
     };*/
 
-    /*programs.firefox = {
+    programs.firefox = {
       enable = true;
       profiles.dani = {
         bookmarks = { };
@@ -150,7 +150,7 @@ in
         ];
       };
       package = pkgs.firefox;
-    };*/
+    };
 
     # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
     home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";

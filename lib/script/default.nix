@@ -32,13 +32,13 @@ let
                 cat ${preamble} "${file}" > "$file"
                 substituteAllInPlace "$file"
 
-#                ${pkgs.shellcheck}/bin/shellcheck \
- #                 --check-sourced \
-#                  --enable all \
-#                  --exclude SC2310,SC2312 \
-#                  --external-sources \
-#                  --shell bash \
-#                  "$file"
+                ${pkgs.shellcheck}/bin/shellcheck \
+                  --check-sourced \
+                  --enable all \
+                  --exclude SC2310,SC2312 \
+                  --external-sources \
+                  --shell bash \
+                  "$file"
 
                 ${optionalString executable ''
                   chmod +x "$file"

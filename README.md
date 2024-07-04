@@ -78,11 +78,36 @@ Firmware of Raspberry Pi needs to be updated manually on a regular basis with th
 1. Copy `result/*` to firmware partition (ensure that old ones are deleted)
 1. Unmount and reboot
 
+##### Update `flake.lock`
+
+Go to [update-flake-lock](https://github.com/573/nix-config-1/actions/workflows/update.yml). There `Use workflow from | Branch: master`. When action is finished go to [Pull requests](https://github.com/573/nix-config-1/pulls), choose the latest `Update flake.lock` and use the `Rebase and merge` (*The 1 commit from this branch will be rebased and added to the base branch.*) approach.
+
 ##### Troubleshoot
+
+###### emacs (all archs)
 
 When emacs is modified i. e. packages are changed, there may occur discrepancies i. e.
 packages missing being noticed at runtime which often is related to so first check the
-flake input `emacs-overlay`, might refer to a dated version.
+flake input `emacs-overlay`, might refer to a dated version. Also when updating emacs
+the aarch64-linux variant needs to be remote-built or binfmt-built and pushed to a
+cache as its build causes an OOM killer on certain devices.
+
+###### nix-on-droid
+
+Observe the recommendations on [n-o-d](https://github.com/nix-community/nix-on-droid/issues/374)s
+page for device settings (or directly [here](https://dontkillmyapp.com/google)).
+
+###### NixOS-WSL
+
+> [!IMPORTANT]  
+> Somehow I managed to downgrade WSL while trying to make usbip-win and/or wslg working.
+> Extremely unadvisable, took me one and a half day of unneccessary tweaking on wrong ends
+> to figure the real cause of *error: getting attributes of path '/run/binfmt': No such file or directory*
+> when trying a nixos-rebuild days or weeks after that mistake.
+> as well as other very weird behaviours (it is still a VM let's not forget about that).
+> *tl;dr* after upgrading again to v2.2.4 (latest by that time) all issues where set.
+> Baseline info [here](https://github.com/nix-community/NixOS-WSL/blob/56907505856b4b000a9c166a566eea6c46aef2a0/docs/src/troubleshooting/README.md?plain=1#L10).
+
 
 [age]: https://age-encryption.org/
 [agenix]: https://github.com/ryantm/agenix

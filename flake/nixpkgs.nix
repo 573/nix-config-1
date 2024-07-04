@@ -27,13 +27,13 @@ import inputs.nixpkgs {
           inherit (prev.stdenv.hostPlatform) system;
           inherit (prev.lib) remove flatten;
           # inherit rootPath;
-          unstable = #inputs.unstable.legacyPackages.${system}; 
-	  import inputs.unstable { inherit config system; };
+          unstable = inputs.unstable.legacyPackages.${system}; 
+	  #import inputs.unstable { inherit config system; };
 
 
           latest = inputs.latest.legacyPackages.${system}; #import inputs.latest { inherit config system; }; #import inputs.nixos-2305 { inherit config system; };
-          nixos-2311 = #inputs.nixos-2311.legacyPackages.${system}; 
-	  import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
+          nixos-2311 = inputs.nixos-2311.legacyPackages.${system}; 
+	  #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
           nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
