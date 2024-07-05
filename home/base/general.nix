@@ -121,6 +121,7 @@ in
 	  agenix-cli
 
 	  nix-inspect
+	  zellij
         ];
 
         sessionVariables = {

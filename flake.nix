@@ -57,6 +57,10 @@
       flake = false;
     };
 
+        catppuccin = {
+	  url = "github:catppuccin/nix";
+	};
+
     devenv = {
       url = "github:cachix/devenv";
       inputs.nixpkgs.follows = "unstable";

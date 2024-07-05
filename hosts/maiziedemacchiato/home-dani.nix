@@ -29,15 +29,6 @@ in
     };
   };
 
-  #  disabledModules = [ "${inputs.home-manager.outPath}/modules/misc/gtk.nix" ];
-
-  #  imports = [ 
-  #    (args@{ config, lib, pkgs, ... }:
-  #      import "${inputs.home-manager-2211.outPath}/modules/misc/gtk.nix"
-  #        (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.system}; })
-  #    )
-  #  ];
-
   # https://mipmip.github.io/home-manager-option-search/?query=syncthing
   services.syncthing = {
     enable = true;
@@ -137,7 +128,6 @@ in
       normcap
       ##gImageReader # archlinux rather
       usbutils.out
-      #gtk4
       gdb
       #libreoffice-qt.out
       libcdio-paranoia
@@ -175,13 +165,6 @@ in
   };
 
   fonts.fontconfig.enable = true;
-
-  gtk = {
-    enable = true;
-    gtk3.extraConfig = {
-      gtk-cursor-blink = false;
-    };
-  };
 
   # not started as of release-23.05
   #programs.tint2 = {

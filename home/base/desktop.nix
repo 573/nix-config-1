@@ -113,6 +113,8 @@ in
       development.direnv.enable = true;
 
       programs = { };
+
+      ui.gtk.enable = true;
     };
 
     # https://www.codingblatt.de/arch-linux-xsecurelock-screenlocker-einrichten/
