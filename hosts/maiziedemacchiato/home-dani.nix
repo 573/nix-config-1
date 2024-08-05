@@ -88,7 +88,7 @@ in
       #yt-dlp
       micro
       #ranger
-      masterpdfeditor
+      #masterpdfeditor
       abcde
       cups-filters
       #      talon

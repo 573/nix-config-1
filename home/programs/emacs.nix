@@ -121,7 +121,7 @@ in
           moe-theme
           org-novelist
           better-defaults
-          vterm
+          #vterm
           bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
           use-package
           writeroom-mode

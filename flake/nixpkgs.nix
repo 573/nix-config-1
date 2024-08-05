@@ -589,7 +589,7 @@ import inputs.nixpkgs {
               extraEmacsPackages = epkgs:
                 with epkgs; [
                   my-default-el # including this here seems essential while override = epkgs: epkgs // { inherit my-default-el; }; seems not and is also not sufficient itself
-                  vterm
+                  #vterm
                   #treesit-grammars.with-all-grammars
                   use-package
                   moe-theme
