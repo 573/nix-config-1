@@ -118,7 +118,6 @@ in
 
 	  # poc
 	  age
-	  agenix-cli
 
 	  nix-inspect
 	  zellij

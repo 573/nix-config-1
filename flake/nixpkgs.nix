@@ -97,7 +97,7 @@ import inputs.nixpkgs {
 
           #inherit (latest) photoprism cups-filters abcde git-absorb flutter dart difftastic diffoscope bashdb scrcpy hydra-check hledger hledger-web autorandr mons maim xdotool xclip nil keepassxc signal-desktop julia_19 sd openssh tailscale;
 
-          inherit (inputs.agenix-cli.packages.${system}) agenix-cli;
+          #inherit (inputs.agenix-cli.packages.${system}) agenix-cli;
           inherit (latest) tailscale csvlens oxker;
           inherit (unstable) cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25;
 	  #inherit (nixos-2311) ;
