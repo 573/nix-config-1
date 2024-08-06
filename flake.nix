@@ -217,7 +217,7 @@ org-mode-ox-odt = {
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
+      url = "github:nix-community/emacs-overlay/c051c42e3325ac62e9bf83e72e3868db1e5f2e64";
     };
 
     emacs-overlay-cached = {
