@@ -83,10 +83,10 @@ in
       #deadnix
       #statix
       #nixfmt
-      stylua
+      #stylua
       #shellcheck
       #yt-dlp
-      micro
+      #micro
       #ranger
       #masterpdfeditor
       abcde

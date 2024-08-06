@@ -1,6 +1,7 @@
 { config
 , lib
 , pkgs
+, inputs
 , ...
 }:
 let
@@ -14,6 +15,8 @@ let
   cfg = config.custom.wsl;
 in
 {
+  imports = [ inputs.nix-ld-rs.nixosModules.nix-ld ];
+
   options.custom.wsl = {
     enable = mkEnableOption "Wsl settings" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
@@ -37,9 +40,8 @@ in
     # to run: NIX_LD_LIBRARY_PATH=/usr/lib/wsl/lib/ /usr/lib/wsl/lib/nvidia-smi
     #programs.nix-ld.enable = true;
     # see  https://github.com/nix-community/NixOS-WSL/discussions/92
-    programs.nix-ld = {
+    programs.nix-ld.dev = {
       enable = true;
-      package = pkgs.nix-ld-rs;
       # TODO https://github.com/Mic92/dotfiles/blob/1b76848e2b5951bc9041af95a834a08b68e146fd/nixos/modules/nix-ld.nix
       libraries = with pkgs; [
         stdenv.cc.cc # for libstdc++.so.6

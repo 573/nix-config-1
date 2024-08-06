@@ -1,5 +1,5 @@
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   inherit (lib)
@@ -11,6 +11,12 @@ let
 in
 
 {
+
+#  disabledModules = [ "hardware/opengl.nix" ];
+
+  imports = [
+    # TODO what belongs here ?
+  ];
 
   ###### interface
 
@@ -24,10 +30,13 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-      hardware.opengl = {
-        enable = true;
-        driSupport32Bit = true;
-      };
+
+#      hardware.graphics = {
+#        enable = true;
+#	# https://search.nixos.org/options?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=32enable32Bit
+#	# AFAIC here lies the problem using nixos-wsl also (needs nixpkgs-unstable, but pkgs here is not, but nixos-24.05)
+#        enable32Bit = true;
+#      };
       # TODO Separate nvidia.nix
       /*  hardware.opengl = {
         driSupport = true;

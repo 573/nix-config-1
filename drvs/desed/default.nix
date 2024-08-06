@@ -1,3 +1,4 @@
+# in overlay: desed = final.callPackage "${rootPath}/drvs/desed" { };
 { lib, rustPlatform, fetchFromGitHub }:
 rustPlatform.buildRustPackage rec {
   pname = "desed";

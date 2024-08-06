@@ -335,7 +335,7 @@ org-mode-ox-odt = {
 
     zig2nix.url = "github:Cloudef/zig2nix";
 
-    nix-ld-rs.url = "github:nix-community/nix-ld-rs";
+    nix-ld-rs.url = "github:Mic92/nix-ld";
     nixvim-config.url = "github:MikaelFangel/nixvim-config";
 
     nixvim = {

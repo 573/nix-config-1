@@ -65,11 +65,11 @@
     #deadnix
     #statix
     #nixfmt
-    lua-language-server
+#    lua-language-server
  #   nodePackages.bash-language-server
 #    nodePackages.vim-language-server
     #deno
-    stylua
+#    stylua
     sqlite
   #  nodePackages.vscode-json-languageserver-bin
     xsel
@@ -89,17 +89,17 @@
     #rustenv
     # this version fails, use version before https://github.com/573/nix-config-1/actions/runs/6589493931/job/17904090802
     #yt-dlp
-    micro
-    jdt-language-server
+#    micro
+#    jdt-language-server
     #ranger
     #pup
     difftastic
-    bashdb
-    desed
-    gradle-vscode-extension.vscode-gradle
+#    bashdb
+#    desed
+#    gradle-vscode-extension.vscode-gradle
     python310Packages.pudb
     jacinda
-    mermaid-cli
+#    mermaid-cli
     dstask
     nixgl.nixGLIntel
     nix-prefetch
