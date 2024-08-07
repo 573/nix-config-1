@@ -177,7 +177,7 @@ in
     (mkIf (!cfg.lightWeight) {
       custom.programs = {
         tmux.enable = true;
-#        emacs.enable = true;
+        emacs.enable = true;
 #        emacs-novelist.enable = true;
 #        emacs-nano.enable = true;
         neovim = {

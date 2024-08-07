@@ -115,7 +115,7 @@ import inputs.nixpkgs {
 
           #yt-dlp =
           #  prev.yt-dlp.overrideAttrs
-          #    (_: { src = inputs.yt-dlp; }); # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
+          #    { src = inputs.yt-dlp; }; # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
                                               # >   - requests<3,>=2.32.2 not satisfied by version 2.31.0
 
           emacsPackages =
@@ -152,6 +152,9 @@ import inputs.nixpkgs {
                 ;
             };
 
+        desed = final.callPackage "${rootPath}/drvs/desed" { };
+
+	          devenv = inputs.devenv.packages.${system}.devenv;
 
           somemore = prev.lib.composeManyExtensions moreOverlays final prev;
 
@@ -167,7 +170,7 @@ import inputs.nixpkgs {
     ] ++ (map (x: x.overlays.default) [
       # FIXME when to do this: https://github.com/jtojnar/nixfiles/blob/522466da4dd5206c7b444ba92c8d387eedf32a22/hosts/brian/profile.nix#L10-L12
       inputs.nixGL
-#      inputs.rust-overlay
+      inputs.rust-overlay
       inputs.nixpkgs-ruby
       inputs.neovim-nightly-overlay
     ])

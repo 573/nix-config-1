@@ -17,17 +17,19 @@ in
 {
   # See https://sourcegraph.com/github.com/michalrus/dotfiles/-/blob/machines/_shared_/features/canoscan-lide-20/default.nix?L34:11
   # but also https://discourse.nixos.org/t/whats-the-difference-between-extraargs-and-specialargs-for-lib-eval-config-nix/5281/2
-  disabledModules = [ "services/hardware/sane.nix" ];
 
-  imports = [
-    # TODO could this be elevated to use unstable home-manager modules in parallel to release-XX as well ?
-    (args@{ config, lib, pkgs, ... }:
-      import "${inputs.nixpkgs.outPath}/nixos/modules/services/hardware/sane.nix"
-        (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.system}; })
-      # above works, but FIXME does not work (again) in unstable yet
-      #(args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
-    )
-  ];
+  #imports = [
+  #{
+  #disabledModules = [ "services/hardware/sane.nix" ];
+  #}
+  #  # TODO could this be elevated to use unstable home-manager modules in parallel to release-XX as well ?
+  #  (args@{ config, lib, pkgs, ... }:
+  #    import "${inputs.nixpkgs.outPath}/nixos/modules/services/hardware/sane.nix"
+  #      (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.system}; })
+  #    # above works, but FIXME does not work (again) in unstable yet
+  #    #(args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
+  #  )
+  #];
 
   options.custom.wsl.scanner = {
     enable = mkEnableOption "Support the Canon LiDE 30 USB-scanner" // optionalAttrs (config.custom.base.general.wsl) { default = true; };

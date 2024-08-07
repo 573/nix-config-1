@@ -368,6 +368,11 @@ org-mode-ox-odt = {
     };
 
     nix-inspect.url = "github:bluskript/nix-inspect";
+
+    nixpkgs-unfree = {
+      url = "github:numtide/nixpkgs-unfree";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

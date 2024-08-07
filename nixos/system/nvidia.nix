@@ -1,5 +1,4 @@
-
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, system, ... }:
 
 let
   inherit (lib)
@@ -11,13 +10,6 @@ let
 in
 
 {
-
-#  disabledModules = [ "hardware/opengl.nix" ];
-
-  imports = [
-    # TODO what belongs here ?
-  ];
-
   ###### interface
 
   options = {
@@ -30,17 +22,20 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
+# TODO https://discourse.nixos.org/t/use-a-module-from-nixpkgs-unstable-in-flake/31463/9
 
-#      hardware.graphics = {
-#        enable = true;
+      #hardware.graphics = {
+      #  enable = true;
 #	# https://search.nixos.org/options?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=32enable32Bit
 #	# AFAIC here lies the problem using nixos-wsl also (needs nixpkgs-unstable, but pkgs here is not, but nixos-24.05)
-#        enable32Bit = true;
-#      };
+      #  enable32Bit = true;
+      #};
       # TODO Separate nvidia.nix
-      /*  hardware.opengl = {
-        driSupport = true;
-        };
+      hardware.opengl = {
+        enable = true;
+        driSupport32Bit = true;
+      };
+      /*
 
         # Load nvidia driver for Xorg and Wayland
         services.xserver.videoDrivers = [ "nvidia" ];

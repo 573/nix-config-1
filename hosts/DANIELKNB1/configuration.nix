@@ -9,13 +9,13 @@
     base.general.wsl = true;
     programs.docker.enable = true;
     # DONT the nixos-2211 hack might cause build problems finally, WIP investigating https://github.com/573/nix-config-1/actions/runs/10269489465/job/28415058034
-    wsl = {
-      scanner.enable = false;
-      usbip.enable = false;
-      yubikey.enable = false;
-    };
-    #wsl.usbip.autoAttach = [ "1-2" ];
-    system.nvidia.enable = false;
+#    wsl = {
+#      scanner.enable = false;
+#      usbip.enable = false;
+#      yubikey.enable = false;
+#    };
+    wsl.usbip.autoAttach = [ "1-2" ];
+    system.nvidia.enable = true;
   };
 
   systemd.tmpfiles.rules = [

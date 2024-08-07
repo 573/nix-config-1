@@ -2752,6 +2752,26 @@
         "type": "github"
       }
     },
+    "nixpkgs-unfree": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1723200601,
+        "narHash": "sha256-oSdsgUlS1PF8DJHDygD68MWR59j+bt+r4SSgMnQ5Gv0=",
+        "owner": "numtide",
+        "repo": "nixpkgs-unfree",
+        "rev": "f6bbe7c3b0dfb485d8da637f3e5110b09d7aa5f7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "nixpkgs-unfree",
+        "type": "github"
+      }
+    },
     "nixpkgs_10": {
       "locked": {
         "lastModified": 1673796341,
@@ -3799,6 +3819,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_16",
         "nixpkgs-ruby": "nixpkgs-ruby",
+        "nixpkgs-unfree": "nixpkgs-unfree",
         "nixvim": "nixvim",
         "nixvim-config": "nixvim-config",
         "nmd": "nmd",
