@@ -115,7 +115,7 @@ import inputs.nixpkgs {
 
           #yt-dlp =
           #  prev.yt-dlp.overrideAttrs
-          #    (_: { src = inputs.yt-dlp; }); # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
+          #    { src = inputs.yt-dlp; }; # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
                                               # >   - requests<3,>=2.32.2 not satisfied by version 2.31.0
 
           emacsPackages =
