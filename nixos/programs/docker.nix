@@ -28,7 +28,7 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-    hardware.nvidia-container-toolkit.enable = true; # renamed here: https://github.com/NixOS/nixpkgs/commit/471ff2c33c99bf88eb87430df2251f73d94181d0
+    #hardware.nvidia-container-toolkit.enable = true; # renamed here: https://github.com/NixOS/nixpkgs/commit/471ff2c33c99bf88eb87430df2251f73d94181d0
     # https://github.com/nix-community/NixOS-WSL/issues/433
     # https://github.com/nix-community/NixOS-WSL/pull/478
     virtualisation = {

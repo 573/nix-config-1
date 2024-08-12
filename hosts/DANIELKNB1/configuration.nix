@@ -15,7 +15,7 @@
 #      yubikey.enable = false;
 #    };
     wsl.usbip.autoAttach = [ "1-2" ];
-    system.nvidia.enable = true;
+    system.nvidia.enable = false;
   };
 
   systemd.tmpfiles.rules = [

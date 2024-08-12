@@ -52,19 +52,23 @@ _:
       log-lines = 35;
       # discourse:nix-flake-update-timeout/17215/5
       #flake-registry = null;
-      flake-registry = "${inputs.flake-registry}/flake-registry.json";
+      flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
     package = pkgs.nixVersions.latest;
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
+    # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry 
+    # https://dataswamp.org/~solene/2022-07-20-nixos-flakes-command-sync-with-system.html
+    channel.enable = false;
+
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       nix-config.flake = inputs.self;
-      "nixpkgs-unfree".to = {
-        type = "path";
-	path = inputs.nixpkgs-unfree;
-      };
+      #"nixpkgs-unfree".to = {
+      #  type = "path";
+#	path = inputs.nixpkgs-unfree;
+ #     };
     };
     nixPath = [ "nixpkgs=flake:nixpkgs" ];
   };

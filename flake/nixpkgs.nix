@@ -170,7 +170,7 @@ import inputs.nixpkgs {
     ] ++ (map (x: x.overlays.default) [
       # FIXME when to do this: https://github.com/jtojnar/nixfiles/blob/522466da4dd5206c7b444ba92c8d387eedf32a22/hosts/brian/profile.nix#L10-L12
       inputs.nixGL
-      inputs.rust-overlay
+      #inputs.rust-overlay
       inputs.nixpkgs-ruby
       inputs.neovim-nightly-overlay
     ])
