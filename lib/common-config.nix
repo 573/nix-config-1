@@ -60,6 +60,7 @@ _:
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
     # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry 
     # https://dataswamp.org/~solene/2022-07-20-nixos-flakes-command-sync-with-system.html
+    # https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538
     channel.enable = false;
 
     registry = {

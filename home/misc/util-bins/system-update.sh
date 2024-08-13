@@ -73,7 +73,7 @@ _pull_changes "pass"        "${HOME}/.password-store"
 # TODO: use scripts defined in home/development/nix
 if _is_nixos; then
     _log "nix" "build nixos configuration"
-    sudo nixos-rebuild build --flake "${nix_config}"
+    sudo nix build --log-format internal-json --verbose "${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel" |& nom --json
     _show_result_diff "/nix/var/nix/profiles/system"
 
     _log "nix" "switch nixos configuration"
@@ -82,7 +82,7 @@ fi
 
 if [[ "${USER}" == "nix-on-droid" ]] && _available nix-on-droid; then
     _log "nix" "build nix-on-droid configuration"
-    nix-on-droid build --flake "${nix_config}#sams9"
+    nix build --log-format internal-json --vv --show-trace --builders '' -j1 "${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure |& nom --json
     _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
 
     _log "nix" "switch nix-on-droid configuration"
@@ -91,7 +91,7 @@ fi
 
 if ! _is_nixos && _available home-manager; then
     _log "nix" "build home-manager configuration"
-    home-manager build --flake "${nix_config}"
+    nix build --log-format internal-json --verbose "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
     _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
     _log "nix" "switch home-manager configuration"
@@ -122,21 +122,4 @@ mapfile -t to_be_removed_pkgs < <(nix-env -q --json | jq -r ".[].pname" | grep -
 if [[ "${#to_be_removed_pkgs[@]}" -ne 0 ]]; then
     _log "migration" "remove manual installed packages via nix-env"
     nix-env --uninstall "${to_be_removed_pkgs[@]}"
-fi
-
-
-# nix cleanup
-sudo_for_cleanup=
-if _is_nixos; then
-    sudo_for_cleanup=sudo
-fi
-
-if ! _has_unit_enabled "nix-gc.timer"; then
-    _log "nix" "nix-collect-garbage"
-    ${sudo_for_cleanup} nix-collect-garbage --delete-older-than 14d 2> /dev/null
-fi
-
-if ! _has_unit_enabled "nix-optimise.timer" && [[ "${USER}" != "nix-on-droid" ]]; then
-    _log "nix" "nix store optimise"
-    ${sudo_for_cleanup} nix store optimise
 fi

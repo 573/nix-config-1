@@ -25,7 +25,7 @@ before_date=$(date +"%Y-%m-%d %H:%M:%S")
 
 sudo nixos-rebuild "${args[@]}"; result=$?
 
-for user in root tobias; do
+for user in root nixos; do
     echo
     journalctl --identifier "hm-activate-${user}" --since "${before_date}" --output cat |
         ccze --raw-ansi
