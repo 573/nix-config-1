@@ -393,11 +393,18 @@ in
           (pluggo "faster-nvim")
           #		(pluggo "deadcolumn-nvim")
         ];
+	extraConfigLua = ''
+	vim.g.clipboard = {
+      name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+      },
+      paste = {                                                    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),                                                                 ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                               },                                                       }
+	'';
         extraPackages = with pkgs; [
           nixpkgs-fmt
         ];
         plugins = {
-          nvim-osc52.enable = true;
+       #   nvim-osc52.enable = true;
           which-key.enable = true;
           luasnip.enable = true;
           lsp = {
