@@ -91,7 +91,7 @@ fi
 
 if ! _is_nixos && _available home-manager; then
     _log "nix" "build home-manager configuration"
-    nix build --log-format internal-json --verbose "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
+    nix build --log-format internal-json -vv --show-trace --builders '' -j1 "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
     _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
     _log "nix" "switch home-manager configuration"

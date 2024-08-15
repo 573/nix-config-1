@@ -66,10 +66,10 @@ _:
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       nix-config.flake = inputs.self;
-      #"nixpkgs-unfree".to = {
-      #  type = "path";
-#	path = inputs.nixpkgs-unfree;
- #     };
+      "nixpkgs-unfree".to = {
+        type = "path";
+	path = inputs.nixpkgs-unfree;
+      };
     };
     nixPath = [ "nixpkgs=flake:nixpkgs" ];
   };

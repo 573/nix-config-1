@@ -25,6 +25,12 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
+# Firefox style
+    penguin-fox = {
+      url = "github:p3nguin-kun/pengufox";
+      flake = false;
+    };
+
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
     ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/270dace49bc95a7f88ad187969179ff0d2ba20ed";   #e1ee359d16a1886f0771cc433a00827da98d861c";
@@ -568,6 +574,8 @@ org-mode-ox-odt = {
                   env.PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
                   env.PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs}/bin/node";
                   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
+		  # https://discourse.nixos.org/t/running-playwright-tests/25655/41
+		  env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true;
                   enterShell = ''
                     		    # Remove playwright from node_modules, so it will be taken from playwright-test
                                         rm node_modules/@playwright/ -R

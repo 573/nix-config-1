@@ -149,6 +149,7 @@ in
       '')
       libreoffice
       #gtt
+      notepad-next
     ];
 
 

@@ -3553,6 +3553,22 @@
         "type": "github"
       }
     },
+    "penguin-fox": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1721742466,
+        "narHash": "sha256-IWGCIyTQskRv63U6itAgzm6Iunk/yeArSJb4EPGlHGA=",
+        "owner": "p3nguin-kun",
+        "repo": "pengufox",
+        "rev": "e41733389afb04b8962eaed7f2cd05824da64c83",
+        "type": "github"
+      },
+      "original": {
+        "owner": "p3nguin-kun",
+        "repo": "pengufox",
+        "type": "github"
+      }
+    },
     "poetry2nix": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -3829,6 +3845,7 @@
         "org-extra-emphasis": "org-extra-emphasis",
         "org-mode-ox-odt": "org-mode-ox-odt",
         "org-novelist": "org-novelist",
+        "penguin-fox": "penguin-fox",
         "pypi-deps-db": "pypi-deps-db",
         "ruby-nix": "ruby-nix",
         "rust-dev-template": "rust-dev-template",
