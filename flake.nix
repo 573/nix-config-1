@@ -14,7 +14,7 @@
     nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
-#    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # seems plausible: https://github.com/NixOS/flake-registry/blob/895a65f8d5acf848136ee8fe8e8f736f0d27df96/flake-registry.json#L301-L311
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
@@ -25,7 +25,7 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
-# Firefox style
+    # Firefox style
     penguin-fox = {
       url = "github:p3nguin-kun/pengufox";
       flake = false;
@@ -33,7 +33,7 @@
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/270dace49bc95a7f88ad187969179ff0d2ba20ed";   #e1ee359d16a1886f0771cc433a00827da98d861c";
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/270dace49bc95a7f88ad187969179ff0d2ba20ed"; #e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -63,9 +63,9 @@
       flake = false;
     };
 
-        catppuccin = {
-	  url = "github:catppuccin/nix";
-	};
+    catppuccin = {
+      url = "github:catppuccin/nix";
+    };
 
     devenv = {
       url = "github:cachix/devenv";
@@ -85,15 +85,15 @@
       inputs.nmd.follows = "nmd";
     };
     org-extra-emphasis = {
-    url = "github:QiangF/org-extra-emphasis";
-    flake = false;
+      url = "github:QiangF/org-extra-emphasis";
+      flake = false;
     };
-org-mode-ox-odt = {
-  url = "github:kjambunathan/org-mode-ox-odt";
-  flake = false;
-};
+    org-mode-ox-odt = {
+      url = "github:kjambunathan/org-mode-ox-odt";
+      flake = false;
+    };
 
-      flatpaks.url = "github:gmodena/nix-flatpak/main";
+    flatpaks.url = "github:gmodena/nix-flatpak/main";
 
     agenix = {
       url = "github:ryantm/agenix";
@@ -106,7 +106,7 @@ org-mode-ox-odt = {
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # TODO https://github.com/search?q=repo%3AGerschtli%2Fnix-config+%22+age+%22&type=code
-   homeage = {
+    homeage = {
       url = "github:jordanisaacs/homeage";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -212,7 +212,7 @@ org-mode-ox-odt = {
 
     # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
     nixos-wsl = {
-      url ="github:nix-community/nixos-wsl";
+      url = "github:nix-community/nixos-wsl";
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
@@ -535,35 +535,75 @@ org-mode-ox-odt = {
               buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
             } ''
-                                                                                                                               	    mkdir -p "$out"
+                                                                                                                                         	    mkdir -p "$out"
 
                         # prevent E886 ('/home-shelter' error)
-                                                                                                                               	    export HOME=$TMPDIR
-                                                                                                                               	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
-                                                                                                                               	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
-                                                                                                                               	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
+                                                                                                                                         	    export HOME=$TMPDIR
+                                                                                                                                         	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
+                                                                                                                                         	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
+                                                                                                                                         	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
 
                         if [ -n "$(cat "$out/nvim.log")" ]; then
-                                                                                                                                                                             	      echo "output: "$(cat "$out/nvim.log")""
-                                                                                                                                                                             	      exit 1
-                                                                                                                               	    fi
+                                                                                                                                                                                           	      echo "output: "$(cat "$out/nvim.log")""
+                                                                                                                                                                                           	      exit 1
+                                                                                                                                         	    fi
           '';
-                                                                             	  */
+                                                                                   	  */
         });
 
       # use like:
       # $ direnv-init jdk11
       # $ lorri-init jdk11
       devShells = forEachSystem (system: listToAttrs [
-        ({
+        {
           name = "nixd";
           value = inputs.nixd.devShells.${system}.default;
-        })
+        }
+        (
+	  # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
+          let
+            pkgs = inputs.nixpkgs.legacyPackages.${system};
+          in
+          {
+            name = "playwright-v2";
+            value = inputs.devenv.lib.mkShell {
+              inherit inputs pkgs;
+              modules =
+                let
+                  playwright-driver = pkgs.playwright-driver;
+                  playwright-driver-browsers = pkgs.playwright-driver.browsers;
+
+                  playright-file = builtins.readFile "${playwright-driver}/package/browsers.json";
+                  playright-json = builtins.fromJSON playright-file;
+                  playwright-chromium-entry = builtins.elemAt
+                    (builtins.filter
+                      (
+                        browser: browser.name == "chromium"
+                      )
+                      playright-json.browsers) 0;
+                  playwright-chromium-revision = playwright-chromium-entry.revision;
+                in
+                [
+                  {
+                    env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${playwright-driver-browsers}/chromium-${playwright-chromium-revision}/chrome-linux/chrome";
+                    # This is used by npx playwright --{ui,debug,...}
+                    env.PLAYWRIGHT_BROWSERS_PATH = "${playwright-driver-browsers}";
+                    languages = {
+                      javascript = {
+                        enable = true;
+                        npm.enable = true;
+                      };
+                    };
+                  }
+                ];
+            };
+          }
+        )
         (
           let
             pkgs = inputs.unstable.legacyPackages.${system};
           in
-          rec {
+          {
             # TODO https://github.com/thenbe/neotest-playwright for configuration
             name = "playwright";
             value = inputs.devenv.lib.mkShell {
@@ -574,12 +614,12 @@ org-mode-ox-odt = {
                   env.PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
                   env.PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs}/bin/node";
                   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
-		  # https://discourse.nixos.org/t/running-playwright-tests/25655/41
-		  env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true;
+                  # https://discourse.nixos.org/t/running-playwright-tests/25655/41
+                  env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = true;
                   enterShell = ''
-                    		    # Remove playwright from node_modules, so it will be taken from playwright-test
-                                        rm node_modules/@playwright/ -R
-                    		  '';
+                    	    # Remove playwright from node_modules, so it will be taken from playwright-test
+                              rm node_modules/@playwright/ -R
+                         	  '';
                 })
               ];
             };
@@ -808,18 +848,18 @@ org-mode-ox-odt = {
               rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; };
             };
             armv7l-linux = {
-	      # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix
-	      # also https://discourse.nixos.org/t/run-nixos-rpi4-image-arm-sd-image-by-qemu-emulation/33946/10
-	      # plus for dtb part https://discourse.nixos.org/t/run-nixos-rpi4-image-arm-sd-image-by-qemu-emulation/33946
-	      # nix build .#rpi-run-in-vm
-	      run-in-vm = import ./files/nix/run-in-vm.nix { inherit nixpkgs rootPath; };
-	    };
+              # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix
+              # also https://discourse.nixos.org/t/run-nixos-rpi4-image-arm-sd-image-by-qemu-emulation/33946/10
+              # plus for dtb part https://discourse.nixos.org/t/run-nixos-rpi4-image-arm-sd-image-by-qemu-emulation/33946
+              # nix build .#rpi-run-in-vm
+              run-in-vm = import ./files/nix/run-in-vm.nix { inherit nixpkgs rootPath; };
+            };
 
-	    x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
-	  }
+            x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+          }
           (nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
             ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ])
-	  ;
+      ;
     };
 
   nixConfig = {
