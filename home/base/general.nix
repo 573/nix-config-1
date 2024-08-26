@@ -121,6 +121,7 @@ in
 
 	  nix-inspect
 	  zellij
+	  viddy
         ];
 
         sessionVariables = {

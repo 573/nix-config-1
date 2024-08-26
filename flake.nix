@@ -16,6 +16,7 @@
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
     #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # seems plausible: https://github.com/NixOS/flake-registry/blob/895a65f8d5acf848136ee8fe8e8f736f0d27df96/flake-registry.json#L301-L311
+    nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
     # latest is not cached, also github:NixOS/nixpkgs points to master/latest so no branch spec needed
@@ -24,6 +25,14 @@
     nixos-2211.url = "github:NixOS/nixpkgs/nixos-22.11";
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
+
+  agenix-rekey = {
+  url = "github:oddlama/agenix-rekey";
+  # Make sure to override the nixpkgs version to follow your flake,
+  # otherwise derivation paths can mismatch (when using storageMode = "derivation"),
+  # resulting in the rekeyed secrets not being found!
+  inputs.nixpkgs.follows = "nixpkgs";
+  };
 
     # Firefox style
     penguin-fox = {
@@ -61,6 +70,11 @@
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
+    };
+
+  zen-browser = {
+    url = "github:MarceColl/zen-browser-flake";
+    inputs.nixpkgs.follows = "nixos-unstable"; # nixos-unstable
     };
 
     catppuccin = {
@@ -429,6 +443,20 @@
         (mkNixos "x86_64-linux" "DANIELKNB1")
         (mkNixos "aarch64-linux" "twopi")
       ];
+
+  # Expose the necessary information in your flake so agenix-rekey
+    # knows where it has too look for secrets and paths.
+    #
+    # Make sure that the pkgs passed here comes from the same nixpkgs version as
+    # the pkgs used on your hosts in `nixosConfigurations`, otherwise the rekeyed
+    # derivations will not be found!
+    # TODO get used to handling first, see example at https://github.com/oddlama/agenix-rekey/pull/28#issue-2331901837
+    agenix-rekey = inputs.agenix-rekey.configure {
+      userFlake = self;
+      nodes = self.nixosConfigurations;
+      # Example for colmena:
+      # inherit ((colmena.lib.makeHive self.colmena).introspect (x: x)) nodes;
+    };
 
       apps = forEachSystem (system:
         (listToAttrs [

@@ -284,6 +284,7 @@ in {
       
       inherit
         (pkgs)
+	zen-browser
       pavucontrol
       pdftk
       qpdfview

@@ -16,6 +16,9 @@
 #    };
     wsl.usbip.autoAttach = [ "1-2" ];
     system.nvidia.enable = false;
+    # i. e. https://github.com/Gerschtli/nix-config/blob/ba690b64b54333c18eadd31b6d51cca8c7805fbe/hosts/argon/configuration.nix#L44
+    # TODO get used to handling first, see example at https://github.com/oddlama/agenix-rekey/pull/28#issue-2331901837
+    #agenix-rekey.enable = true;
   };
 
   systemd.tmpfiles.rules = [

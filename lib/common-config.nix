@@ -55,7 +55,7 @@ _:
       flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
-    package = pkgs.nixVersions.latest;
+    package = pkgs.nixVersions.nix_2_20; # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
     # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry 

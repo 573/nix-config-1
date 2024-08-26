@@ -63,7 +63,7 @@ in
       home.packages = [
         (buildWithDiff
           "hm-build"
-	  "nix build --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
+	  "nix build --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
           "${config.home.homeDirectory}/.local/state/nix/profiles/home-manager"
         )
       ];
@@ -77,7 +77,7 @@ in
       home.packages = [
         (buildWithDiff
           "nod-build"
-	  "nix build -vv --show-trace --builders '' -j1 --log-format internal-json \"${nixConfigDir}#nixOnDroidConfigurations.sams9.activationPackage\" --impure |& nom --json"
+	  "nix build --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams9.activationPackage\" --impure"
           "/nix/var/nix/profiles/nix-on-droid"
         )
       ];
@@ -88,12 +88,13 @@ in
         (config.lib.custom.mkScript
           "n-rebuild"
           ./n-rebuild.sh
-          [ /*pkgs.ccze*/ pkgs.nix-output-monitor ] # FIXME madhouse/ccze repo now private on github, remove dep ?
+          [ pkgs.ccze pkgs.nix-output-monitor ] # FIXME madhouse/ccze repo now private on github, remove dep ?
           {
             inherit nixConfigDir;
             buildCmd = "${buildWithDiff
               "n-rebuild-build"
-	      "sudo nix build --log-format internal-json --verbose \"${nixConfigDir}#nixosConfigurations.$(hostname).config.system.build.toplevel\" |& nom --json"
+	      # see https://github.com/maralorn/nix-output-monitor/issues/68 (https://github.com/Gerschtli/nix-config/commit/5d71277ac5079485830073f02d42d4b13ac05d8d)
+	      "sudo nix build --builders '' --verbose \"${nixConfigDir}#nixosConfigurations.$(hostname).config.system.build.toplevel\""
               "/nix/var/nix/profiles/system"
             }/bin/n-rebuild-build";
             _doNotClearPath = true;

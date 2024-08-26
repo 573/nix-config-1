@@ -45,8 +45,8 @@ fi
 
 
 # add key
-_log "keychain" "add key"
-keychain "${HOME}/.ssh/keys/id_rsa.vcs"
+#_log "keychain" "add key"
+#keychain "${HOME}/.ssh/keys/id_rsa.vcs"
 
 
 # update ubuntu
@@ -64,16 +64,16 @@ fi
 
 # update projects
 _pull_changes "nix-config"  "${nix_config}"
-_pull_changes "atom"        "${HOME}/.atom"
-_pull_changes "files"       "${HOME}/.files"
-_pull_changes "pass"        "${HOME}/.password-store"
+#_pull_changes "atom"        "${HOME}/.atom"
+#_pull_changes "files"       "${HOME}/.files"
+#_pull_changes "pass"        "${HOME}/.password-store"
 
 
 # nix updates
 # TODO: use scripts defined in home/development/nix
 if _is_nixos; then
     _log "nix" "build nixos configuration"
-    sudo nix build --log-format internal-json --verbose "${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel" |& nom --json
+    sudo nix build --builders '' --verbose "${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel"
     _show_result_diff "/nix/var/nix/profiles/system"
 
     _log "nix" "switch nixos configuration"
@@ -82,7 +82,7 @@ fi
 
 if [[ "${USER}" == "nix-on-droid" ]] && _available nix-on-droid; then
     _log "nix" "build nix-on-droid configuration"
-    nix build --log-format internal-json --vv --show-trace --builders '' -j1 "${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure |& nom --json
+    nix build --show-trace -vv "${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure
     _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
 
     _log "nix" "switch nix-on-droid configuration"
@@ -91,7 +91,7 @@ fi
 
 if ! _is_nixos && _available home-manager; then
     _log "nix" "build home-manager configuration"
-    nix build --log-format internal-json -vv --show-trace --builders '' -j1 "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
+    nix build --builders '' --log-format internal-json --verbose "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
     _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
     _log "nix" "switch home-manager configuration"
@@ -100,26 +100,26 @@ fi
 
 
 # general migrations
-if [[ ! -f "${HOME}/.age/key.txt" || -L "${HOME}/.age" ]] && _read_boolean "Generate ~/.age/key.txt?"; then
-    if [[ -L "${HOME}/.age" ]]; then
-        rm -v "${HOME}/.age"
-    fi
+#if [[ ! -f "${HOME}/.age/key.txt" || -L "${HOME}/.age" ]] && _read_boolean "Generate ~/.age/key.txt?"; then
+#    if [[ -L "${HOME}/.age" ]]; then
+#        rm -v "${HOME}/.age"
+#    fi
+#
+#    mkdir -p "${HOME}/.age"
+#    age-keygen -o "${HOME}/.age/key.txt" 2>&1 |
+#        sed -e "s,^Public key: \(.*\)\$,\n# $(hostname)-${USER} = \"\1\"," |
+#        tee -a "${nix_config}/.agenix.toml"
+#else
+#    _migration_remove "${HOME}/.age-bak" 1
+#fi
 
-    mkdir -p "${HOME}/.age"
-    age-keygen -o "${HOME}/.age/key.txt" 2>&1 |
-        sed -e "s,^Public key: \(.*\)\$,\n# $(hostname)-${USER} = \"\1\"," |
-        tee -a "${nix_config}/.agenix.toml"
-else
-    _migration_remove "${HOME}/.age-bak" 1
-fi
+#_migration_remove "${HOME}/.ssh/id_rsa"
+#_migration_remove "${HOME}/.ssh/id_rsa.pub"
+#_migration_remove "${HOME}/.ssh/known_hosts.old"
+#_migration_remove "${HOME}/.gnupg-setup" 1
 
-_migration_remove "${HOME}/.ssh/id_rsa"
-_migration_remove "${HOME}/.ssh/id_rsa.pub"
-_migration_remove "${HOME}/.ssh/known_hosts.old"
-_migration_remove "${HOME}/.gnupg-setup" 1
-
-mapfile -t to_be_removed_pkgs < <(nix-env -q --json | jq -r ".[].pname" | grep -Ev '^(home-manager|nix-on-droid)-path$')
-if [[ "${#to_be_removed_pkgs[@]}" -ne 0 ]]; then
-    _log "migration" "remove manual installed packages via nix-env"
-    nix-env --uninstall "${to_be_removed_pkgs[@]}"
-fi
+#mapfile -t to_be_removed_pkgs < <(nix-env -q --json | jq -r ".[].pname" | grep -Ev '^(home-manager|nix-on-droid)-path$')
+#if [[ "${#to_be_removed_pkgs[@]}" -ne 0 ]]; then
+#    _log "migration" "remove manual installed packages via nix-env"
+#    nix-env --uninstall "${to_be_removed_pkgs[@]}"
+#fi

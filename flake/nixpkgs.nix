@@ -166,7 +166,7 @@ import inputs.nixpkgs {
             # rootPath
 
             ;
-        } // genAttrs [ "nix-inspect" "nixvim-config" "bundix" "talon" "devenv" ] (name: inputs.${name}.packages.${system}.default))
+        } // genAttrs [ "nix-inspect" "nixvim-config" "bundix" "talon" "devenv" "zen-browser" ] (name: inputs.${name}.packages.${system}.default))
     ] ++ (map (x: x.overlays.default) [
       # FIXME when to do this: https://github.com/jtojnar/nixfiles/blob/522466da4dd5206c7b444ba92c8d387eedf32a22/hosts/brian/profile.nix#L10-L12
       inputs.nixGL
