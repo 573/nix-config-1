@@ -3,5 +3,9 @@
 echo
 
 nvd diff @activeLinkPath@ ./result
-
-rm result
+# shellcheck disable=SC2050
+if [[ "@name@" != "nod-build" ]]; then
+  rm result
+else
+  ./result/activate
+fi

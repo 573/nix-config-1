@@ -48,7 +48,7 @@ import inputs.nixpkgs {
         in
         {
           inherit (latest) csvlens;
-          inherit (unstable) tailscale oxker cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25;
+          inherit (unstable) tailscale oxker cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25 age-plugin-yubikey;
 	  #inherit (nixos-2311) ;
           inherit (unstable.cudaPackages) cudatoolkit;
 	  inherit (inputs.libreoffice-postscript.legacyPackages.${system}) libreoffice;

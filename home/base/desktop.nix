@@ -299,6 +299,7 @@ in {
       vlc
       mediathekview
       xclip
+      age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
       ;
       inherit
       (pkgs.xorg)
@@ -312,6 +313,8 @@ in {
       ;
     });
 
+    # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb
+    # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl
     home.file.".Xkbmap".text = ''
       -model pc104 -layout us -variant altgr-intl
     '';
