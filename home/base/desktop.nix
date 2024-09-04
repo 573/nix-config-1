@@ -154,6 +154,8 @@ in
 
   # as in https://github.com/gvolpe/nix-config/blob/6feb7e4f47e74a8e3befd2efb423d9232f522ccd/home/programs/browsers/firefox.nix (https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/21)
   # ~/.mozilla/firefox/PROFILE_NAME/prefs.js | user.js
+  # FIXME https://github.com/toonn/nix-config/blob/master/home/ff-webgl-userjs.nixos
+  # FIXME https://github.com/toonn/nix-config/blob/a3877b34ec7d8ce3fda6cd33cf5cad3617103272/home/home.nix#L150
   settings = {
     "app.normandy.first_run" = false;
     "app.shield.optoutstudies.enabled" = false;

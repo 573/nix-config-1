@@ -42,7 +42,7 @@
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/270dace49bc95a7f88ad187969179ff0d2ba20ed"; #e1ee359d16a1886f0771cc433a00827da98d861c";
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/47c1824c261a343a6acca36d168a0a86f0e66292"; #e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -782,7 +782,7 @@
 
                   languages.haskell = {
                     enable = true;
-                    package = pkgs.haskell.packages.ghc946.ghcWithHoogle (pset: with pset; [
+                    package = pkgs.haskell.packages.ghc965.ghcWithHoogle (pset: with pset; [
                       # libraries
                       #zlib
                       #arrows

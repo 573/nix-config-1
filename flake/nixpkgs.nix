@@ -37,7 +37,6 @@ import inputs.nixpkgs {
 	  #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
 #          nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
-
           # TODO https://github.com/onekey-sec/unblob/blob/4e900ff/flake.nix#L21
           moreOverlays =
             (map (x: x.overlays.default) [
@@ -52,6 +51,7 @@ import inputs.nixpkgs {
 	  #inherit (nixos-2311) ;
           inherit (unstable.cudaPackages) cudatoolkit;
 	  inherit (inputs.libreoffice-postscript.legacyPackages.${system}) libreoffice;
+	  inherit (inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965) arbtt; 
 
           # see https://github.com/NixOS/nixpkgs/issues/271989, I think this comes down to not having the correct udev rules in place
           # on the host os for the home-manager managed nix, thus on a non-nixos currently (release-23-11) there is no scanner

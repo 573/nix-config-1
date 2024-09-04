@@ -26,6 +26,8 @@ in
       hledger.enable = true;
 
       audio.enable = true;
+
+      arbtt.enable = true;
     };
   };
 
