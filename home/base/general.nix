@@ -1,6 +1,12 @@
-{ config, lib, pkgs, inputs, ... }:
-with lib;
+{ config, lib, pkgs, ... }:
 let
+  inherit (lib)
+    attrValues
+    concatStringsSep	
+    mkEnableOption
+    mkIf
+    mkMerge
+    ;
   cfg = config.custom.base.general;
   localeGerman = "de_DE.UTF-8";
   localeEnglish = "en_US.UTF-8";
@@ -56,7 +62,8 @@ in
           #time = localeGerman;
         };
 
-        packages = with pkgs; [
+        packages = attrValues {
+	  inherit (pkgs)
           # TODO Put into home/programs/neovim ASAP
           # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-binary/39770/2
           #(inputs.nixvim.packages."${system}".default)
@@ -93,9 +100,6 @@ in
           bind # dig
           netcat
 
-          iotop
-          ncdu
-          nload
           psmisc # killall
           whois
 
@@ -122,7 +126,9 @@ in
 	  nix-inspect
 	  zellij
 	  viddy
-        ];
+	  zoxide
+	  ;
+        }; # replaces with pkgs; [], i. e. because nixd catches duplicates this way
 
         sessionVariables = {
           LESS = concatStringsSep " " [
@@ -187,7 +193,8 @@ in
         };
       };
 
-      home.packages = with pkgs; [
+      home.packages = attrValues {
+        inherit (pkgs)
         lshw
         ouch
         strace
@@ -198,7 +205,8 @@ in
         #haskellPackages.pushme # broken
         #datalad
         #git-annex-utils
-      ];
+	;
+      };
     })
 
     (mkIf (!cfg.minimal) {
