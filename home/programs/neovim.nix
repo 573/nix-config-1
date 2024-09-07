@@ -391,6 +391,7 @@ in
           vimPlugins.nnn-vim
           vimPlugins.neoterm
 	  vimPlugins.grapple-nvim
+	  vimPlugins.nvim-web-devicons
           (pluggo "faster-nvim")
           #		(pluggo "deadcolumn-nvim")
         ];
