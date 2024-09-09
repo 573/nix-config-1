@@ -1,17 +1,37 @@
 _:
 
 { lib, pkgs, homeModules ? [ ], inputs, rootPath, ... }:
-
+let
+  inherit (pkgs.stdenv) isLinux isAarch64
+; in
 {
+/**
+see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialArgs` there and `homeManagerConfiguration.modules`
+*/
   homeManager = {
     baseConfig = {
       backupFileExtension = "hm-bak";
-      extraSpecialArgs = { inherit inputs rootPath; };
+  /**
+    as in ./../flake/default.nix `homeManagerConfiguration.extraSpecialArgs`
+  */
+      extraSpecialArgs = {
+        inherit inputs rootPath;
+	    emacs = if isLinux && isAarch64
+	      then inputs.emacs-overlay-cached.packages.${pkgs.system}.emacs-unstable-nox
+	      else inputs.emacs-overlay.packages.${pkgs.system}.emacs-unstable;
+
+	    emacsWithPackagesFromUsePackage = if isLinux && isAarch64 
+	      then inputs.emacs-overlay-cached.lib.${pkgs.system}.emacsWithPackagesFromUsePackage
+	      else inputs.emacs-overlay.lib.${pkgs.system}.emacsWithPackagesFromUsePackage;
+      };
       sharedModules = homeModules;
       useGlobalPkgs = true; # disables options nixpkgs.*
       useUserPackages = true;
     };
 
+    /**
+    as in ./../flake/default.nix `homeManagerConfiguration.modules`
+    */
     userConfig = host: user: "${rootPath}/hosts/${host}/home-${user}.nix";
   };
 
@@ -19,6 +39,7 @@ _:
     settings = {
       # TODO https://discourse.nixos.org/t/merged-list-contains-duplicates/38004
       substituters = [
+      "https://anmonteiro.nix-cache.workers.dev"
         "https://573-bc.cachix.org/"
         "https://cache.nixos.org/"
         "https://nix-on-droid.cachix.org/"
@@ -34,6 +55,7 @@ _:
         "https://yazi.cachix.org"
       ];
       trusted-public-keys = lib.mkForce [
+      "ocaml.nix-cache.com-1:/xI2h2+56rwFfKyyFVbkJSeGqSIYMC/Je+7XXqGKDIY="
         "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
@@ -55,7 +77,10 @@ _:
       flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
-    package = pkgs.nixVersions.nix_2_20; # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
+
+    package = pkgs.nixVersions.nix_2_20;
+    # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
+    
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
     # https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry
     # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry 
@@ -68,7 +93,7 @@ _:
       nix-config.flake = inputs.self;
       "nixpkgs-unfree".to = {
         type = "path";
-	path = inputs.nixpkgs-unfree;
+        path = inputs.nixpkgs-unfree;
       };
     };
     nixPath = [ "nixpkgs=flake:nixpkgs" ];

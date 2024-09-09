@@ -1,4 +1,3 @@
-
 { config, lib, pkgs, ... }:
 
 let
@@ -23,7 +22,6 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
-  };
+  config = mkIf cfg.enable { };
 
 }

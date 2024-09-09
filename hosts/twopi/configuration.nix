@@ -36,8 +36,8 @@
 
   #networking.wireless = {
   #  enable = true;
-    #environmentFile = config.age.secrets.wireless-config.path;
-    #networks."Vodafone-12345".psk = "@PSK@";
+  #environmentFile = config.age.secrets.wireless-config.path;
+  #networks."Vodafone-12345".psk = "@PSK@";
   #};
 
   # needed because wpa_supplicant fails on startup

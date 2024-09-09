@@ -1,4 +1,4 @@
-{ config, lib, pkgs, homeModules, inputs, rootPath, ... }@configArgs:
+{ config, lib, pkgs, homeModules, inputs, rootPath, system, ... }@configArgs:
 
 let
   sshdTmpDirectory = "${config.user.home}/sshd-tmp";
@@ -39,7 +39,8 @@ in
   environment = {
     etcBackupExtension = ".nod-bak";
     motd = null;
-    packages = with pkgs; [
+    packages = builtins.attrValues {
+      inherit (pkgs)
       diffutils
       findutils
       gawk
@@ -55,6 +56,15 @@ in
       gzip
       which
       micro
+      kalker
+      ;
+    } ++ (let
+      inherit (pkgs)
+        writeScriptBin
+        runtimeShell
+	openssh
+      ;
+      in [
       (writeScriptBin "debug-ssl" ''
         #!${runtimeShell}
 
@@ -66,8 +76,7 @@ in
         echo "Starting sshd in non-daemonized way on port 8022"
         ${openssh}/bin/sshd -f "${sshdDirectory}/sshd_config" -D
       '')
-      kalker
-    ];
+    ]);
   };
 
   home-manager = {

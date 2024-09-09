@@ -1,8 +1,4 @@
 { config, lib, pkgs, inputs, rootPath, ... }:
-let
-  inherit (lib)
-    mkDefault;
-in
 {
   custom = {
     base = {

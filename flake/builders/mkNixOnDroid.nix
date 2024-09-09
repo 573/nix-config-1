@@ -2,6 +2,7 @@
 
 let
   inherit (pkgsNixOnDroidFor.${system}) lib;
+  inherit (pkgsNixOnDroidFor.${system}.stdenv) isLinux isAarch64;
 in
 
 inputs.nix-on-droid.lib.nixOnDroidConfiguration {
@@ -27,6 +28,14 @@ inputs.nix-on-droid.lib.nixOnDroidConfiguration {
 
   extraSpecialArgs = {
     inherit inputs rootPath;
+    unstable = inputs.unstable.legacyPackages.${system};
+    emacs = if isLinux && isAarch64
+      then inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
+      else inputs.emacs-overlay.packages.${system}.emacs-unstable;
+
+    emacsWithPackagesFromUsePackage = if isLinux && isAarch64 
+      then inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
+      else inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
     homeModules = homeModulesFor.${system};
   };
 }

@@ -1,7 +1,26 @@
-{ config, lib, pkgs, inputs, rootPath, ... }:
+/**
+Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+
+For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+*/
+{ config, lib, pkgs, libreoffice-postscript, inputs, rootPath, ... }:
 let
-  inherit (lib)
-    mkDefault;
+  inherit
+    (lib)
+    attrValues
+    mkDefault
+    ;
+  inherit
+    (pkgs)
+    writeScriptBin
+    runtimeShell
+    ;
+/**
+Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+
+If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+*/
+  #inherit (pkgs.stdenv.hostPlatform) system;
 in
 {
   custom = {
@@ -74,85 +93,109 @@ in
     homeDirectory = "/home/dani";
     username = "dani";
 
-    packages = with pkgs; [
-      #my-neovim
-      #ranger
-      #photoprism
-      #alejandra
-      shellharden
-      shfmt
-      #rnix-lsp
-      #deadnix
-      #statix
-      #nixfmt
-      #stylua
-      #shellcheck
-      #yt-dlp
-      #micro
-      #ranger
-      #masterpdfeditor
-      abcde
-      cups-filters
-      #      talon
-      #scrcpy
-      autorandr
-      mons
-      xorg.libxcvt
-      xorg.xrandr
-      maim
-      xdotool
-      xclip
-      keepassxc
-      swappy
-      arandr
-      xterm
-      signal-desktop
-      #tailscale # and openssh to custom package, i. e. home/programs/ssh
-      #my-emacs
-      #openssh
-      dstask
-      # TODO https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/ https://wiki.hyprland.org/Nix/Hyprland-on-other-distros/ https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8 https://wiki.archlinux.org/title/Display_manager
-      nixgl.nixGLIntel
-      pcmanfm
-      chafa
-      #simple-scan # memory error, potential workaround: https://github.com/NixOS/nixpkgs/issues/149812
-      #tint2 # rather use at service definition themselves
-      #simple-scan # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations of home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work, rather using host's simple-scan until https://github.com/NixOS/nixpkgs/issues/271989 gets recognition
-      #sane-frontends.out
-      # sane-backends only "worked" due to leftover udev files from a non-nixos host provided sane installation I removed without rebooting and so tricked the system into belief it had scanner access via standalone home-manager
-      # paths only seem to be there but aren't in use (version 1.0.32 of sane-backends in nixos-22.11)
-      # ls $(dirname $(realpath $(which scanimage)))/../etc/udev
-      # ls $(dirname $(realpath $(which scanimage)))/../sbin
-      #sane-backends # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations oof home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work
-      #ocrfeeder # import pdf dialog crashes, broken on NixOS-WSL as well
-      ##pdfsandwich # archlinux rather, gscan2pdf, ocrmypdf
-      cuneiform
-      normcap
-      ##gImageReader # archlinux rather
-      usbutils.out
-      gdb
-      #libreoffice-qt.out
-      libcdio-paranoia
-      #mpvScripts.chapterskip
-      #mpvScripts.quality-menu
-      (nerdfonts.override { fonts = [ "UbuntuMono" ]; })
-      source-code-pro
-      ubuntu_font_family
-      #spotify-player
-      (writeScriptBin "keyboard-de" ''
+    packages = attrValues {
+      # with pkgs; [
+      inherit
+        (pkgs)
+        #my-neovim
+        #ranger
+        #photoprism
+        #alejandra
+        shellharden
+        shfmt
+        #rnix-lsp
+        #deadnix
+        #statix
+        #nixfmt
+        #stylua
+        #shellcheck
+        #yt-dlp
+        #micro
+        #ranger
+        #masterpdfeditor
+        abcde
+        cups-filters
+        #      talon
+        #scrcpy
+        autorandr
+        mons
+        maim
+        xdotool
+        xclip
+        keepassxc
+        swappy
+        arandr
+        xterm
+        signal-desktop
+        #tailscale # and openssh to custom package, i. e. home/programs/ssh
+        #my-emacs
+        #openssh
+        dstask
+        # TODO https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/ https://wiki.hyprland.org/Nix/Hyprland-on-other-distros/ https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8 https://wiki.archlinux.org/title/Display_manager
+        pcmanfm
+        chafa
+        #simple-scan # memory error, potential workaround: https://github.com/NixOS/nixpkgs/issues/149812
+        #tint2 # rather use at service definition themselves
+        #simple-scan # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations of home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work, rather using host's simple-scan until https://github.com/NixOS/nixpkgs/issues/271989 gets recognition
+        #sane-frontends.out
+        # sane-backends only "worked" due to leftover udev files from a non-nixos host provided sane installation I removed without rebooting and so tricked the system into belief it had scanner access via standalone home-manager
+        # paths only seem to be there but aren't in use (version 1.0.32 of sane-backends in nixos-22.11)
+        # ls $(dirname $(realpath $(which scanimage)))/../etc/udev
+        # ls $(dirname $(realpath $(which scanimage)))/../sbin
+        #sane-backends # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations oof home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work
+        #ocrfeeder # import pdf dialog crashes, broken on NixOS-WSL as well
+        ##pdfsandwich # archlinux rather, gscan2pdf, ocrmypdf
+        cuneiform
+        normcap
+        ##gImageReader # archlinux rather
+        gdb
+        #libreoffice-qt.out
+        libcdio-paranoia
+        #mpvScripts.chapterskip
+        #mpvScripts.quality-menu
+        source-code-pro
+        ubuntu_font_family
+        #spotify-player
+        #gtt
+        notepad-next
+        ;
+
+      inherit
+        (pkgs.usbutils)
+        out
+        ;
+
+      inherit
+        (pkgs.xorg)
+        libxcvt
+        xrandr
+        ;
+
+      inherit
+        (pkgs.nixgl)
+        nixGLIntel
+        ;
+
+      inherit
+        (libreoffice-postscript)
+        libreoffice
+        ;
+
+      nerdfonts =
+        pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
+
+      keyboard-de = (writeScriptBin "keyboard-de" ''
         #!${runtimeShell}
 
         setxkbmap -model pc104 -layout de
-      '')
-      (writeScriptBin "keyboard-en" ''
+      '');
+
+      keyboard-en = (writeScriptBin "keyboard-en" ''
                 #!${runtimeShell}
 
         	setxkbmap -model pc104 -layout us -variant altgr-intl
-      '')
-      libreoffice
-      #gtt
-      notepad-next
-    ];
+      '');
+    };
 
 
 

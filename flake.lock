@@ -1399,17 +1399,17 @@
     },
     "ghc-nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1720393365,
-        "narHash": "sha256-tqagWw38sP0IXggMWHmkr1RY5xy4r3mFT7cnyz1hmnM=",
+        "lastModified": 1720494119,
+        "narHash": "sha256-IE7PZn9bSjxI4/MugjAEx49oPoxu0uKXdfC+X7HcRuQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "47c1824c261a343a6acca36d168a0a86f0e66292",
+        "rev": "05bbf675397d5366259409139039af8077d695ce",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "47c1824c261a343a6acca36d168a0a86f0e66292",
+        "rev": "05bbf675397d5366259409139039af8077d695ce",
         "type": "github"
       }
     },
@@ -1759,16 +1759,17 @@
       "flake": false,
       "locked": {
         "dir": "bin",
-        "lastModified": 1725533767,
-        "narHash": "sha256-FMTAL4fSl3T2emGq5N9yOjdLEN8ou59hbcOZlwQQ7W0=",
+        "lastModified": 1706441426,
+        "narHash": "sha256-z1LvnuPKcV2jeW6K6diIuptwYbE8XkHCi8fLk9G/sfo=",
         "owner": "simonmichael",
         "repo": "hledger",
-        "rev": "e34fa491af88173e96b1e7948858821f8fa1d2ad",
+        "rev": "caeab172a825b14f251439ea30c58df5271ab924",
         "type": "github"
       },
       "original": {
         "dir": "bin",
         "owner": "simonmichael",
+        "ref": "refs/tags/hledger-1.32.3",
         "repo": "hledger",
         "type": "github"
       }
@@ -1777,16 +1778,17 @@
       "flake": false,
       "locked": {
         "dir": "hledger/shell-completion",
-        "lastModified": 1725533767,
-        "narHash": "sha256-FMTAL4fSl3T2emGq5N9yOjdLEN8ou59hbcOZlwQQ7W0=",
+        "lastModified": 1706441426,
+        "narHash": "sha256-z1LvnuPKcV2jeW6K6diIuptwYbE8XkHCi8fLk9G/sfo=",
         "owner": "simonmichael",
         "repo": "hledger",
-        "rev": "e34fa491af88173e96b1e7948858821f8fa1d2ad",
+        "rev": "caeab172a825b14f251439ea30c58df5271ab924",
         "type": "github"
       },
       "original": {
         "dir": "hledger/shell-completion",
         "owner": "simonmichael",
+        "ref": "refs/tags/hledger-1.32.3",
         "repo": "hledger",
         "type": "github"
       }

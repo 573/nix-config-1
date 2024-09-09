@@ -1,3 +1,6 @@
+/**
+Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
+*/
 { config, lib, pkgs, inputs, ... }:
 
 let
@@ -6,6 +9,11 @@ let
     mkIf
     attrValues
     ;
+/**
+Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+
+If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+*/
   inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.desktop;
 
@@ -32,14 +40,6 @@ let
     fixGL = true;
   };
 
-  anbox = config.lib.custom.wrapProgram {
-    name = "anbox-application-manager";
-    desktopFileName = "anbox-application-manager";
-    source = pkgs.anbox; # needs unfree: inputs.google-chrome.packages.${system}.google-chrome-dev; # pkgs.google-chrome;
-    path = "/bin/anbox-application-manager";
-    fixGL = true;
-  };
-
   # different approach here: https://pmiddend.github.io/posts/nixgl-on-ubuntu
   ausweisapp = config.lib.custom.wrapProgram {
     name = "ausweisapp";
@@ -52,13 +52,6 @@ let
     name = "vlc";
     source = pkgs.vlc;
     path = "/bin/vlc";
-    fixGL = true;
-  };
-
-  spotify = config.lib.custom.wrapProgram {
-    name = "spotify";
-    source = pkgs.spotify;
-    path = "/bin/spotify";
     fixGL = true;
   };
 
@@ -149,130 +142,124 @@ in
           facebook-container
           private-relay
           browserpass
-	  keepassxc-browser
+          keepassxc-browser
         ];
 
-  # as in https://github.com/gvolpe/nix-config/blob/6feb7e4f47e74a8e3befd2efb423d9232f522ccd/home/programs/browsers/firefox.nix (https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/21)
-  # ~/.mozilla/firefox/PROFILE_NAME/prefs.js | user.js
-  # FIXME https://github.com/toonn/nix-config/blob/master/home/ff-webgl-userjs.nixos
-  # FIXME https://github.com/toonn/nix-config/blob/a3877b34ec7d8ce3fda6cd33cf5cad3617103272/home/home.nix#L150
-  settings = {
-    "app.normandy.first_run" = false;
-    "app.shield.optoutstudies.enabled" = false;
+        # as in https://github.com/gvolpe/nix-config/blob/6feb7e4f47e74a8e3befd2efb423d9232f522ccd/home/programs/browsers/firefox.nix (https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/21)
+        # ~/.mozilla/firefox/PROFILE_NAME/prefs.js | user.js
+        # FIXME https://github.com/toonn/nix-config/blob/master/home/ff-webgl-userjs.nixos
+        # FIXME https://github.com/toonn/nix-config/blob/a3877b34ec7d8ce3fda6cd33cf5cad3617103272/home/home.nix#L150
+        settings = {
+          "app.normandy.first_run" = false;
+          "app.shield.optoutstudies.enabled" = false;
 
-    # disable updates (pretty pointless with nix)
-    "app.update.channel" = "default";
+          # disable updates (pretty pointless with nix)
+          "app.update.channel" = "default";
 
-    "browser.contentblocking.category" = "standard"; # "strict"
-    "browser.ctrlTab.recentlyUsedOrder" = false;
+          "browser.contentblocking.category" = "standard"; # "strict"
+          "browser.ctrlTab.recentlyUsedOrder" = false;
 
-    "browser.download.useDownloadDir" = false;
-    "browser.download.viewableInternally.typeWasRegistered.svg" = true;
-    "browser.download.viewableInternally.typeWasRegistered.webp" = true;
-    "browser.download.viewableInternally.typeWasRegistered.xml" = true;
+          "browser.download.useDownloadDir" = false;
+          "browser.download.viewableInternally.typeWasRegistered.svg" = true;
+          "browser.download.viewableInternally.typeWasRegistered.webp" = true;
+          "browser.download.viewableInternally.typeWasRegistered.xml" = true;
 
-    "browser.link.open_newwindow" = true;
+          "browser.link.open_newwindow" = true;
 
-    #"browser.search.region" = "PL";
-    "browser.search.widget.inNavBar" = true;
+          #"browser.search.region" = "PL";
+          "browser.search.widget.inNavBar" = true;
 
-    "browser.shell.checkDefaultBrowser" = false;
-    "browser.startup.homepage" = "https://nixos.org";
-    "browser.tabs.loadInBackground" = true;
-    "browser.urlbar.placeholderName" = "DuckDuckGo";
-    #"browser.urlbar.showSearchSuggestionsFirst" = false;
+          "browser.shell.checkDefaultBrowser" = false;
+          "browser.startup.homepage" = "https://nixos.org";
+          "browser.tabs.loadInBackground" = true;
+          "browser.urlbar.placeholderName" = "DuckDuckGo";
+          #"browser.urlbar.showSearchSuggestionsFirst" = false;
 
-    # disable all the annoying quick actions
-    #"browser.urlbar.quickactions.enabled" = false;
-    #"browser.urlbar.quickactions.showPrefs" = false;
-    #"browser.urlbar.shortcuts.quickactions" = false;
-    #"browser.urlbar.suggest.quickactions" = false;
+          # disable all the annoying quick actions
+          #"browser.urlbar.quickactions.enabled" = false;
+          #"browser.urlbar.quickactions.showPrefs" = false;
+          #"browser.urlbar.shortcuts.quickactions" = false;
+          #"browser.urlbar.suggest.quickactions" = false;
 
-    "distribution.searchplugins.defaultLocale" = "en-US";
+          "distribution.searchplugins.defaultLocale" = "en-US";
 
-    "doh-rollout.balrog-migration-done" = true;
-    "doh-rollout.doneFirstRun" = true;
+          "doh-rollout.balrog-migration-done" = true;
+          "doh-rollout.doneFirstRun" = true;
 
-    "dom.forms.autocomplete.formautofill" = false;
+          "dom.forms.autocomplete.formautofill" = false;
 
-    "general.autoScroll" = true;
-    "general.useragent.locale" = "en-US";
+          "general.autoScroll" = true;
+          "general.useragent.locale" = "en-US";
 
-    "extensions.activeThemeID" = "firefox-alpenglow@mozilla.org";
+          "extensions.activeThemeID" = "firefox-alpenglow@mozilla.org";
 
-    "extensions.extensions.activeThemeID" = "firefox-alpenglow@mozilla.org";
-    "extensions.update.enabled" = false;
-    "extensions.webcompat.enable_picture_in_picture_overrides" = true;
-    "extensions.webcompat.enable_shims" = true;
-    "extensions.webcompat.perform_injections" = true;
-    "extensions.webcompat.perform_ua_overrides" = true;
+          "extensions.extensions.activeThemeID" = "firefox-alpenglow@mozilla.org";
+          "extensions.update.enabled" = false;
+          "extensions.webcompat.enable_picture_in_picture_overrides" = true;
+          "extensions.webcompat.enable_shims" = true;
+          "extensions.webcompat.perform_injections" = true;
+          "extensions.webcompat.perform_ua_overrides" = true;
 
-    "print.print_footerleft" = "";
-    "print.print_footerright" = "";
-    "print.print_headerleft" = "";
-    "print.print_headerright" = "";
+          "print.print_footerleft" = "";
+          "print.print_footerright" = "";
+          "print.print_headerleft" = "";
+          "print.print_headerright" = "";
 
-    "privacy.donottrackheader.enabled" = true;
+          "privacy.donottrackheader.enabled" = true;
 
-    # Yubikey
-    "security.webauth.u2f" = true;
-    "security.webauth.webauthn" = true;
-    "security.webauth.webauthn_enable_softtoken" = true;
-    "security.webauth.webauthn_enable_usbtoken" = true;
+          # Yubikey
+          "security.webauth.u2f" = true;
+          "security.webauth.webauthn" = true;
+          "security.webauth.webauthn_enable_softtoken" = true;
+          "security.webauth.webauthn_enable_usbtoken" = true;
 
-    "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-  } // { "layout.css.devPixelsPerPx" = "-1.0"; };
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        } // { "layout.css.devPixelsPerPx" = "-1.0"; };
 
-	userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
+        userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
         userContent = lib.readFile "${inputs.penguin-fox}/files/chrome/userContent.css";
       };
       package = pkgs.wrapFirefox pkgs.firefox-unwrapped {
-     # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
-	extraPolicies = {
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      DontCheckDefaultBrowser = true;
-      #DisablePocket = true;
-      SearchBar = "unified";
+        # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
+        extraPolicies = {
+          DisableTelemetry = true;
+          DisableFirefoxStudies = true;
+          DontCheckDefaultBrowser = true;
+          #DisablePocket = true;
+          SearchBar = "unified";
 
-      Preferences = let
-  lock-false = {
-    Value = false;
-    Status = "locked";
-  };
-  lock-true = {
-    Value = true;
-    Status = "locked";
-  };
-  lock-empty-string = {
-    Value = "";
-    Status = "locked";
-  };
-in {
-        # Privacy settings
-        #"extensions.pocket.enabled" = lock-false;
-        #"browser.newtabpage.pinned" = lock-empty-string;
-        "browser.topsites.contile.enabled" = lock-false;
-        "browser.newtabpage.activity-stream.showSponsored" = lock-false;
-        "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
-        "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
-      };
+          Preferences =
+            let
+              lock-false = {
+                Value = false;
+                Status = "locked";
+              };
+            in
+            {
+              # Privacy settings
+              #"extensions.pocket.enabled" = lock-false;
+              #"browser.newtabpage.pinned" = lock-empty-string;
+              "browser.topsites.contile.enabled" = lock-false;
+              "browser.newtabpage.activity-stream.showSponsored" = lock-false;
+              "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
+              "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
+            };
 
-      ExtensionSettings = {
-        "uBlock0@raymondhill.net" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-          installation_mode = "force_installed";
+          ExtensionSettings = {
+            "uBlock0@raymondhill.net" = {
+              install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+              installation_mode = "force_installed";
+            };
+            "jid1-MnnxcxisBPnSXQ@jetpack" = {
+              install_url = "https://addons.mozilla.org/firefox/downloads/latest/privacy-badger17/latest.xpi";
+              installation_mode = "force_installed";
+            };
+            "extension@tabliss.io" = {
+              install_url = "https://addons.mozilla.org/firefox/downloads/file/3940751/tabliss-2.6.0.xpi";
+              installation_mode = "force_installed";
+            };
+          };
         };
-        "jid1-MnnxcxisBPnSXQ@jetpack" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/privacy-badger17/latest.xpi";
-          installation_mode = "force_installed";
-        };
-        "extension@tabliss.io" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/file/3940751/tabliss-2.6.0.xpi";
-          installation_mode = "force_installed";
-        };
-      };
-      };
       };
     };
 
@@ -281,38 +268,40 @@ in {
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 
-    home.packages = [chrome
-      ausweisapp] ++ (attrValues {
-      
+    home.packages = [
+      chrome
+      ausweisapp
+    ] ++ (attrValues {
+
       inherit
         (pkgs)
-	zen-browser
-      pavucontrol
-      pdftk
-      qpdfview
-      # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
-      obconf
-      # DONT home-manager on non-nixos can't manage system files i. e. /etc/pam.d/* see https://github.com/NixOS/nixpkgs/issues/157112
-      #xss-lock # reason for slock not being on this list: https://gist.github.com/573/5ce58db3b72913648968968dbfa59d86
-      # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
-      #xsecurelock # lxdm not shown
-      xscreensaver
-      droidcam # host-install v4l2loopback
-      vlc
-      mediathekview
-      xclip
-      age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
-      ;
+        zen-browser
+        pavucontrol
+        pdftk
+        qpdfview
+        # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
+        obconf
+        # DONT home-manager on non-nixos can't manage system files i. e. /etc/pam.d/* see https://github.com/NixOS/nixpkgs/issues/157112
+        #xss-lock # reason for slock not being on this list: https://gist.github.com/573/5ce58db3b72913648968968dbfa59d86
+        # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
+        #xsecurelock # lxdm not shown
+        xscreensaver
+        droidcam# host-install v4l2loopback
+        vlc
+        mediathekview
+        xclip
+        age-plugin-yubikey# arch: https://github.com/str4d/age-plugin-yubikey
+        ;
       inherit
-      (pkgs.xorg)
-      # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
-      #xorg.xset
-      xev
-      ;
+        (pkgs.xorg)
+        # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
+        #xorg.xset
+        xev
+        ;
       inherit
-      (pkgs.lxde)
-      lxsession
-      ;
+        (pkgs.lxde)
+        lxsession
+        ;
     });
 
     # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb

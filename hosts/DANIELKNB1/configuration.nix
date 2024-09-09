@@ -1,4 +1,4 @@
-{ config, lib, pkgs, rootPath, ... }:
+{ config, lib, pkgs, rootPath, unstable, ... }:
 
 {
   # FIXME currently disabled due to Windows-Update 21.11.23
@@ -9,11 +9,11 @@
     base.general.wsl = true;
     programs.docker.enable = true;
     # DONT the nixos-2211 hack might cause build problems finally, WIP investigating https://github.com/573/nix-config-1/actions/runs/10269489465/job/28415058034
-#    wsl = {
-#      scanner.enable = false;
-#      usbip.enable = false;
-#      yubikey.enable = false;
-#    };
+    #    wsl = {
+    #      scanner.enable = false;
+    #      usbip.enable = false;
+    #      yubikey.enable = false;
+    #    };
     wsl.usbip.autoAttach = [ "1-2" ];
     system.nvidia.enable = false;
     # i. e. https://github.com/Gerschtli/nix-config/blob/ba690b64b54333c18eadd31b6d51cca8c7805fbe/hosts/argon/configuration.nix#L44

@@ -60,7 +60,7 @@ in
 
         # https://github.com/nix-community/NixOS-WSL/blob/0fa9268bf9a903498cb567e6d4d01eb945f36f6e/modules/wsl-distro.nix#L120
         nixos = 1000;
-	dani = 1001;
+        dani = 1001;
         #funktionstester = 1000;
       };
 

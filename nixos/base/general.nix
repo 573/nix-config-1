@@ -1,4 +1,4 @@
-{ config, lib, pkgs, homeModules, inputs, rootPath, ... }@configArgs:
+{ config, lib, pkgs, homeModules, inputs, rootPath, unstable, ... }@configArgs:
 # TODO https://github.com/search?q=repo%3AGerschtli%2Fnix-config%20custom.base.desktop&type=code
 let
   inherit (lib)

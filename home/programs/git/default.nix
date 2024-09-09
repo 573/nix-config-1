@@ -399,8 +399,8 @@ in
     # just run this in a repo with separated git dir:
     # git config --local core.hooksPath ~/.config/git/hooks
     xdg.configFile."git/hooks/pre-push".source = pkgs.writeScript "pre-push" ''
-echo >&2 ".git directory separated to keep private, not pushing"
-exit 1
+      echo >&2 ".git directory separated to keep private, not pushing"
+      exit 1
     '';
 
   };

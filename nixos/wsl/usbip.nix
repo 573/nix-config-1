@@ -54,10 +54,10 @@ in
       services."usbip-auto-attach@" = {
         description = "Auto attach device having busid %i with usbip";
         #after = [ "wsl-vpnkit-auto.target" ]; FIXME how
-	# https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.after&from=0&size=50&sort=relevance&type=packages&query=systemd.services
-	# "If the specified units are started at the same time as this unit, delay this unit until they have started."
+        # https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.after&from=0&size=50&sort=relevance&type=packages&query=systemd.services
+        # "If the specified units are started at the same time as this unit, delay this unit until they have started."
         # name being network there https://github.com/nix-community/NixOS-WSL/blob/f5a6c03/modules/usbip.nix
-	after = [ "wsl-vpnkit.target" ];
+        after = [ "wsl-vpnkit.target" ];
 
         scriptArgs = "%i";
         path = with pkgs; [
@@ -74,9 +74,9 @@ in
           	'';
       };
 
-       # https://search.nixos.org/options?channel=24.05&show=systemd.targets.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.targets
-       # https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.services
-       # "systemd.services.<name>.wants"
+      # https://search.nixos.org/options?channel=24.05&show=systemd.targets.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.targets
+      # https://search.nixos.org/options?channel=24.05&show=systemd.services.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.services
+      # "systemd.services.<name>.wants"
       # "Start the specified units when this unit is started."
       # name being multi-user there https://github.com/nix-community/NixOS-WSL/blob/f5a6c03/modules/usbip.nix
       targets.wsl-vpnkit.wants = map (busid: "usbip-auto-attach@${busid}.service") cfg.autoAttach;

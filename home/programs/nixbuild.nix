@@ -33,15 +33,18 @@ in
             IdentityFile /root/.ssh/my-nixbuild-key
         '';
 
-#        custom.base.non-nixos.builders = [
-#	"eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
-#        ];
+        #        custom.base.non-nixos.builders = [
+        #	"eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
+        #        ];
       })
 
       {
-        home.packages = with pkgs; [
-          rlwrap
-        ];
+        home.packages = builtins.attrValues {
+	  inherit
+	    (pkgs)
+            rlwrap
+	    ;
+        };
       }
     ]);
 }
