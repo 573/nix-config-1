@@ -26,17 +26,15 @@ import inputs.nixpkgs {
         let
           inherit (prev.stdenv.hostPlatform) system;
           inherit (prev.lib) remove flatten;
-	  inherit (prev.lib.attrsets) genAttrs;
+          inherit (prev.lib.attrsets) genAttrs;
           # inherit rootPath;
-          unstable = inputs.unstable.legacyPackages.${system}; 
-	  #import inputs.unstable { inherit config system; };
+          #unstable = inputs.unstable.legacyPackages.${system}; 
+          #import inputs.unstable { inherit config system; };
 
 
-          latest = inputs.latest.legacyPackages.${system}; #import inputs.latest { inherit config system; }; #import inputs.nixos-2305 { inherit config system; };
-          nixos-2311 = inputs.nixos-2311.legacyPackages.${system}; 
-	  #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
+          #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
 
-#          nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
+          #          nixos-2211 = inputs.nixos-2211.legacyPackages.${system}; #import inputs.nixos-2211 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
           # TODO https://github.com/onekey-sec/unblob/blob/4e900ff/flake.nix#L21
           moreOverlays =
             (map (x: x.overlays.default) [
@@ -46,115 +44,53 @@ import inputs.nixpkgs {
 
         in
         {
-          inherit (latest) csvlens;
-          inherit (unstable) tailscale oxker cachix/*nixVersions*/ eza mermaid-cli scrcpy yazi powerline-rs pwvucontrol gscan2pdf htmx-lsp/* for nixvim */ gtt nixd docker_25 age-plugin-yubikey;
-	  #inherit (nixos-2311) ;
-          inherit (unstable.cudaPackages) cudatoolkit;
-	  inherit (inputs.libreoffice-postscript.legacyPackages.${system}) libreoffice;
-	  inherit (inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965) arbtt; 
-
           # see https://github.com/NixOS/nixpkgs/issues/271989, I think this comes down to not having the correct udev rules in place
           # on the host os for the home-manager managed nix, thus on a non-nixos currently (release-23-11) there is no scanner
           # detected
           # simple-scan (v42.5) from nixos-22.11 seems to work with sane from arch linux
           # also simple-scan (v44.0) from nixos-23.11 does NOT seem to work with sane from arch linux
           # there is still the problem of crashing (https://github.com/NixOS/nixpkgs/issues/271991), which will not fixed for that v42.5 which would mean being stuck at it with oom bug, so maybe rather use arch linux' simple-scan also until the scanner missing bug (https://github.com/NixOS/nixpkgs/issues/271989) is sorted out as well.
-#          inherit (nixos-2211) simple-scan/*sane-backends*/; # nixos-23.11 Scanner not found
+          #          inherit (nixos-2211) simple-scan/*sane-backends*/; # nixos-23.11 Scanner not found
 
           git-issue = inputs.git-issue;
 
-          # FIXME is workaround until upstream has the PR accepted, see https://github.com/nix-community/NixOS-WSL/issues/262#issuecomment-1825648537
-          wsl-vpnkit =
-            let inherit (unstable)
-              lib
-              findutils
-              pstree
-              resholve
-              wsl-vpnkit;
-            in
-            wsl-vpnkit.override {
-              resholve =
-                resholve
-                // {
-                  mkDerivation = attrs @ { solutions, ... }:
-                    resholve.mkDerivation (lib.recursiveUpdate attrs {
-                      src = inputs.wsl-vpnkit;
-
-                      solutions.wsl-vpnkit = {
-                        inputs =
-                          solutions.wsl-vpnkit.inputs
-                          ++ [
-                            findutils
-                            pstree
-                          ];
-
-                        execer =
-                          solutions.wsl-vpnkit.execer
-                          ++ [ "cannot:${pstree}/bin/pstree" ];
-                      };
-                    });
-                };
-            };
-
-          openai-whisper =
+          /*openai-whisper =
             let
               inherit (latest) openai-whisper;
             in
             openai-whisper.override {
               torch = prev.python3.pkgs.torch-bin;
-            };
+            };*/
 
-        # TODO https://matrix.to/#/!RRerllqmbATpmbJgCn:nixos.org/$mP53sN976wEgmMCKeM5JWPABO1lh17x7ucXtgKp1cWY?via=nixos.org&via=matrix.org&via=tchncs.de https://nixpk.gs/pr-tracker.html?pr=239005 (https://discourse.nixos.org/t/a-nixpkgs-pr-tracker-with-pure-front-end/50096)
+          # TODO https://matrix.to/#/!RRerllqmbATpmbJgCn:nixos.org/$mP53sN976wEgmMCKeM5JWPABO1lh17x7ucXtgKp1cWY?via=nixos.org&via=matrix.org&via=tchncs.de https://nixpk.gs/pr-tracker.html?pr=239005 (https://discourse.nixos.org/t/a-nixpkgs-pr-tracker-with-pure-front-end/50096)
 
-          # fix pam-service in xsecurelock, see https://git.rauhala.info/MasseR/temp-fix-xsecurelock/commit/129fcc5eb285ece0f7c414b42bef6281fc4edc42
-          # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
-          xsecurelock =
-            prev.xsecurelock.overrideAttrs
-              # simply replacing the configureFlags rn
-              (oldAttrs: { configureFlags = (remove "--with-pam-service-name=login" (flatten oldAttrs.configureFlags)) ++ [ "--with-pam-service-name=system_auth" ]; }); # if doesn't work, try --with-pam-service-name=authproto_pam here or ...=common_auth or ...system-local-login, https://github.com/google/xsecurelock/blob/8a448bd/README.md#installation and https://sourcegraph.com/search?q=context%3Aglobal+content%3A--with-pam-service-name&patternType=standard&sm=1&groupBy=repo
 
           #yt-dlp =
           #  prev.yt-dlp.overrideAttrs
           #    { src = inputs.yt-dlp; }; # > Checking runtime dependencies for yt_dlp-2024.5.27-py3-none-any.whl
-                                              # >   - requests<3,>=2.32.2 not satisfied by version 2.31.0
+          # >   - requests<3,>=2.32.2 not satisfied by version 2.31.0
 
-          emacsPackages =
-            prev.emacsPackages
-            // {
-              inherit
-                (unstable.emacsPackages)
-                mistty
-                ;
-            };
-          cudaPackages =
-            prev.cudaPackages
-            // {
-              inherit
-                (unstable.cudaPackages)
-                cudatoolkit
-                ;
-            };
           # DONE [gist] For later ref - override to i. e. nix_2_13 - see https://github.com/Gerschtli/nix-config/commit/da486994d122eb4e64a8b7940e9ef3469b44e06c#diff-3bcbef26c40d018f46094799af27a3698c921aa094bb2bffdaac77266c90ec21L64
-          nixVersions =
+          /*nixVersions =
             prev.nixVersions
             // {
               inherit
                 (unstable.nixVersions)
                 latest;
-            };
+            };*/
 
-          vimUtils =
+          /*vimUtils =
             prev.vimUtils
             // {
               inherit
                 (unstable.vimUtils)
                 buildVimPlugin
                 ;
-            };
+            };*/
 
-        desed = final.callPackage "${rootPath}/drvs/desed" { };
+          desed = final.callPackage "${rootPath}/drvs/desed" { };
 
-	          devenv = inputs.devenv.packages.${system}.devenv;
+          devenv = inputs.devenv.packages.${system}.devenv;
 
           somemore = prev.lib.composeManyExtensions moreOverlays final prev;
 
@@ -176,7 +112,7 @@ import inputs.nixpkgs {
     ])
     ++ inputs.nixpkgs.lib.optionals nixOnDroid [
       inputs.nix-on-droid.overlays.default
-      # prevent uploads to remote builder
+      # prevent uploads to remote builder, https://ryantm.github.io/nixpkgs/functions/prefer-remote-fetch
       (final: prev: prev.prefer-remote-fetch final prev)
     ];
 }

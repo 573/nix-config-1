@@ -46,8 +46,8 @@ let
                luafile ${rootPath}/home/misc/nvim-wsl-clipboard.lua
 
                " let g:languagetool_server_command='$ { pkgs.languagetool }/bin/languagetool-http-server'
-                            	   lua require("gitsigns").setup()
-                            	   lua require("stcursorword").setup()
+                                	   lua require("gitsigns").setup()
+                                	   lua require("stcursorword").setup()
   '';*/
   /*plugins = with pkgs.vimPlugins; [
     # https://gitlab.com/rycee/home-manager/blob/de3758e3/modules/programs/neovim.nix#L113
@@ -216,7 +216,7 @@ let
             { name = "path"; }
           ];
           /*sources = {
-                                		  __raw = ''
+                                    		  __raw = ''
       cmp.config.sources({
         { name = 'nvim_lsp' },
         -- { name = 'vsnip' },
@@ -228,8 +228,8 @@ let
         { name = 'buffer' },
         { name = 'path' },
       })
-                                		  '';
-                              		  }; */
+                                    		  '';
+                                  		  }; */
 
           formatting = {
             fields = [ "abbr" "kind" "menu" ];
@@ -387,40 +387,236 @@ in
       custom.programs.neovim.minimalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim {
         enableMan = false;
         colorschemes.gruvbox.enable = true;
-        extraPlugins = with pkgs; [
-          vimPlugins.nnn-vim
-          vimPlugins.neoterm
-	  vimPlugins.grapple-nvim
-	  vimPlugins.nvim-web-devicons
+        extraPlugins = builtins.attrValues {
+	  inherit (pkgs.vimPlugins)
+          nnn-vim
+          neoterm
+          grapple-nvim
+          nvim-web-devicons
+	  ;
+	} ++ [
           (pluggo "faster-nvim")
           #		(pluggo "deadcolumn-nvim")
-        ];
-	extraConfigLua = ''
-	vim.g.clipboard = {
-      name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-      },
-      paste = {                                                    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),                                                                 ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                               },                                                       }
+	];
+        extraConfigLua = ''
+          	vim.g.clipboard = {
+                name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+                  ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+                },
+                paste = {                                                    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),                                                                 ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                               },                                                       }
 
-require("grapple").setup({
-    opts = {
-        scope = "git", -- also try out "git_branch"
-    },
-    event = { "BufReadPost", "BufNewFile" },
-    cmd = "Grapple",
-    keys = {
-        { "<leader>m", "<cmd>Grapple toggle<cr>", desc = "Grapple toggle tag" },
-        { "<leader>M", "<cmd>Grapple toggle_tags<cr>", desc = "Grapple open tags window" },
-        { "<leader>n", "<cmd>Grapple cycle_tags next<cr>", desc = "Grapple cycle next tag" },
-        { "<leader>p", "<cmd>Grapple cycle_tags prev<cr>", desc = "Grapple cycle previous tag" },
-    },
-})
-	'';
-        extraPackages = with pkgs; [
+          require("grapple").setup({
+              opts = {
+                  scope = "git", -- also try out "git_branch"
+              },
+              event = { "BufReadPost", "BufNewFile" },
+              cmd = "Grapple",
+              keys = {
+                  { "<leader>m", "<cmd>Grapple toggle<cr>", desc = "Grapple toggle tag" },
+                  { "<leader>M", "<cmd>Grapple toggle_tags<cr>", desc = "Grapple open tags window" },
+                  { "<leader>n", "<cmd>Grapple cycle_tags next<cr>", desc = "Grapple cycle next tag" },
+                  { "<leader>p", "<cmd>Grapple cycle_tags prev<cr>", desc = "Grapple cycle previous tag" },
+              },
+          })
+          	'';
+        extraPackages = builtins.attrValues {
+	  inherit (pkgs)
           nixpkgs-fmt
-        ];
+	  ;
+	};
+  keymaps = [
+    {
+      mode = "n";
+      key = "gd";
+      action = "<cmd>Lspsaga finder def<CR>";
+      options = {
+        desc = "Goto Definition";
+        silent = true;
+      };
+    }
+    {
+      mode = "n";
+      key = "gr";
+      action = "<cmd>Lspsaga finder ref<CR>";
+      options = {
+        desc = "Goto References";
+        silent = true;
+      };
+    }
+
+    # {
+    #   mode = "n";
+    #   key = "gD";
+    #   action = "<cmd>Lspsaga show_line_diagnostics<CR>";
+    #   options = {
+    #     desc = "Goto Declaration";
+    #     silent = true;
+    #   };
+    # }
+
+    {
+      mode = "n";
+      key = "gI";
+      action = "<cmd>Lspsaga finder imp<CR>";
+      options = {
+        desc = "Goto Implementation";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "gT";
+      action = "<cmd>Lspsaga peek_type_definition<CR>";
+      options = {
+        desc = "Type Definition";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "K";
+      action = "<cmd>Lspsaga hover_doc ++keep<CR>";
+      options = {
+        desc = "Hover doc";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "<leader>cw";
+      action = "<cmd>Lspsaga outline<CR>";
+      options = {
+        desc = "Outline";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "<leader>cr";
+      action = "<cmd>Lspsaga rename<CR>";
+      options = {
+        desc = "Rename";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "<leader>ca";
+      action = "<cmd>Lspsaga code_action<CR>";
+      options = {
+        desc = "Code Action";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "<leader>cd";
+      action = "<cmd>Lspsaga show_line_diagnostics<CR>";
+      options = {
+        desc = "Line Diagnostics";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "[d";
+      action = "<cmd>Lspsaga diagnostic_jump_next<CR>";
+      options = {
+        desc = "Next Diagnostic";
+        silent = true;
+      };
+    }
+
+    {
+      mode = "n";
+      key = "]d";
+      action = "<cmd>Lspsaga diagnostic_jump_prev<CR>";
+      options = {
+        desc = "Previous Diagnostic";
+        silent = true;
+      };
+    }
+    ];
         plugins = {
-       #   nvim-osc52.enable = true;
+	  lspsaga = {
+    enable = true;
+    beacon = {
+      enable = true;
+    };
+    ui = {
+      border = "rounded"; # One of none, single, double, rounded, solid, shadow
+      codeAction = "💡"; # Can be any symbol you want 💡
+    };
+    hover = {
+      openCmd = "!floorp"; # Choose your browser
+      openLink = "gx";
+    };
+    diagnostic = {
+      borderFollow = true;
+      diagnosticOnlyCurrent = false;
+      showCodeAction = true;
+    };
+    symbolInWinbar = {
+      enable = true; # Breadcrumbs
+    };
+    codeAction = {
+      extendGitSigns = false;
+      showServerName = true;
+      onlyInCursor = true;
+      numShortcut = true;
+      keys = {
+        exec = "<CR>";
+        quit = [
+          "<Esc>"
+          "q"
+        ];
+      };
+    };
+    lightbulb = {
+      enable = false;
+      sign = false;
+      virtualText = true;
+    };
+    implement = {
+      enable = false;
+    };
+    rename = {
+      autoSave = false;
+      keys = {
+        exec = "<CR>";
+        quit = [
+          "<C-k>"
+          "<Esc>"
+        ];
+        select = "x";
+      };
+    };
+    outline = {
+      autoClose = true;
+      autoPreview = true;
+      closeAfterJump = true;
+      layout = "normal"; # normal or float
+      winPosition = "right"; # left or right
+      keys = {
+        jump = "e";
+        quit = "q";
+        toggleOrJump = "o";
+      };
+    };
+    scrollPreview = {
+      scrollDown = "<C-f>";
+      scrollUp = "<C-b>";
+    };
+  };
+  
+          #   nvim-osc52.enable = true;
           which-key.enable = true;
           luasnip.enable = true;
           lsp = {
@@ -586,17 +782,17 @@ require("grapple").setup({
       # see https://discourse.nixos.org/t/conflicts-between-treesitter-withallgrammars-and-builtin-neovim-parsers-lua-c/33536/3
       # FIXME https://github.com/nix-community/nixvim/blob/4f6e90212c7ec56d7c03611fb86befa313e7f61f/plugins/languages/treesitter/treesitter.nix#L12
       /*      xdg.configFile."nvim/parser".source = "${pkgs.symlinkJoin {
-                     	      name = "treesitter-parsers";
-                     	      paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
-                     			    nix
-                     			    bash
-                     			    yaml
-                     			    json
-                     			    lua
-                     			    latex
-                     			    comment
-                     	      ])).dependencies;
-                 	    }}/parser"; */
+                            	      name = "treesitter-parsers";
+                            	      paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [
+                            			    nix
+                            			    bash
+                            			    yaml
+                            			    json
+                            			    lua
+                            			    latex
+                            			    comment
+                            	      ])).dependencies;
+                      	    }}/parser"; */
     })
   ]);
 }

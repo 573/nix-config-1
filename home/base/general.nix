@@ -1,12 +1,24 @@
-{ config, lib, pkgs, ... }:
+/**
+Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+
+Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
+For `[inputs]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+*/
+{ config, lib, pkgs, inputs, ... }:
 let
   inherit (lib)
     attrValues
-    concatStringsSep	
+    concatStringsSep
     mkEnableOption
     mkIf
     mkMerge
     ;
+/**
+Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+
+If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+*/
+  inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.general;
   localeGerman = "de_DE.UTF-8";
   localeEnglish = "en_US.UTF-8";
@@ -63,71 +75,75 @@ in
         };
 
         packages = attrValues {
-	  inherit (pkgs)
-          # TODO Put into home/programs/neovim ASAP
-          # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-binary/39770/2
-          #(inputs.nixvim.packages."${system}".default)
-          # this way can have nvim-mini in parallel
-          # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-executable/39770/4
-          # FIXME assumes now broken https://github.com/nix-community/nixvim/commit/d53afe0d7348b6c41a9127db4217adeaf1e9d69b
-          # https://github.com/nix-community/nixvim/compare/main...573:nixvim:fit-23.11
-          #(pkgs.runCommand "nix-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-          #           mkdir -p $out/bin
-          #           makeWrapper ${inputs.nixvim.packages."${system}".default}/bin/nvim $out/bin/nix-nvim
-          #           '')
-          #nixvim-configured
-          bc
-          file
-          # httpie   # build for aarch64-linux times out, https://github.com/573/nix-config-1/actions/runs/3744580521/jobs/6358117765#step:5:7429
-          iotop
-          jq
-          mmv-go
-          nmap
-          ncdu
-          nload # network traffic monitor
-          pwgen
-          #ripgrep # build broken on aarch64-linux, https://github.com/573/nix-config-1/actions/runs/6309380420/job/17129186691, also build unmaintained currently
-          silver-searcher
-          tree
-          wget
-          yq-go
+          inherit (pkgs)
+            # TODO Put into home/programs/neovim ASAP
+            # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-binary/39770/2
+            #(inputs.nixvim.packages."${system}".default)
+            # this way can have nvim-mini in parallel
+            # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-executable/39770/4
+            # FIXME assumes now broken https://github.com/nix-community/nixvim/commit/d53afe0d7348b6c41a9127db4217adeaf1e9d69b
+            # https://github.com/nix-community/nixvim/compare/main...573:nixvim:fit-23.11
+            #(pkgs.runCommand "nix-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+            #           mkdir -p $out/bin
+            #           makeWrapper ${inputs.nixvim.packages."${system}".default}/bin/nvim $out/bin/nix-nvim
+            #           '')
+            #nixvim-configured
+            bc
+            file
+            # httpie   # build for aarch64-linux times out, https://github.com/573/nix-config-1/actions/runs/3744580521/jobs/6358117765#step:5:7429
+            iotop
+            jq
+            mmv-go
+            nmap
+            ncdu
+            nload# network traffic monitor
+            pwgen
+            #ripgrep # build broken on aarch64-linux, https://github.com/573/nix-config-1/actions/runs/6309380420/job/17129186691, also build unmaintained currently
+            silver-searcher
+            tree
+            wget
+            yq-go
 
-          gzip
-          unzip
-          xz
-          zip
+            gzip
+            unzip
+            xz
+            zip
 
-          bind # dig
-          netcat
+            bind# dig
+            netcat
 
-          psmisc # killall
-          whois
+            psmisc# killall
+            whois
 
-          sqlite
+            sqlite
 
-          eza
-          #cachix
-          yazi
-          #actionlint
-          #powerline-rs
+            #actionlint
+            #powerline-rs
 
-          gist
-          fd
-          sd
-          pv
+            gist
+            fd
+            sd
+            pv
 
-          # TODO https://www.arthurkoziel.com/restic-backups-b2-nixos
-          backblaze-b2
-          attr
+            # TODO https://www.arthurkoziel.com/restic-backups-b2-nixos
+            backblaze-b2
+            attr
 
-	  # poc
-	  age
+            # poc
+            age
 
-	  nix-inspect
-	  zellij
-	  viddy
-	  zoxide
-	  ;
+            nix-inspect
+            zellij
+            viddy
+            zoxide
+            ;
+
+          inherit
+            (inputs.unstable.legacyPackages.${system})
+            eza
+            yazi
+            ;
+
         }; # replaces with pkgs; [], i. e. because nixd catches duplicates this way
 
         sessionVariables = {
@@ -139,8 +155,8 @@ in
           ];
           PAGER = "${pkgs.less}/bin/less";
           SHELL = "bash";
-	  EDITOR = "vi";
-	  VISUAL = "vi";
+          EDITOR = "vi";
+          VISUAL = "vi";
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html
@@ -168,7 +184,7 @@ in
     })
 
     {
-        home.stateVersion = "24.05";
+      home.stateVersion = "24.05";
     }
 
     (mkIf cfg.termux {
@@ -176,7 +192,7 @@ in
         base.general = {
           lightWeight = true;
           minimal = true;
-	};
+        };
         programs.emacs-novelist.enable = true;
       };
     })
@@ -185,8 +201,8 @@ in
       custom.programs = {
         tmux.enable = true;
         emacs.enable = true;
-#        emacs-novelist.enable = true;
-#        emacs-nano.enable = true;
+        #        emacs-novelist.enable = true;
+        emacs-nano.enable = true;
         neovim = {
           enable = true;
           lightWeight = false;
@@ -195,17 +211,17 @@ in
 
       home.packages = attrValues {
         inherit (pkgs)
-        lshw
-        ouch
-        strace
-        lineselect
-        git-annex
-        #git-annex-remote-googledrive
-        #haskellPackages.feedback
-        #haskellPackages.pushme # broken
-        #datalad
-        #git-annex-utils
-	;
+          lshw
+          ouch
+          strace
+          lineselect
+          git-annex
+          #git-annex-remote-googledrive
+          #haskellPackages.feedback
+          #haskellPackages.pushme # broken
+          #datalad
+          #git-annex-utils
+          ;
       };
     })
 
@@ -218,9 +234,9 @@ in
           git.enable = true;
           nnn.enable = true;
           rsync.enable = true;
-	  ssh = {
+          ssh = {
             enable = true;
-          #  modules = [ "vcs" ];
+            #  modules = [ "vcs" ];
           };
         };
       };

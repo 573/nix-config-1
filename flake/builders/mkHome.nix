@@ -8,11 +8,20 @@ let
   hostname = builtins.elemAt splittedName 1;
 in
 
+/**
+see also ./../../lib/common-config.nix `homeManager.baseConfig.extraSpecialArgs` there and `homeManager.userConfig`
+*/
 inputs.home-manager.lib.homeManagerConfiguration {
   pkgs = pkgsFor.${system};
+  /**
+    as in ./../../lib/common-config.nix `homeManager.baseConfig.extraSpecialArgs`
+  */
   extraSpecialArgs = { inherit inputs rootPath; };
 
   modules = [
+    /**
+    as in ./../../lib/common-config.nix `homeManager.userConfig`
+    */
     "${rootPath}/hosts/${hostname}/home-${username}.nix"
   ]
   ++ homeModulesFor.${system};

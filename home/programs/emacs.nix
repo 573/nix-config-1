@@ -75,13 +75,15 @@ in
 
     custom.programs.shell.shellAliases = { } // optionalAttrs (isLinux && isAarch64) { emacs = "emacs -nw"; };
 
-    home.packages = with pkgs; [
+    home.packages = builtins.attrValues {
+      inherit (pkgs.librsvg)
       # https://www.emacswiki.org/emacs/EmacsSvg; not working when emacs -nw
-      librsvg.out
+      out
       # DONT # https://github.com/nix-community/home-manager/issues/3113
       #dconf
       #emacsPackages.git-annex
-    ];
+      ;
+    };
 
     programs.info.enable = true;
 
@@ -115,11 +117,10 @@ in
         (add-hook 'before-save-hook nil)
       '';
 
-      extraPackages = epkgs: with epkgs;
+      extraPackages = epkgs: builtins.attrValues {
+        inherit (epkgs)
         #(pack emacs.pkgs.melpaPackages) ++
-        [
           moe-theme
-          org-novelist
           better-defaults
           #vterm
           bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
@@ -132,7 +133,11 @@ in
           repl-driven-development
           sensible-defaults
           sane-defaults
-        ] ++ optionals (isLinux && isx86_64) [
+          org-novelist
+	  ;
+	}
+        ++ optionals (isLinux && isx86_64) builtins.attrValues {
+	inherit (epkgs)
           flymake-hledger
           hledger-mode
           sqlite3
@@ -145,10 +150,13 @@ in
           org-bullets
           ob-mermaid
           magit
+	  ;
+	  inherit (pkgs)
           git-annex
-        ];
+	  ;
+        };
 
-      overrides = _self: _super: rec {
+      overrides = _self: _super: {
         org-novelist = (pkgs.emacsPackages.trivialBuild rec {
           pname = "org-novelist";
           version = "0";
@@ -158,8 +166,8 @@ in
             mkdir -p "$(dirname "$target")"
             cp *.el "$target"
           '';
-          meta = with lib; {
-            description = "Org Novelist is a system for writing novel-length fiction using Emacs Org mode.";
+          meta = {
+            lib.description = "Org Novelist is a system for writing novel-length fiction using Emacs Org mode.";
           };
         });
 
@@ -174,8 +182,8 @@ in
             mkdir -p "$(dirname "$target")"
             cp "$src" "$target"
           '';
-          meta = with lib; {
-            description = "A simple, modular collection of better Emacs default settings.";
+          meta = {
+            lib.description = "A simple, modular collection of better Emacs default settings.";
           };
         });
         sane-defaults = (pkgs.emacsPackages.trivialBuild rec {
@@ -188,8 +196,8 @@ in
             mkdir -p "$(dirname "$target")"
             cp "$src" "$target"
           '';
-          meta = with lib; {
-            description = "An ever-changing set of emacs settings..";
+          meta = {
+            lib.description = "An ever-changing set of emacs settings..";
           };
         });
       };

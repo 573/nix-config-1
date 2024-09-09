@@ -1,4 +1,12 @@
-{ config, lib, pkgs, rootPath, ... }: {
+{ config, lib, pkgs, unstable, rootPath, ... }:
+let
+  inherit
+    (lib)
+    attrValues
+    ;
+in
+
+{
   custom = {
     base = {
       general.lightWeight = true;
@@ -17,7 +25,7 @@
 
     programs = {
       tex.enable = true;
-      #      hledger.enable = true;
+      hledger.enable = true;
       shell = {
         logoutExtra = ''
           count="$(ps -e | grep proot-static | wc -l)"
@@ -31,11 +39,11 @@
         #      '';
       };
 
-#      ssh = {
-#        cleanKeysOnShellStartup = false;
-#        controlMaster = "no";
-#        modules = [ "private" ];
-#      };
+      #      ssh = {
+      #        cleanKeysOnShellStartup = false;
+      #        controlMaster = "no";
+      #        modules = [ "private" ];
+      #      };
 
       # FIXME: tmux does not start
       tmux.enable = lib.mkForce false;
@@ -44,7 +52,8 @@
   };
 
   home = {
-    packages = with pkgs; [
+    packages = attrValues {
+      # with pkgs; [
       /*
       (writeShellScriptBin "tailscale" ''
           ${pkgs.sysvtools}/bin/pidof tailscaled &>/dev/null || {
@@ -53,7 +62,7 @@
         }
 
         [[ -n $1 ]] && {
-         ${pkgs.tailscale}/bin/tailscale "$@"
+         ${unstable.tailscale}/bin/tailscale "$@"
          }
       '')
       */
@@ -63,8 +72,11 @@
       #mermaid-cli
       #chafa
       #      asciinema
-      nix-inspect
-    ];
+      inherit
+        (pkgs)
+        nix-inspect
+        ;
+    };
 
     activation = let inherit config; in {
       copyFont =

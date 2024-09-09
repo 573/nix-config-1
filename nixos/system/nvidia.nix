@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, system, ... }:
+{ config, lib, pkgs, unstable, inputs, system, ... }:
 
 let
   inherit (lib)
@@ -22,20 +22,20 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-# TODO https://discourse.nixos.org/t/use-a-module-from-nixpkgs-unstable-in-flake/31463/9
+    # TODO https://discourse.nixos.org/t/use-a-module-from-nixpkgs-unstable-in-flake/31463/9
 
-      #hardware.graphics = {
-      #  enable = true;
-#	# https://search.nixos.org/options?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=32enable32Bit
-#	# AFAIC here lies the problem using nixos-wsl also (needs nixpkgs-unstable, but pkgs here is not, but nixos-24.05)
-      #  enable32Bit = true;
-      #};
-      # TODO Separate nvidia.nix
-      hardware.opengl = {
-        enable = true;
-        driSupport32Bit = true;
-      };
-      /*
+    #hardware.graphics = {
+    #  enable = true;
+    #	# https://search.nixos.org/options?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=32enable32Bit
+    #	# AFAIC here lies the problem using nixos-wsl also (needs nixpkgs-unstable, but pkgs here is not, but nixos-24.05)
+    #  enable32Bit = true;
+    #};
+    # TODO Separate nvidia.nix
+    hardware.opengl = {
+      enable = true;
+      driSupport32Bit = true;
+    };
+    /*
 
         # Load nvidia driver for Xorg and Wayland
         services.xserver.videoDrivers = [ "nvidia" ];
@@ -60,16 +60,18 @@ in
         open = false;
 
         # Enable the Nvidia settings menu,
-              	# accessible via `nvidia-settings`.
+               	# accessible via `nvidia-settings`.
         nvidiaSettings = true;
 
         # Optionally, you may need to select the appropriate driver version for your specific GPU.
         package = config.boot.kernelPackages.nvidiaPackages.stable;
         };
 
-        environment.systemPackages = with pkgs; [
-        cudatoolkit
-        ];
+        environment.systemPackages = attrValues {# with pkgs; [
+          inherit (unstable.cudaPackages)
+       	  cudatoolkit
+       	  ;
+        };
       */
   };
 

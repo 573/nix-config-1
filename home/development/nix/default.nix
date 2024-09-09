@@ -63,7 +63,7 @@ in
       home.packages = [
         (buildWithDiff
           "hm-build"
-	  "nix build --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
+          "nix build --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
           "${config.home.homeDirectory}/.local/state/nix/profiles/home-manager"
         )
       ];
@@ -77,7 +77,7 @@ in
       home.packages = [
         (buildWithDiff
           "nod-build"
-	  "nix build --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams9.activationPackage\" --impure"
+          "nix build --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams9.activationPackage\" --impure"
           "/nix/var/nix/profiles/nix-on-droid"
         )
       ];

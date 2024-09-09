@@ -1,15 +1,62 @@
-
+/**
+see ./../programs/docker.nix for similar issue
+*/
 { config
 , lib
 , pkgs
+, inputs
+/*, unstable*/
 , ...
 }:
 let
   inherit (lib)
-  mkIf
-  mkEnableOption
-  optionalAttrs
-  ;
+    mkIf
+    mkEnableOption
+    optionalAttrs
+    ;
+
+/**
+Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+
+If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+*/
+  inherit (pkgs.stdenv.hostPlatform) system;
+
+
+  # FIXME FIXME https://github.com/NixOS/nixpkgs/issues/5725#issuecomment-72851235
+  # FIXME is workaround until upstream has the PR accepted, see https://github.com/nix-community/NixOS-WSL/issues/262#issuecomment-1825648537
+  wsl-vpnkit =
+    let inherit (inputs.unstable.legacyPackages.${system})
+      lib
+      findutils
+      pstree
+      resholve
+      wsl-vpnkit;
+    in
+    wsl-vpnkit.override {
+      resholve =
+        resholve
+        // {
+          mkDerivation = attrs @ { solutions, ... }:
+            resholve.mkDerivation (lib.recursiveUpdate attrs {
+              src = inputs.wsl-vpnkit;
+
+              solutions.wsl-vpnkit = {
+                inputs =
+                  solutions.wsl-vpnkit.inputs
+                  ++ [
+                    findutils
+                    pstree
+                  ];
+
+                execer =
+                  solutions.wsl-vpnkit.execer
+                  ++ [ "cannot:${pstree}/bin/pstree" ];
+              };
+            });
+        };
+    };
+
 
   cfg = config.custom.wsl.wsl-vpnkit;
 in
@@ -32,62 +79,62 @@ in
   };
 
   config = mkIf (cfg.enable) {
-    systemd = { 
-	    services = {
-	      wsl-vpnkit-auto = {
-		      enable = cfg.autoVPN;
-		      description = "wsl-vpnkit";
+    systemd = {
+      services = {
+        wsl-vpnkit-auto = {
+          enable = cfg.autoVPN;
+          description = "wsl-vpnkit";
 
-		      path = [pkgs.iputils];
-		      script = ''
-			has_internet () {
-			  ping -q -w 1 -c 1 8.8.8.8 >/dev/null
-			}
+          path = [ pkgs.iputils ];
+          script = ''
+            			has_internet () {
+            			  ping -q -w 1 -c 1 8.8.8.8 >/dev/null
+            			}
 
-			has_company_network () {
-			  ping -q -w 1 -c 1 ${cfg.checkURL} >/dev/null
-			}
+            			has_company_network () {
+            			  ping -q -w 1 -c 1 ${cfg.checkURL} >/dev/null
+            			}
 
-			is_active_wsl-vpnkit () {
-			  systemctl is-active -q wsl-vpnkit.service
-			}
+            			is_active_wsl-vpnkit () {
+            			  systemctl is-active -q wsl-vpnkit.service
+            			}
 
-			main () {
-			  if is_active_wsl-vpnkit; then
-			    if has_internet && ! has_company_network; then
-			      echo "Stopping wsl-vpnkit..."
-			      systemctl stop wsl-vpnkit.service
-			    fi
-			  else
-			    if ! has_internet; then
-			      echo "Starting wsl-vpnkit..."
-			      systemctl start wsl-vpnkit.service
-			    fi
-			  fi
-			}
+            			main () {
+            			  if is_active_wsl-vpnkit; then
+            			    if has_internet && ! has_company_network; then
+            			      echo "Stopping wsl-vpnkit..."
+            			      systemctl stop wsl-vpnkit.service
+            			    fi
+            			  else
+            			    if ! has_internet; then
+            			      echo "Starting wsl-vpnkit..."
+            			      systemctl start wsl-vpnkit.service
+            			    fi
+            			  fi
+            			}
 
-			while :
-			do
-			  main
-			  sleep 5
-			done
-		      '';
+            			while :
+            			do
+            			  main
+            			  sleep 5
+            			done
+            		      '';
 
-		      wantedBy = ["multi-user.target"];
-	    };
+          wantedBy = [ "multi-user.target" ];
+        };
 
-	    wsl-vpnkit = {
-	      enable = true;
-	      description = "wsl-vpnkit";
+        wsl-vpnkit = {
+          enable = true;
+          description = "wsl-vpnkit";
 
-	      serviceConfig = {
-		ExecStart = "${pkgs.wsl-vpnkit}/bin/wsl-vpnkit";
-		Type = "idle";
-		Restart = "always";
-		KillMode = "mixed";
-	      };
-	    };
-       };
+          serviceConfig = {
+            ExecStart = "${wsl-vpnkit}/bin/wsl-vpnkit";
+            Type = "idle";
+            Restart = "always";
+            KillMode = "mixed";
+          };
+        };
+      };
     };
   };
 }

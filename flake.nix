@@ -26,13 +26,13 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
-  agenix-rekey = {
-  url = "github:oddlama/agenix-rekey";
-  # Make sure to override the nixpkgs version to follow your flake,
-  # otherwise derivation paths can mismatch (when using storageMode = "derivation"),
-  # resulting in the rekeyed secrets not being found!
-  inputs.nixpkgs.follows = "nixpkgs";
-  };
+    agenix-rekey = {
+      url = "github:oddlama/agenix-rekey";
+      # Make sure to override the nixpkgs version to follow your flake,
+      # otherwise derivation paths can mismatch (when using storageMode = "derivation"),
+      # resulting in the rekeyed secrets not being found!
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Firefox style
     penguin-fox = {
@@ -42,7 +42,8 @@
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/47c1824c261a343a6acca36d168a0a86f0e66292"; #e1ee359d16a1886f0771cc433a00827da98d861c";
+    # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.32.3&fullName=hledger-1.32.3&keyName=haskellPackages.hledger&revision=05bbf675397d5366259409139039af8077d695ce&channel=nixpkgs-unstable#instructions
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/05bbf675397d5366259409139039af8077d695ce"; #e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -72,9 +73,9 @@
       flake = false;
     };
 
-  zen-browser = {
-    url = "github:MarceColl/zen-browser-flake";
-    inputs.nixpkgs.follows = "nixos-unstable"; # nixos-unstable
+    zen-browser = {
+      url = "github:MarceColl/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixos-unstable"; # nixos-unstable
     };
 
     catppuccin = {
@@ -158,12 +159,12 @@
 
     "hledger-completion.bash" = {
       flake = false;
-      url = "github:simonmichael/hledger?dir=hledger/shell-completion";
+      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.32.3&dir=hledger/shell-completion";
     };
 
     hledger-bin = {
       flake = false;
-      url = "github:simonmichael/hledger?dir=bin";
+      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.32.3&dir=bin";
     };
 
     fsread-nvim = {
@@ -404,8 +405,12 @@
     let
       rootPath = self;
       forEachSystem = nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ];
-      flakeLib = import ./flake {
-        inherit inputs rootPath forEachSystem;
+      /**
+      "includes" ./flake/default.nix (function) and provides it the attributes `inputs rootPath forEachSystem` from "environment" as parameters
+      */
+      flakeLib = import ./flake /* /default.nix */ {
+        inherit inputs rootPath /*specialArgs*/ forEachSystem;
+	#inherit (nixpkgs.pkgs.stdenv.hostPlatform) system;
       };
 
       formatterPackArgsFor = forEachSystem (system: {
@@ -426,11 +431,30 @@
 
       });
 
-      inherit (nixpkgs.lib) listToAttrs;
+      inherit (nixpkgs.lib) listToAttrs attrValues;
       inherit (flakeLib) mkApp mkHome mkNixOnDroid mkNixos mkDevenvJvmLang mkDevenvDeno mkDevenvFlutter mkDevenvOcaml mkDevenvRust mkDevenvMachnix mkDevenvJupyenv mkDevenvRuby mkDevenvHaskell mkDevenvRustWasm32;
+      # NOTE https://discourse.nixos.org/t/installing-only-a-single-package-from-unstable/5598/30
+      #  and https://discourse.nixos.org/t/add-an-option-to-home-manager-as-a-nixos-module-using-flake/38731/4
+      #  and https://discourse.nixos.org/t/how-do-specialargs-work/50615/4
+      #  and https://discourse.nixos.org/t/access-inputs-via-specialargs-in-mkshell/51905/5
+      /**
+      "Used" like this: `specialArgs.${system}`
+      */
+      specialArgs = forEachSystem (system: {
+        inherit system;
+	nixpkgs = inputs.nixpkgs.legacyPackages.${system};
+        latest = inputs.latest.legacyPackages.${system};
+        unstable = inputs.unstable.legacyPackages.${system};
+        libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
+	ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
+      });
     in
     {
       homeConfigurations = listToAttrs [
+        /**
+	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
+	*/
         (mkHome "aarch64-linux" "u0_a210@localhost")
         (mkHome "x86_64-linux" "dani@maiziedemacchiato")
       ];
@@ -444,19 +468,19 @@
         (mkNixos "aarch64-linux" "twopi")
       ];
 
-  # Expose the necessary information in your flake so agenix-rekey
-    # knows where it has too look for secrets and paths.
-    #
-    # Make sure that the pkgs passed here comes from the same nixpkgs version as
-    # the pkgs used on your hosts in `nixosConfigurations`, otherwise the rekeyed
-    # derivations will not be found!
-    # TODO get used to handling first, see example at https://github.com/oddlama/agenix-rekey/pull/28#issue-2331901837
-    agenix-rekey = inputs.agenix-rekey.configure {
-      userFlake = self;
-      nodes = self.nixosConfigurations;
-      # Example for colmena:
-      # inherit ((colmena.lib.makeHive self.colmena).introspect (x: x)) nodes;
-    };
+      # Expose the necessary information in your flake so agenix-rekey
+      # knows where it has too look for secrets and paths.
+      #
+      # Make sure that the pkgs passed here comes from the same nixpkgs version as
+      # the pkgs used on your hosts in `nixosConfigurations`, otherwise the rekeyed
+      # derivations will not be found!
+      # TODO get used to handling first, see example at https://github.com/oddlama/agenix-rekey/pull/28#issue-2331901837
+      agenix-rekey = inputs.agenix-rekey.configure {
+        userFlake = self;
+        nodes = self.nixosConfigurations;
+        # Example for colmena:
+        # inherit ((colmena.lib.makeHive self.colmena).introspect (x: x)) nodes;
+      };
 
       apps = forEachSystem (system:
         (listToAttrs [
@@ -540,12 +564,36 @@
 
           (mkApp system "nixos-shell" {
             file = ./files/apps/nixos-shell.sh;
-            path = pkgs: with pkgs; [ nixos-shell gawk jq git ];
+            path = pkgs: attrValues { #pkgs: with pkgs; [ 
+	      inherit (pkgs)
+	        nixos-shell 
+		gawk
+		jq 
+		git
+		;
+	    };
           })
 
           (mkApp system "setup" {
             file = ./files/apps/setup.sh;
-            path = pkgs: with pkgs; [ coreutils curl git gnugrep hostname jq nixVersions.nix_2_19 openssh ];
+            path = pkgs: attrValues {
+	    #pkgs: with pkgs; [ 
+	      inherit
+	        (pkgs)
+		  coreutils
+		  curl
+		  git
+		  gnugrep
+		  hostname
+		  jq
+		  openssh
+		  ;
+	      inherit
+	        (nixpkgs.nixVersions)
+	          nix_2_20
+		  ;
+	   };
+
             envs._doNotClearPath = true;
           })
 
@@ -563,20 +611,20 @@
               buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
             } ''
-                                                                                                                                         	    mkdir -p "$out"
+                                                                                                                                              	    mkdir -p "$out"
 
                         # prevent E886 ('/home-shelter' error)
-                                                                                                                                         	    export HOME=$TMPDIR
-                                                                                                                                         	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
-                                                                                                                                         	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
-                                                                                                                                         	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
+                                                                                                                                              	    export HOME=$TMPDIR
+                                                                                                                                              	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
+                                                                                                                                              	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
+                                                                                                                                              	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
 
                         if [ -n "$(cat "$out/nvim.log")" ]; then
-                                                                                                                                                                                           	      echo "output: "$(cat "$out/nvim.log")""
-                                                                                                                                                                                           	      exit 1
-                                                                                                                                         	    fi
+                                                                                                                                                                                                  	      echo "output: "$(cat "$out/nvim.log")""
+                                                                                                                                                                                                  	      exit 1
+                                                                                                                                              	    fi
           '';
-                                                                                   	  */
+                                                                                      	  */
         });
 
       # use like:
@@ -588,7 +636,7 @@
           value = inputs.nixd.devShells.${system}.default;
         }
         (
-	  # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
+          # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
           let
             pkgs = inputs.nixpkgs.legacyPackages.${system};
           in
@@ -629,7 +677,8 @@
         )
         (
           let
-            pkgs = inputs.unstable.legacyPackages.${system};
+	    inherit (specialArgs.${system}) unstable;
+            pkgs = unstable;
           in
           {
             # TODO https://github.com/thenbe/neotest-playwright for configuration
@@ -638,7 +687,18 @@
               inherit inputs pkgs;
               modules = [
                 ({ pkgs, ... }: {
-                  packages = with pkgs;[ nodejs playwright-test playwright-driver.browsers ];
+                  packages = builtins.attrValues {
+		    inherit
+		      (unstable)
+		      nodejs
+		      playwright-test
+		      ;
+
+		      inherit
+		      (unstable.playwright-driver)
+		      browsers
+		      ;
+		  };
                   env.PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
                   env.PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs}/bin/node";
                   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
@@ -711,10 +771,14 @@
           };
         pythonShell =
           let
-            pkgs = inputs.unstable.legacyPackages.${system}; #import inputs.unstable { inherit system; };
+	    inherit (specialArgs.${system}) unstable;
+            pkgs = unstable;
             # see https://discourse.nixos.org/t/help-using-poetry-in-a-flake-devshell/36874/3
-            mypython = pkgs.python311.withPackages (p: with p; [
-              sqlglot
+            mypython = pkgs.python311.withPackages (pythonPackageSet: attrValues {#p: with p; [
+              inherit
+	      # see https://discourse.flox.dev/t/questions-around-using-this-with-python-packages/665/6
+	      (pythonPackageSet)
+	      sqlglot
               # https://medium.com/social-impact-analytics/extract-text-from-unsearchable-pdfs-for-data-analysis-using-python-a6a2ca0866dd
               pymupdf
               pdf2image
@@ -723,27 +787,43 @@
               ocrmypdf
               pandas
               numpy
-            ]);
+	      ;
+            });
           in
           pkgs.mkShell {
             packages = [ mypython ];
           };
         agda =
           let
-            pkgs = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}; #import inputs.ghc-nixpkgs-unstable { inherit system; };
+	    inherit
+	     (specialArgs.${system})
+	     ghc-nixpkgs-unstable
+	     haskellPackages
+	     ;
+            pkgs = ghc-nixpkgs-unstable;
             myagda = (pkgs.agdaPackages.override {
-              Agda = pkgs.haskellPackages.Agda.overrideAttrs { };
-            }).agda.withPackages (p: with p; [ standard-library ]);
+              Agda = haskellPackages.Agda.overrideAttrs { };
+            }).agda.withPackages (agdaPackageSet: builtins.attrValues {
+	    inherit
+	    (agdaPackageSet)
+	    standard-library
+	    ;
+	    });
           in
           pkgs.mkShell {
             packages = [ myagda ];
           };
         # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
-        clShell = let pkgs = inputs.unstable.legacyPackages.${system}; in        #import inputs.unstable { inherit system; }; in
+        clShell = let
+	  inherit (specialArgs.${system}) unstable;
+	  pkgs = unstable;
+	  in
           pkgs.mkShell {
             nativeBuildInputs = [
-              (pkgs.sbcl.withPackages
-                (ps: with ps; [
+              (pkgs.sbcl.withPackages 
+                (sbclPackageSet: builtins.attrValues {
+		inherit
+		  (sbclPackageSet)
                   alexandria
                   str
                   dexador
@@ -751,13 +831,15 @@
                   sqlite
                   arrow-macros
                   jzon
-                ]))
+		  ;
+                }))
             ];
           };
         # https://github.com/tweag/ormolu/blob/74887f00137d6cd91811440325c3ac330a371b2c/ormolu-live/default.nix
         ghcWasmShell =
           let
-            pkgs = inputs.unstable.legacyPackages.${system}; #import inputs.unstable { inherit system; };
+            inherit (specialArgs.${system}) nixpks;
+	    pkgs = nixpks;
           in
           pkgs.mkShell {
             packages = [ inputs.ghc-wasm-meta.packages.${system}.all_9_8 ];
@@ -765,24 +847,24 @@
         # try https://github.com/cachix/devenv/issues/585
         haskellShell =
           let
+            inherit (specialArgs.${system}) unstable haskellPackages nixpks;
+	    pkgs = nixpkgs;
             hiPrio = pkg: pkgs.lib.updateManyAttrsByPath (builtins.map (output: { path = [ output ]; update = pkgs.hiPrio; }) pkg.outputs) pkg;
-            pkgs = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}; #import inputs.ghc-nixpkgs-unstable { inherit system; };
-            stack = hiPrio (inputs.unstable.legacyPackages.${system}.stack);
           in
           inputs.devenv.lib.mkShell rec {
             inherit inputs pkgs;
             modules = [
-              ({ pkgs, ... }:
+              ({ ... }:
                 {
                   packages = [
                     (inputs.ghciwatch.packages.${system}.default)
-                    stack # still the stack from ghc-nixpkgs-unstable seemingly
-                    pkgs.hledger
+                    (hiPrio (unstable.stack)) # still the stack from ghc-nixpkgs-unstable seemingly
+                    haskellPackages.hledger
                   ];
 
                   languages.haskell = {
                     enable = true;
-                    package = pkgs.haskell.packages.ghc965.ghcWithHoogle (pset: with pset; [
+                    package = haskellPackages.ghcWithHoogle (haskellPackageSet: attrValues {#pset: with pset; [
                       # libraries
                       #zlib
                       #arrows
@@ -791,10 +873,13 @@
                       #criterion
                       # tools
                       #cabal-install
-                      shake
+                      inherit
+		      (haskellPackageSet)
+		      shake
                       # see this also: https://nixos.wiki/wiki/Haskell#Using_Stack_.28no_nix_caching.29
                       # stack # stack of ghc-nixpkgs-unstable is too old
-                    ]);
+		      ;
+                    });
                   };
                 })
             ];
@@ -817,11 +902,10 @@
           in
           pkgs.mkShell {
             buildInputs =
-              [
-                pkgs.python310
-                #pkgs.python38Packages.pytorch
-                pkgs.python310Packages.pytorch-bin
-              ];
+	      builtins.attrValues {
+	        inherit (pkgs) python310;
+		inherit (pkgs.python310Packages) pytorch-bin;
+	      };
 
             shellHook = ''
               export LD_LIBRARY_PATH=/usr/lib/wsl/lib
@@ -829,12 +913,19 @@
           };
         yaocaml =
           let
-            pkgs = inputs.unstable.legacyPackages.${system}; #import inputs.unstable { inherit system; };
+	    inherit (specialArgs.${system}) unstable;
+            pkgs = unstable;
           in
           pkgs.mkShell {
-            packages = with pkgs; [ ocaml ocamlformat opam ] ++
-              (with pkgs.ocamlPackages; [
-                ocaml
+            packages = builtins.attrValues {
+	      inherit 
+	        (pkgs)
+		ocaml
+		ocamlformat
+		opam
+		;
+              inherit
+	        (pkgs.ocamlPackages)
                 findlib
                 dune_3
                 odoc
@@ -842,11 +933,15 @@
                 merlin
                 utop
                 ocp-indent
-                janeStreet.async
-                janeStreet.base
-                janeStreet.core_unix
-                janeStreet.ppx_let
-              ]);
+		;
+	      inherit
+	        (pkgs.ocamlPackages.janeStreet)
+                #async
+                base
+                core_unix
+                ppx_let
+		;
+            };
           };
       }));
 

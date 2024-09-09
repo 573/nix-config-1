@@ -1,3 +1,6 @@
+/**
+`@configArgs` as below provided to `commonConfig`, latter defined in ./../../lib/common-config.nix and bound in ./../../lib/default.nix as well as in ./../../flake/default.nix under the attribute name `customLibFor` where also a module with a mere attribute `lib.custom`is included with the `homeModulesFor` function
+*/
 { config, lib, pkgs, ... }@configArgs:
 
 let
@@ -30,7 +33,7 @@ in
       builders = mkOption {
         type = types.listOf types.str;
         default = [
-	  "ssh://eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
+          "ssh://eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
         ];
         description = "Nix remote builders.";
       };

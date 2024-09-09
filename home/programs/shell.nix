@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, /*unstable,*/ ... }:
 
 let
   inherit (lib)

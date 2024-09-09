@@ -1,4 +1,15 @@
-{ config, lib, pkgs, rootPath, inputs, ... }: {
+/**
+Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+
+For `[latest]` and `[unstable]` parameters determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+*/
+{ lib, pkgs, /*latest, unstable,*/ ... }:
+let
+  inherit (lib)
+    attrValues
+    ;
+in
+{
 
   custom = {
     base = {
@@ -53,61 +64,81 @@
   #];
 
   home.file.".mob".text = ''
-      MOB_TIMER_USER="Daniel"
-      MOB_DONE_SQUASH="squash-wip"
-    '';
+    MOB_TIMER_USER="Daniel"
+    MOB_DONE_SQUASH="squash-wip"
+  '';
 
-  home.packages = with pkgs; [
-    #alejandra
-    shellharden
-    shfmt
-    #rnix-lsp
-    #deadnix
-    #statix
-    #nixfmt
-#    lua-language-server
- #   nodePackages.bash-language-server
-#    nodePackages.vim-language-server
-    #deno
-#    stylua
-    sqlite
-  #  nodePackages.vscode-json-languageserver-bin
-    xsel
-    #nodejs_latest
-    #shellcheck
-    chafa
-    #cachix
-    #nil
-    w3m
-    #fff
-    #my-neovim
-    #manix
-    #lolcat
-    epr
-    #my-emacs
-    #pandoc
-    #rustenv
-    # this version fails, use version before https://github.com/573/nix-config-1/actions/runs/6589493931/job/17904090802
-    #yt-dlp
-#    micro
-#    jdt-language-server
-    #ranger
-    #pup
-    difftastic
-#    bashdb
-#    desed
-#    gradle-vscode-extension.vscode-gradle
-    python310Packages.pudb
-    jacinda
-#    mermaid-cli
-    dstask
-    nixgl.nixGLIntel
-    nix-prefetch
-    hadolint
-    csvlens
-    hurl
-    oxker
-  ];
+  home.packages = attrValues {
+    #with pkgs; [   
+    inherit
+      (pkgs)
+      #alejandra
+      shellharden
+      shfmt
+      #rnix-lsp
+      #deadnix
+      #statix
+      #nixfmt
+      #    lua-language-server
+      #   nodePackages.bash-language-server
+      #    nodePackages.vim-language-server
+      #deno
+      #    stylua
+      sqlite
+      #  nodePackages.vscode-json-languageserver-bin
+      xsel
+      #nodejs_latest
+      #shellcheck
+      chafa
+      #cachix
+      #nil
+      w3m
+      #fff
+      #my-neovim
+      #manix
+      #lolcat
+      epr
+      #my-emacs
+      #pandoc
+      #rustenv
+      # this version fails, use version before https://github.com/573/nix-config-1/actions/runs/6589493931/job/17904090802
+      #yt-dlp
+      #    micro
+      #    jdt-language-server
+      #ranger
+      #pup
+      difftastic
+      #    bashdb
+      #    desed
+      #    gradle-vscode-extension.vscode-gradle
+      jacinda
+      #    mermaid-cli
+      dstask
+      nix-prefetch
+      hadolint
+      hurl
+      ;
+
+    /*inherit
+      (unstable)
+      oxker
+      ;*/
+
+    inherit
+      (pkgs.python310Packages)
+      pudb
+      ;
+
+    inherit
+      (pkgs.nixgl)
+      nixGLIntel
+      ;
+
+    /*inherit
+      (latest)
+      csvlens
+      ;*/
+  };
   /*
     home.file = {
     ".emacs.d/early-init.el".text = ''

@@ -26,7 +26,7 @@ let
 
   inherit (inputs.emacs-overlay.lib.${system}) emacsWithPackagesFromUsePackage;
 
-  emacs-nano = (pkgs.emacsPackages.trivialBuild rec {
+  emacs-nano = (pkgs.emacsPackages.trivialBuild {
     pname = "emacs-nano";
     version = "0";
     src = "${inputs.nano-emacs}";
@@ -37,8 +37,8 @@ let
                   mkdir -p "$target"
                   cp *.el "$target"
     '';
-    meta = with lib; {
-      description = "GNU Emacs / N Λ N O is a set of configuration files for GNU Emacs such as to provide a nice and consistent look and feel.";
+    meta = {
+      lib.description = "GNU Emacs / N Λ N O is a set of configuration files for GNU Emacs such as to provide a nice and consistent look and feel.";
     };
   });
 
@@ -96,11 +96,15 @@ in
     custom.programs.emacs-nano.finalPackage = (emacsWithPackagesFromUsePackage {
       alwaysEnsure = true;
       package = emacs;
-      extraEmacsPackages = epkgs: with epkgs; [
+      extraEmacsPackages = epkgs: builtins.attrValues {
+        inherit
+	  (epkgs)
         bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
         use-package
+        ;
+      } ++ [
         emacs-nano
-        my-default-el
+	my-default-el
       ];
       config = "";
     });
@@ -109,8 +113,13 @@ in
 
     programs.info.enable = true;
 
-    home.packages = with pkgs; [
-      (pkgs.runCommand "emacs-nano" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+    home.packages = let
+      inherit (pkgs)
+        runCommand
+	makeWrapper
+	;
+      in [
+      (runCommand "emacs-nano" { nativeBuildInputs = [ makeWrapper ]; } ''
         mkdir -p $out/bin	
         makeWrapper ${config.custom.programs.emacs-nano.finalPackage.outPath}/bin/emacs $out/bin/emacs-nano --argv0 emacs    
       '')

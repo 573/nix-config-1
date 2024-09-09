@@ -1,4 +1,9 @@
-{ config, lib, pkgs, inputs, ... }:
+/**
+see ./../../flake/builders/mkNixos.nix line `++ customLibFor.${system}.listNixFilesRecursive "${rootPath}/nixos";` and ./../../flake/default.nix `customLibFor` declaration
+
+Same as written in ./../../flake/builders/mkNixos.nix should apply here (regarding `specialArgs` injection) as the anonymous module is a module next to `"${rootPath}/hosts/${name}/configuration.nix"` there
+*/
+{ config, lib, /* unstable,*/ pkgs, inputs, ... }:
 
 let
   inherit (lib)
@@ -10,11 +15,11 @@ let
 in
 
 {
-#  imports = [
-#    (args@{ pkgs, ... }:
-#      import "${inputs.unstable.outPath}/nixos/modules/services/hardware/nvidia-container-toolkit"
-#        (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; }))
-#  ];
+  #  imports = [
+  #    (args@{ pkgs, ... }:
+  #      import "${inputs.unstable.outPath}/nixos/modules/services/hardware/nvidia-container-toolkit"
+  #        (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; }))
+  #  ];
 
   ###### interface
 
@@ -34,7 +39,7 @@ in
     virtualisation = {
       docker = {
         enable = true;
-        package = pkgs.docker_25;
+        #package = pkgs.docker_24; #unstable.docker_25;
         #       enableNvidia = true;
 
         storageDriver = "overlay2";
@@ -46,13 +51,13 @@ in
           # for the "whole" discussion of it (rootless or not) i. e. https://discourse.nixos.org/t/docker-rootless-with-nvidia-support/37069
           setSocketVariable = true; # false for driver exact support
           /*	daemon.settings = {
-                                    				runtimes = {
-                                           					nvidia = {
-                                 			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
-                               			};
-                                    				};
+                                        				runtimes = {
+                                                					nvidia = {
+                                    			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
+                                  			};
+                                        				};
             };
-                                         	    */
+                                              	    */
         };
       };
     };

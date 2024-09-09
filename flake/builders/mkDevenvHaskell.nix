@@ -1,8 +1,9 @@
-{ system, pkgsFor, inputs, name, args, ... }:
+{ system, pkgsFor, inputs, specialArgs, name, args, ... }:
 
 let
   pkgs = pkgsFor.${system};
   inherit (inputs.devenv.lib) mkShell;
+  inherit (specialArgs.${system}) haskellPackages;
 in
 mkShell rec {
   inherit inputs pkgs;
@@ -10,7 +11,7 @@ mkShell rec {
     ({ pkgs, ... }:
       let
         myHaskellPackages =
-          inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc946.override (old: {
+          haskellPackages.override (old: {
             overrides = pkgs.lib.composeExtensions (old.overrides or (_: _: { }))
               (hself: hsuper: {
                 ghc = hsuper.ghc // { withPackages = hsuper.ghc.withHoogle; };
