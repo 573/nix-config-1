@@ -4,7 +4,7 @@ let
   pkgs = pkgsFor.${system};
 in
 
-inputs.devenv.lib.mkShell {
+args.mkShell {
   inherit inputs pkgs;
   modules = [
     ({ pkgs, ... }: {

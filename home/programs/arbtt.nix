@@ -3,7 +3,7 @@ Original author's home'nix files are always prefixed with `{ config, lib, pkgs, 
 
 For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, /*haskellPackages,*/ inputs, ... }:
+{ config, lib, pkgs, haskellPackages, inputs, ... }:
 
 let
   inherit (lib)
@@ -37,7 +37,7 @@ in
   config = mkIf cfg.enable {
     # FIXME https://github.com/toonn/nix-config/blob/master/home/home.nix
     home.packages = attrValues {
-      inherit (inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965)
+      inherit (haskellPackages)
         arbtt
         ;
     };
@@ -51,7 +51,7 @@ in
               let
                 path = builtins.concatStringsSep ":"
                   (map (p: "${lib.getBin p}/bin")
-                    (attrValues { inherit (inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965) arbtt; inherit (pkgs) coreutils; } # with pkgs; []
+                    (attrValues { inherit (haskellPackages) arbtt; inherit (pkgs) coreutils; } # with pkgs; []
                     )
                   );
               in

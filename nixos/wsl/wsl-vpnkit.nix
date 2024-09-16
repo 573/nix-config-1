@@ -5,7 +5,7 @@ see ./../programs/docker.nix for similar issue
 , lib
 , pkgs
 , inputs
-/*, unstable*/
+, unstable
 , ...
 }:
 let
@@ -20,13 +20,12 @@ Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatfo
 
 If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
 */
-  inherit (pkgs.stdenv.hostPlatform) system;
 
 
   # FIXME FIXME https://github.com/NixOS/nixpkgs/issues/5725#issuecomment-72851235
   # FIXME is workaround until upstream has the PR accepted, see https://github.com/nix-community/NixOS-WSL/issues/262#issuecomment-1825648537
   wsl-vpnkit =
-    let inherit (inputs.unstable.legacyPackages.${system})
+    let inherit (unstable)
       lib
       findutils
       pstree

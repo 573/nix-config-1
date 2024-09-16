@@ -4,7 +4,7 @@ Original author's home'nix files are always prefixed with `{ config, lib, pkgs, 
 Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
 For `[inputs]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, unstable, ... }:
 let
   inherit (lib)
     attrValues
@@ -18,7 +18,7 @@ Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatfo
 
 If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
 */
-  inherit (pkgs.stdenv.hostPlatform) system;
+  #inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.general;
   localeGerman = "de_DE.UTF-8";
   localeEnglish = "en_US.UTF-8";
@@ -31,7 +31,7 @@ in
       enable = mkEnableOption "basic config" // { default = true; };
 
       lightWeight =
-        mkEnableOption "light weight config for low performance hosts";
+        mkEnableOption "light weight config for low performance hosts" // { default = false; };
 
       wsl = mkEnableOption "config for NixOS-WSL instances";
 
@@ -49,7 +49,7 @@ in
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
-    (mkIf (!cfg.termux) {
+     {
       custom.programs = {
         emacs-novelist.enable = true;
         emacs-nano.enable = true;
@@ -58,7 +58,8 @@ in
         nix-index.enable = true;
         neovim = {
           enable = true;
-          lightWeight = false; # FIXME Remove this line, only for testing if build works on nix-on-droid
+	  # not inherit not same attr
+	  lightWeight = cfg.lightWeight;
         };
       };
 
@@ -143,9 +144,10 @@ in
             ;
 
           inherit
-            (inputs.unstable.legacyPackages.${system})
+            (unstable)
             eza
             yazi
+	    cyme
             ;
 
         }; # replaces with pkgs; [], i. e. because nixd catches duplicates this way
@@ -159,6 +161,7 @@ in
           ];
           PAGER = "${pkgs.less}/bin/less";
           SHELL = "bash";
+	  # TODO how does that interfere with same attr in neovim.nix
           EDITOR = "vi";
           VISUAL = "vi";
           # (ft-man-plugin),
@@ -169,65 +172,19 @@ in
           # export MANPAGER='nvim -u NONE -i NONE "+runtime plugin/man.lua" -c "Man"''!'' -o -'
           #working#MANPAGER = "${config.custom.programs.neovim.finalPackage}/bin/nvim -u NONE -i NONE '+runtime plugin/man.lua' -c Man! -o -";
         };
-
       };
-
-      programs.fzf.enable = true;
-
-      # FIXME: set to sd-switch once it works for krypton, https://home-manager-options.extranix.com/?query=systemd.user.startServices&release=release-24.05
-      systemd.user.startServices = "legacy";
-    })
-
-    (mkIf cfg.wsl {
-      custom.programs.shell.shellAliases = {
-        pbcopy = "powershell.exe -NoProfile -Command \"Set-Clipboard -Value \\\$input\"";
-        pbpaste = "powershell.exe -NoProfile -Command 'Get-Clipboard'";
-      };
-
-      # programs.starship.enable = true; # long lines are distorted
-    })
+    }
 
     {
       home.stateVersion = "24.05";
     }
 
-    (mkIf cfg.termux {
-      custom = {
-        base.general = {
-          lightWeight = true;
-          minimal = true;
-        };
-        programs.emacs-novelist.enable = true;
-      };
-    })
+    {
+      programs.fzf.enable = true;
 
-    (mkIf (!cfg.lightWeight) {
-      custom.programs = {
-        tmux.enable = true;
-        emacs.enable = true;
-        #        emacs-novelist.enable = true;
-        #emacs-nano.enable = true;
-        neovim = {
-          enable = true;
-          lightWeight = false;
-        };
-      };
-
-      home.packages = attrValues {
-        inherit (pkgs)
-          lshw
-          ouch
-          strace
-          lineselect
-          git-annex
-          #git-annex-remote-googledrive
-          #haskellPackages.feedback
-          #haskellPackages.pushme # broken
-          #datalad
-          #git-annex-utils
-          ;
-      };
-    })
+      # FIXME: set to sd-switch once it works for krypton, https://home-manager-options.extranix.com/?query=systemd.user.startServices&release=release-24.05
+      systemd.user.startServices = "legacy";
+    }
 
     (mkIf (!cfg.minimal) {
       custom = {
@@ -245,8 +202,37 @@ in
         };
       };
 
-      programs = {
-        home-manager.enable = true;
+      programs.home-manager.enable = true;
+    })
+
+    (mkIf cfg.wsl {
+      custom.programs.shell.shellAliases = {
+        pbcopy = "powershell.exe -NoProfile -Command \"Set-Clipboard -Value \\\$input\"";
+        pbpaste = "powershell.exe -NoProfile -Command 'Get-Clipboard'";
+      };
+
+      # programs.starship.enable = true; # long lines are distorted
+    })
+
+    (mkIf (!cfg.lightWeight) {
+      custom.programs = {
+        tmux.enable = true;
+        emacs.enable = true;
+      };
+
+      home.packages = attrValues {
+        inherit (pkgs)
+          lshw
+          ouch
+          strace
+          lineselect
+          git-annex
+          #git-annex-remote-googledrive
+          #haskellPackages.feedback
+          #haskellPackages.pushme # broken
+          #datalad
+          #git-annex-utils
+          ;
       };
     })
   ]);

@@ -197,6 +197,11 @@
       inputs.nmd.follows = "nmd";
     };
 
+    ml_env = {
+      url = "github:AlexChalk/ml_env";
+      inputs.nixpkgs.follows = "unstable";
+    };
+
     nixGL = {
       url = "github:guibou/nixGL";
       # follows nixpkgs (master)
@@ -278,28 +283,20 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "unstable";
     };
+ poetry2nix.url = "github:nix-community/poetry2nix";
+#      poetry2nix.inputs.flake-utils.follows = "flake-utils";
+poetry2nix.inputs.nixpkgs.follows = "unstable";
 
-    jupyenv.url = "github:573/jupyenv-aarch64-experimental";
+    jupyenv.url = "github:tweag/jupyenv?ref=refs/pull/524/head"; # "github:573/jupyenv-aarch64-experimental";
 
     nixpkgs-ruby = {
       url = "github:bobvanderlinden/nixpkgs-ruby";
-      inputs.nixpkgs.follows = "nixpkgs";
+   #   inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ocaml-overlay = {
       url = "github:nix-ocaml/nix-overlays";
       inputs.nixpkgs.follows = "latest";
-    };
-
-    pypi-deps-db = {
-      url = "github:DavHau/pypi-deps-db";
-      flake = false;
-    };
-
-    mach-nix = {
-      url = "github:DavHau/mach-nix"; # ?ref=3.5.0
-      inputs.nixpkgs.follows = "unstable";
-      inputs.pypi-deps-db.follows = "pypi-deps-db";
     };
 
     nixd = {
@@ -422,6 +419,7 @@
             enable = true;
             noLambdaPatternNames = true;
           };
+	  # TODO see https://github.com/nix-community/nixd/blob/9355fa2/flake.nix#L60
           nixpkgs-fmt.enable = true;
           statix = {
             enable = true;
@@ -432,7 +430,8 @@
       });
 
       inherit (nixpkgs.lib) listToAttrs attrValues;
-      inherit (flakeLib) mkApp mkHome mkNixOnDroid mkNixos mkDevenvJvmLang mkDevenvDeno mkDevenvFlutter mkDevenvOcaml mkDevenvRust mkDevenvMachnix mkDevenvJupyenv mkDevenvRuby mkDevenvHaskell mkDevenvRustWasm32;
+      inherit (flakeLib) mkApp mkHome mkNixOnDroid mkNixos mkDevenvJvmLang mkDevenvDeno mkDevenvFlutter mkDevenvOcaml mkDevenvRust mkDevenvMachnix mkDevenvJupyenv mkDevenvRuby mkDevenvHaskell mkDevenvRustWasm32 mkDevShellJdk mkDevenvRubyNix mkDevenvRubyVar3  mkDevShellOcaml mkDevenvRust2 mkDevShellPython mkDevShellCudaWsl mkDevenvJulia  mkDevShellAgda mkDevShellCommonLisp mkDevenvPlaywright mkDevenvPlaywright2 mkDevShellGhcwasm  mkDevenvHaskell2;
+
       # NOTE https://discourse.nixos.org/t/installing-only-a-single-package-from-unstable/5598/30
       #  and https://discourse.nixos.org/t/add-an-option-to-home-manager-as-a-nixos-module-using-flake/38731/4
       #  and https://discourse.nixos.org/t/how-do-specialargs-work/50615/4
@@ -448,7 +447,14 @@
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
 	ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
-      });
+        fenix = inputs.fenix.packages.${system};
+	nixpkgs-ruby-overlay = inputs.nixpkgs-ruby.overlays.default;
+        ghciwatch = inputs.ghciwatch.packages.${system}.default;
+        ghc-wasm-meta = inputs.ghc-wasm-meta.packages.${system}.all_9_8;
+        inherit (inputs.devenv.lib) mkShell;
+        inherit (inputs.nixpkgs-ruby.lib) packageFromRubyVersionFile;
+        inherit (inputs.jupyenv.lib.${system}) mkJupyterlabNew;
+    });
     in
     {
       homeConfigurations = listToAttrs [
@@ -630,320 +636,54 @@
       # use like:
       # $ direnv-init jdk11
       # $ lorri-init jdk11
-      devShells = forEachSystem (system: listToAttrs [
-        {
-          name = "nixd";
-          value = inputs.nixd.devShells.${system}.default;
-        }
-        (
-          # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
-          let
-            pkgs = inputs.nixpkgs.legacyPackages.${system};
-          in
-          {
-            name = "playwright-v2";
-            value = inputs.devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules =
-                let
-                  playwright-driver = pkgs.playwright-driver;
-                  playwright-driver-browsers = pkgs.playwright-driver.browsers;
-
-                  playright-file = builtins.readFile "${playwright-driver}/package/browsers.json";
-                  playright-json = builtins.fromJSON playright-file;
-                  playwright-chromium-entry = builtins.elemAt
-                    (builtins.filter
-                      (
-                        browser: browser.name == "chromium"
-                      )
-                      playright-json.browsers) 0;
-                  playwright-chromium-revision = playwright-chromium-entry.revision;
-                in
-                [
-                  {
-                    env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${playwright-driver-browsers}/chromium-${playwright-chromium-revision}/chrome-linux/chrome";
-                    # This is used by npx playwright --{ui,debug,...}
-                    env.PLAYWRIGHT_BROWSERS_PATH = "${playwright-driver-browsers}";
-                    languages = {
-                      javascript = {
-                        enable = true;
-                        npm.enable = true;
-                      };
-                    };
-                  }
-                ];
-            };
-          }
-        )
-        (
-          let
-	    inherit (specialArgs.${system}) unstable;
-            pkgs = unstable;
-          in
-          {
-            # TODO https://github.com/thenbe/neotest-playwright for configuration
-            name = "playwright";
-            value = inputs.devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules = [
-                ({ pkgs, ... }: {
-                  packages = builtins.attrValues {
-		    inherit
-		      (unstable)
-		      nodejs
-		      playwright-test
-		      ;
-
-		      inherit
-		      (unstable.playwright-driver)
-		      browsers
-		      ;
-		  };
-                  env.PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
-                  env.PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs}/bin/node";
-                  env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
-                  # https://discourse.nixos.org/t/running-playwright-tests/25655/41
-                  env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = true;
-                  enterShell = ''
-                    	    # Remove playwright from node_modules, so it will be taken from playwright-test
-                              rm node_modules/@playwright/ -R
-                         	  '';
-                })
-              ];
-            };
-          }
-        )
+      devShells = forEachSystem (system: 
+      let 
+        inherit (specialArgs.${system}) mkShell nixpkgs unstable packageFromRubyVersionFile nixpkgs-ruby-overlay haskellPackages fenix ghc-wasm-meta ghciwatch ghc-nixpkgs-unstable mkJupyterlabNew;
+      in listToAttrs [
+        #{ name = "template";  value = nixpkgs.mkShell {}; }
         # AFAIU the pkgs used herein (mkDevenv*) are with the overlays as in flake/nixpkgs.nix etc. applied, also means any derivation defined therein can be used here then, but is a different derivation than i. e. some binary-cached elsewhere, which can lead to subtle differences i. e. (un)expected rebuilds. To use a binary-cached flake define here directly in flake.nix and add overlays when needed only.
-        (mkDevenvJupyenv system "jupyenv" { })
-        (mkDevenvJvmLang system "jvmlanguages-devenv" { })
-        (mkDevenvDeno system "deno" { })
-        (mkDevenvFlutter system "flutter" { })
+        (mkDevShellJdk system "jdk21" { jdk = pkgs: pkgs.jdk21; })
+	# TODO wait for https://github.com/tweag/jupyenv/pull/524
+	# until then as in https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/editors/jupyter-kernels/coq/default.nix (https://github.com/NixOS/nixpkgs/issues/255923, https://github.com/NixOS/nixpkgs/pull/268078 and https://gist.github.com/teto/4d12998d734f982e27f48d8bb001c8ae)
+	# https://discourse.nixos.org/t/install-custom-kernels-into-jupyter-lab/37502
+	# https://github.com/AlexChalk/ml_env/blob/3fb4d915e2ffac3d340b6b406defcf7753a587ad/flake.nix
+	# use i. e.:
+	# nix run --impure --expr 'with import <nixpkgs> {}; jupyter.override { definitions.clojure = clojupyter.definition; }'
+	# (mkDevenvJupyenv system "jupyenv" { inherit mkShell mkJupyterlabNew; })
+        (mkDevenvJvmLang system "jvmlanguages-devenv" { inherit mkShell; })
+        (mkDevenvDeno system "deno" { inherit mkShell; })
+        (mkDevenvFlutter system "flutter" { inherit mkShell; })
         # TODO https://github.com/c-cube/iter
-        (mkDevenvOcaml system "ocaml" { })
-        (mkDevenvRuby system "ruby" { })
-        (mkDevenvRust system "rust" { })
-        (mkDevenvRustWasm32 system "rustwasm32" { })
-        (mkDevenvHaskell system "haskell" { })
-
-        (mkDevenvMachnix system "machnix" { })
+        (mkDevenvOcaml system "ocaml" { inherit mkShell; })
+        (mkDevenvRuby system "ruby" { inherit packageFromRubyVersionFile; })
+        (mkDevenvRubyNix system "rubyNix" { })
+        (mkDevenvRubyVar3 system "rubyShell" { inherit nixpkgs-ruby-overlay; inherit (inputs) nixpkgs; })
+        (mkDevenvRust system "rust" { inherit mkShell inputs; })
+        (mkDevenvRustWasm32 system "rustwasm32" { inherit mkShell fenix; })
+        (mkDevenvHaskell system "haskell" { inherit haskellPackages mkShell; })
+	(mkDevShellOcaml system "yaocaml" { inherit unstable; })
+	(mkDevenvRust2 system "rustyShell" { inherit inputs mkShell; })
+	#(mkDevShellPython system "python" { inherit unstable; })
+	# DONT probably delusional, rather try https://sourcegraph.com/github.com/nixvital/ml-pkgs/-/blob/overlays/torch-family.nix
+	# also: https://wiki.nixos.org/wiki/CUDA
+	#(mkDevShellCudaWsl system "cudawsl" { })
         #(mkDevenvJulia system "julia" { })
-      ] // ({
-        # based on this https://github.com/cachix/devenv/pull/667#issuecomment-1656811711
-        rustyShell =
-          let
-            # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
-            pkgs = import inputs.unstable {
-              inherit system;
-              overlays =
-                (map (x: x.overlays.default) [
-                  inputs.rust-overlay
-                  # see https://github.com/nix-community/fenix#usage (as a flake)
-                  inputs.fenix
-                ])
-              ;
-            };
-            rustVersion = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
-            #aarch64-binutils = pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc;
-            #x86_64-binutils = pkgs.pkgsCross.gnu64.stdenv.cc;
-          in
-          inputs.devenv.lib.mkShell rec {
-            inherit inputs pkgs;
-            modules = [
-              ({ pkgs, ... }: {
-                languages.rust = {
-                  enable = true;
-                  toolchain.rustc = (rustVersion.override {
-                    extensions = [ "rust-src" "rust-analyzer" ];
-                    targets = [ /*"x86_64-unknown-linux-gnu" "aarch64-unknown-linux-gnu"*/ "wasm32-unknown-unknown" ];
-                  });
-                };
-
-                /*packages = [
-                  pkgs.libunwind
-                  aarch64-binutils
-                ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin (with pkgs.darwin.apple_sdk; [
-                  frameworks.Security
-                  frameworks.CoreFoundation
-                  x86_64-binutils
-                ]);*/
-              })
-            ];
-          };
-        pythonShell =
-          let
-	    inherit (specialArgs.${system}) unstable;
-            pkgs = unstable;
-            # see https://discourse.nixos.org/t/help-using-poetry-in-a-flake-devshell/36874/3
-            mypython = pkgs.python311.withPackages (pythonPackageSet: attrValues {#p: with p; [
-              inherit
-	      # see https://discourse.flox.dev/t/questions-around-using-this-with-python-packages/665/6
-	      (pythonPackageSet)
-	      sqlglot
-              # https://medium.com/social-impact-analytics/extract-text-from-unsearchable-pdfs-for-data-analysis-using-python-a6a2ca0866dd
-              pymupdf
-              pdf2image
-              opencv4
-              pytesseract
-              ocrmypdf
-              pandas
-              numpy
-	      ;
-            });
-          in
-          pkgs.mkShell {
-            packages = [ mypython ];
-          };
-        agda =
-          let
-	    inherit
-	     (specialArgs.${system})
-	     ghc-nixpkgs-unstable
-	     haskellPackages
-	     ;
-            pkgs = ghc-nixpkgs-unstable;
-            myagda = (pkgs.agdaPackages.override {
-              Agda = haskellPackages.Agda.overrideAttrs { };
-            }).agda.withPackages (agdaPackageSet: builtins.attrValues {
-	    inherit
-	    (agdaPackageSet)
-	    standard-library
-	    ;
-	    });
-          in
-          pkgs.mkShell {
-            packages = [ myagda ];
-          };
-        # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
-        clShell = let
-	  inherit (specialArgs.${system}) unstable;
-	  pkgs = unstable;
-	  in
-          pkgs.mkShell {
-            nativeBuildInputs = [
-              (pkgs.sbcl.withPackages 
-                (sbclPackageSet: builtins.attrValues {
-		inherit
-		  (sbclPackageSet)
-                  alexandria
-                  str
-                  dexador
-                  cl-ppcre
-                  sqlite
-                  arrow-macros
-                  jzon
-		  ;
-                }))
-            ];
-          };
-        # https://github.com/tweag/ormolu/blob/74887f00137d6cd91811440325c3ac330a371b2c/ormolu-live/default.nix
-        ghcWasmShell =
-          let
-            inherit (specialArgs.${system}) nixpks;
-	    pkgs = nixpks;
-          in
-          pkgs.mkShell {
-            packages = [ inputs.ghc-wasm-meta.packages.${system}.all_9_8 ];
-          };
-        # try https://github.com/cachix/devenv/issues/585
-        haskellShell =
-          let
-            inherit (specialArgs.${system}) unstable haskellPackages nixpks;
-	    pkgs = nixpkgs;
-            hiPrio = pkg: pkgs.lib.updateManyAttrsByPath (builtins.map (output: { path = [ output ]; update = pkgs.hiPrio; }) pkg.outputs) pkg;
-          in
-          inputs.devenv.lib.mkShell rec {
-            inherit inputs pkgs;
-            modules = [
-              ({ ... }:
-                {
-                  packages = [
-                    (inputs.ghciwatch.packages.${system}.default)
-                    (hiPrio (unstable.stack)) # still the stack from ghc-nixpkgs-unstable seemingly
-                    haskellPackages.hledger
-                  ];
-
-                  languages.haskell = {
-                    enable = true;
-                    package = haskellPackages.ghcWithHoogle (haskellPackageSet: attrValues {#pset: with pset; [
-                      # libraries
-                      #zlib
-                      #arrows
-                      #async
-                      # cgi # marked broken
-                      #criterion
-                      # tools
-                      #cabal-install
-                      inherit
-		      (haskellPackageSet)
-		      shake
-                      # see this also: https://nixos.wiki/wiki/Haskell#Using_Stack_.28no_nix_caching.29
-                      # stack # stack of ghc-nixpkgs-unstable is too old
-		      ;
-                    });
-                  };
-                })
-            ];
-          };
+	(mkDevShellAgda system "agda" { inherit ghc-nixpkgs-unstable haskellPackages; })
+	#(mkDevShellCommonLisp system "commonlisp" { inherit unstable; })
+	#(mkDevenvPlaywright "playwright" { inherit nixpkgs mkShell; })
+	#(mkDevenvPlaywright2 "playwright2" { inherit unstable mkShell; })
+	#(mkDevShellGhcwasm "ghcwasm" { inherit ghc-wasm-meta unstable; })
+#	(mkDevenvHaskell2 "haskell2" { inherit nixpkgs ghciwatch haskellPackages unstable mkShell; })
+      ] /*// {
+        #template = (nixpkgs.mkShell.override { stdenv = nixpkgs.stdenvAdapters.useMoldLinker nixpkgs.stdenv; });
         # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
         zigShell = inputs.zig2nix.devShells.${system}.default;
         rustShell = inputs.rust-dev-template.devShells.${system}.default;
         cljShell = inputs.clojure-dev-template.devShells.${system}.default;
         ocamlShell = inputs.ocaml-dev-template.devShells.${system}.default;
-        cudaShell =
-          let
-            pkgs = import inputs.nixpkgs {
-              inherit system;
-              # FIXME https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
-              config = {
-                allowUnfree = true;
-                cudaSupport = true;
-              };
-            };
-          in
-          pkgs.mkShell {
-            buildInputs =
-	      builtins.attrValues {
-	        inherit (pkgs) python310;
-		inherit (pkgs.python310Packages) pytorch-bin;
-	      };
-
-            shellHook = ''
-              export LD_LIBRARY_PATH=/usr/lib/wsl/lib
-            '';
-          };
-        yaocaml =
-          let
-	    inherit (specialArgs.${system}) unstable;
-            pkgs = unstable;
-          in
-          pkgs.mkShell {
-            packages = builtins.attrValues {
-	      inherit 
-	        (pkgs)
-		ocaml
-		ocamlformat
-		opam
-		;
-              inherit
-	        (pkgs.ocamlPackages)
-                findlib
-                dune_3
-                odoc
-                ocaml-lsp
-                merlin
-                utop
-                ocp-indent
-		;
-	      inherit
-	        (pkgs.ocamlPackages.janeStreet)
-                #async
-                base
-                core_unix
-                ppx_let
-		;
-            };
-          };
-      }));
+        nixdShell = inputs.nixd.devShells.${system}.default;
+	jupyShell = inputs.ml_env.devShells.${system}.default;
+      }*/);
 
       formatter = forEachSystem (system: nix-formatter-pack.lib.mkFormatter formatterPackArgsFor.${system});
 

@@ -2,20 +2,28 @@
 
 let
   pkgs = pkgsFor.${system};
+  inherit (args) mkShell;
 in
 
-inputs.devenv.lib.mkShell {
+mkShell {
   inherit inputs pkgs;
   modules = [
     ({ pkgs, config, lib, ... }:
       {
         languages.ocaml.enable = true;
         #        languages.ocaml.packages = ocamlPackagesNew;
-        packages = with config.languages.ocaml.packages; [
-          pkgs.opam
-          findlib
+        packages = builtins.attrValues {
+	  inherit
+	  (config.languages.ocaml.packages)
+	  findlib
+	  ;
+
+	  inherit
+	  (pkgs)
+          opam
+          ;
           # see https://github.com/NixOS/nixpkgs/issues/16085, utop sufficient, no need for #use "topfind";; in ocaml
-        ];
+        };
       })
   ];
 }

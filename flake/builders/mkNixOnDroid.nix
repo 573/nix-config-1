@@ -29,6 +29,7 @@ inputs.nix-on-droid.lib.nixOnDroidConfiguration {
   extraSpecialArgs = {
     inherit inputs rootPath;
     unstable = inputs.unstable.legacyPackages.${system};
+    inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
     emacs = if isLinux && isAarch64
       then inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
       else inputs.emacs-overlay.packages.${system}.emacs-unstable;

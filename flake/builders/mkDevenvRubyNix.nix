@@ -1,17 +1,9 @@
-{ system, rootPath, pkgsFor, inputs, name, args, ... }:
+{ system, rootPath, pkgsInsecFor, inputs, name, args, ... }:
 
 let
-  pkgs = pkgsFor.${system};
+  pkgs = pkgsInsecFor.${system};
 
-  ignoringVulns = x: x // { meta = (x.meta // { knownVulnerabilities = [ ]; }); };
-
-  ruby = (args.packageFromRubyVersionFile {
-    file = "${rootPath}/home/misc/.ruby-version";
-
-    inherit system;
-  }).override {
-    openssl = pkgs.openssl_1_1.overrideAttrs ignoringVulns;
-  };
+  ruby = pkgs."ruby-2.4.0";
 
   gems = pkgs.bundlerEnv {
     name = "gemset";

@@ -12,6 +12,7 @@ inputs.nixpkgs.lib.nixosSystem {
   */
   specialArgs = {
     inherit inputs rootPath;
+    inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
     # NOTE one can alternatively also just (with only inherit inputs;) use in the downstream nix file then: inputs.unstable.legacyPackages.${pkgs.system};
     unstable = inputs.unstable.legacyPackages.${system};
     emacs = if isLinux && isAarch64

@@ -43,10 +43,16 @@ in
 
   config = mkIf (cfg.enable) {
 
-    environment.systemPackages = [
-      pkgs.linuxPackages.usbip
-      pkgs.usbutils.out
-    ];
+    environment.systemPackages = builtins.attrValues {
+      inherit
+        (pkgs.linuxPackages)
+        usbip
+	;
+      inherit 
+        (pkgs.usbutils)
+	out
+        ;
+   };
 
     services.udev.enable = true;
 
@@ -60,10 +66,16 @@ in
         after = [ "wsl-vpnkit.target" ];
 
         scriptArgs = "%i";
-        path = with pkgs; [
-          iproute2
-          linuxPackages.usbip
-        ];
+        path = builtins.attrValues {
+	  inherit
+	    (pkgs)
+            iproute2
+	    ;
+	  inherit
+	    (pkgs.linuxPackages)
+	    usbip
+	    ;
+        };
 
         script = ''
           	  busid="$1"

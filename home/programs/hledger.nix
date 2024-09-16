@@ -1,9 +1,10 @@
 /**
+
 Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
 For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ghc-nixpkgs-unstable, ... }:
 
 let
   inherit (lib)
@@ -17,7 +18,7 @@ let
   inherit (pkgs.stdenv) isLinux isx86_64;
 
   inherit
-    (inputs.ghc-nixpkgs-unstable.legacyPackages.${system})
+    (ghc-nixpkgs-unstable)
     hledger
     hledger-utils
     hledger-interest
@@ -30,7 +31,7 @@ Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatfo
 
 If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
 */
-  inherit (pkgs.stdenv.hostPlatform) system;
+ # inherit (pkgs.stdenv.hostPlatform) system;
 
   cfg = config.custom.programs.hledger;
 in

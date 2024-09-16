@@ -3,7 +3,8 @@
 {
   # FIXME currently disabled due to Windows-Update 21.11.23
   # https://mynixos.com/nixpkgs/option/boot.binfmt.emulatedSystems
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ]; /* [ "armv7l-linux" ]; */ # list type misleading here as either or is only possible
+  # FIXME just too unstable: https://github.com/nix-community/NixOS-WSL/issues/552
+  #boot.binfmt.emulatedSystems = [ "aarch64-linux" ]; /* [ "armv7l-linux" ]; */ # list type misleading here as either or is only possible
 
   custom = {
     base.general.wsl = true;

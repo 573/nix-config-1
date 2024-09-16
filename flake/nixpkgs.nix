@@ -1,23 +1,24 @@
 { inputs
 , rootPath
 , system
+, pkgsSet ? inputs.nixpkgs
 , nixOnDroid ? false
-}:
-let
-  config = {
+, config ? {
     # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
-    allowAliases = false;
-    allowUnfree = true;
-    cudaSupport = true;
-    cudnnSupport = true;
-    cudaVersion = "12";
+    #allowAliases = false;
+    #allowUnfree = true;
+    #cudaSupport = true;
+    #cudnnSupport = true;
+    #cudaVersion = "12";
     # https://discourse.nixos.org/t/laggy-mouse-when-use-nvidia-driver/38410
     nvidia.acceptLicense = true;
-  };
-in
-import inputs.nixpkgs {
+  }
+}:
+import pkgsSet {
   inherit config system rootPath;
-
+  #config = {
+  #    permittedInsecurePackages = [ "openssl-1.1.1w" ];
+  #  };
   overlays =
     [
       #inputs.rust-overlay.overlays.default # now commented out due to:  error: attribute 'rust-analyzer' missing https://github.com/573/nix-config-1/actions/runs/4923802480/jobs/8796067915#step:6:826 # rustc still 1.64 when building as opposed to nix shell 1.67
@@ -41,7 +42,6 @@ import inputs.nixpkgs {
               inputs.ocaml-overlay # see i. e. https://github.com/nix-ocaml/nix-overlays/blob/51c3d87/README.md#alternative-advanced
             ])
           ;
-
         in
         {
           # see https://github.com/NixOS/nixpkgs/issues/271989, I think this comes down to not having the correct udev rules in place
@@ -51,6 +51,7 @@ import inputs.nixpkgs {
           # also simple-scan (v44.0) from nixos-23.11 does NOT seem to work with sane from arch linux
           # there is still the problem of crashing (https://github.com/NixOS/nixpkgs/issues/271991), which will not fixed for that v42.5 which would mean being stuck at it with oom bug, so maybe rather use arch linux' simple-scan also until the scanner missing bug (https://github.com/NixOS/nixpkgs/issues/271989) is sorted out as well.
           #          inherit (nixos-2211) simple-scan/*sane-backends*/; # nixos-23.11 Scanner not found
+
 
           git-issue = inputs.git-issue;
 
@@ -109,10 +110,26 @@ import inputs.nixpkgs {
       #inputs.rust-overlay
       inputs.nixpkgs-ruby
       inputs.neovim-nightly-overlay
-    ])
+    ]) ++
+    [(final: prev: {
+        # https://discourse.nixos.org/t/overriding-torch-with-torch-bin-for-all-packages/37086/2
+        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+          (py-final: py-prev: {
+            torch = py-final.torch-bin;
+          })
+        ];
+      })]
     ++ inputs.nixpkgs.lib.optionals nixOnDroid [
       inputs.nix-on-droid.overlays.default
       # prevent uploads to remote builder, https://ryantm.github.io/nixpkgs/functions/prefer-remote-fetch
       (final: prev: prev.prefer-remote-fetch final prev)
+      (final: prev: {
+        # https://discourse.nixos.org/t/overriding-torch-with-torch-bin-for-all-packages/37086/2
+        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+          (py-final: py-prev: {
+            torch = py-final.torch-bin;
+          })
+        ];
+      })
     ];
 }

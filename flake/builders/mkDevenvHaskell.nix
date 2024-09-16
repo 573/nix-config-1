@@ -1,11 +1,11 @@
-{ system, pkgsFor, inputs, specialArgs, name, args, ... }:
+{ system, pkgsFor, inputs, name, args, ... }:
 
 let
   pkgs = pkgsFor.${system};
-  inherit (inputs.devenv.lib) mkShell;
-  inherit (specialArgs.${system}) haskellPackages;
+  inherit (args) mkShell haskellPackages;
+  #inherit (specialArgs.${system}) haskellPackages;
 in
-mkShell rec {
+mkShell {
   inherit inputs pkgs;
   modules = [
     ({ pkgs, ... }:
@@ -16,8 +16,10 @@ mkShell rec {
               (hself: hsuper: {
                 ghc = hsuper.ghc // { withPackages = hsuper.ghc.withHoogle; };
                 #ghcWithPackages = hself.ghc.withPackages; # would this be a function still ? leads to infinite recursion
-                myGhc = hself.ghc.withPackages (p: with p; with hsuper; [
-                  zlib
+                myGhc = hself.ghc.withPackages (p: builtins.attrValues { #with p; with hsuper; 
+                  inherit
+		  (p)
+		  zlib
                   # hledger # haddock: internal error: Data.Binary.getPrim: end of file
                   arrows
                   async
@@ -27,7 +29,8 @@ mkShell rec {
                   cabal-install
                   #	  haskintex
                   # haskell-language-server # haddock: internal error: Data.Binary.getPrim: end of file
-                ]);
+                  ;
+		});
               });
           });
       in

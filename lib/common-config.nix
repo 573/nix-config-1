@@ -2,7 +2,8 @@ _:
 
 { lib, pkgs, homeModules ? [ ], inputs, rootPath, ... }:
 let
-  inherit (pkgs.stdenv) isLinux isAarch64
+  inherit (pkgs.stdenv) isLinux isAarch64;
+  inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions) nix_2_20
 ; in
 {
 /**
@@ -16,13 +17,17 @@ see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialAr
   */
       extraSpecialArgs = {
         inherit inputs rootPath;
-	    emacs = if isLinux && isAarch64
-	      then inputs.emacs-overlay-cached.packages.${pkgs.system}.emacs-unstable-nox
-	      else inputs.emacs-overlay.packages.${pkgs.system}.emacs-unstable;
+        inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim;
+        unstable = inputs.unstable.legacyPackages.${pkgs.system};
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc965;
+        ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system};
+        emacs = if isLinux && isAarch64
+          then inputs.emacs-overlay-cached.packages.${pkgs.system}.emacs-unstable-nox
+          else inputs.emacs-overlay.packages.${pkgs.system}.emacs-unstable;
 
-	    emacsWithPackagesFromUsePackage = if isLinux && isAarch64 
-	      then inputs.emacs-overlay-cached.lib.${pkgs.system}.emacsWithPackagesFromUsePackage
-	      else inputs.emacs-overlay.lib.${pkgs.system}.emacsWithPackagesFromUsePackage;
+        emacsWithPackagesFromUsePackage = if isLinux && isAarch64 
+          then inputs.emacs-overlay-cached.lib.${pkgs.system}.emacsWithPackagesFromUsePackage
+          else inputs.emacs-overlay.lib.${pkgs.system}.emacsWithPackagesFromUsePackage;
       };
       sharedModules = homeModules;
       useGlobalPkgs = true; # disables options nixpkgs.*
@@ -53,7 +58,8 @@ see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialAr
         "https://nixpkgs-ruby.cachix.org/"
         "https://nixvim.cachix.org/"
         "https://yazi.cachix.org"
-      ];
+"https://cuda-maintainers.cachix.org/"     
+];
       trusted-public-keys = lib.mkForce [
       "ocaml.nix-cache.com-1:/xI2h2+56rwFfKyyFVbkJSeGqSIYMC/Je+7XXqGKDIY="
         "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs="
@@ -69,7 +75,8 @@ see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialAr
         "nixpkgs-ruby.cachix.org-1:vrcdi50fTolOxWCZZkw0jakOnUI1T19oYJ+PRYdK4SM="
         "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA="
         "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
-      ];
+    "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+    ];
       experimental-features = [ "nix-command" "flakes" "configurable-impure-env" "auto-allocate-uids" ];
       log-lines = 35;
       # discourse:nix-flake-update-timeout/17215/5
@@ -78,7 +85,7 @@ see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialAr
     };
 
 
-    package = pkgs.nixVersions.nix_2_20;
+    package = nix_2_20;
     # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
     
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613

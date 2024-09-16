@@ -1,4 +1,4 @@
-{ config, lib, pkgs, rootPath, inputs, ... }:
+{ config, lib, pkgs, rootPath, inputs, unstable, makeNixvim, ... }:
 
 let
   inherit (lib)
@@ -19,7 +19,7 @@ let
   #	    version = "2023-20-10";
   #	  };
 
-  pluggo = pname: inputs.unstable.legacyPackages.${system}.vimUtils.buildVimPlugin { inherit pname; src = inputs."${pname}"; version = "0.1"; };
+  pluggo = pname: unstable.vimUtils.buildVimPlugin { inherit pname; src = inputs."${pname}"; version = "0.1"; };
   /*extraConfig = ''
                if filereadable($HOME . "/.vimrc")
                   source ~/.vimrc
@@ -354,7 +354,7 @@ in
       enable = mkEnableOption "neovim config";
 
       lightWeight =
-        mkEnableOption "light weight config for low performance hosts" // { default = true; };
+        mkEnableOption "light weight neovim (vi) config for low performance hosts" // { default = true; };
 
       #lightweight = mkEnableOption "light weight config for low performance hosts";
       minimalPackage = mkOption {
@@ -385,7 +385,7 @@ in
   config = mkIf cfg.enable (mkMerge [
     {
       # FIXME add nvim-lsp as in https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
-      custom.programs.neovim.minimalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim {
+      custom.programs.neovim.minimalPackage = makeNixvim {
         enableMan = false;
         colorschemes.gruvbox.enable = true;
         extraPlugins = builtins.attrValues {
@@ -398,6 +398,7 @@ in
 	} ++ [
 	  (pkgs.vimPlugins.nvim-treesitter.withPlugins (parsers: with parsers;[ nix markdown markdown_inline ]))
           (pluggo "faster-nvim")
+          (pluggo "action-hints.nvim")
           #		(pluggo "deadcolumn-nvim")
 	];
         extraConfigLua = ''
@@ -547,6 +548,54 @@ in
     }
     ];
         plugins = {
+	  fzf-lua = {
+	    enable = true;
+profile = "telescope";
+      keymaps = {
+        "<Leader>ff" = {
+          action = "files";
+          settings = {
+            cwd = "~/.nix-config";
+            winopts = {
+              height = 0.1;
+              width = 0.5;
+            };
+          };
+          options.silent = true;
+        };
+        "<Leader>fg" = "live_grep";
+        "<C-x><C-f>" = {
+          mode = "i";
+          action = "complete_file";
+          settings = {
+            cmd = "rg --files";
+            winopts.preview.hidden = "nohidden";
+          };
+          options = {
+            silent = true;
+            desc = "Fuzzy complete file";
+          };
+        };
+      };
+      settings = {
+        grep = {
+          prompt = "Grep  ";
+        };
+        winopts = {
+          height = 0.4;
+          width = 0.93;
+          row = 0.99;
+          col = 0.3;
+        };
+        files = {
+          find_opts.__raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
+          prompt = "Files❯ ";
+          multiprocess = true;
+          file_icons = true;
+          color_icons = true;
+        };
+      };
+	    };
 	  lspsaga = {
     enable = true;
     beacon = {
@@ -800,7 +849,7 @@ in
 
     (mkIf (!cfg.lightWeight) {
       # inputs.nixvim.legacyPackages."${system}".makeNixvim configuration;
-      custom.programs.neovim.finalPackage = inputs.nixvim.legacyPackages."${system}".makeNixvim configuration;
+      custom.programs.neovim.finalPackage = makeNixvim configuration;
 
       home.packages = let inherit (config.custom.programs.neovim) finalPackage; in [
         finalPackage
