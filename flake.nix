@@ -663,17 +663,17 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
         (mkDevenvHaskell system "haskell" { inherit haskellPackages mkShell; })
 	(mkDevShellOcaml system "yaocaml" { inherit unstable; })
 	(mkDevenvRust2 system "rustyShell" { inherit inputs mkShell; })
-	#(mkDevShellPython system "python" { inherit unstable; })
+	(mkDevShellPython system "python" { inherit unstable; })
 	# DONT probably delusional, rather try https://sourcegraph.com/github.com/nixvital/ml-pkgs/-/blob/overlays/torch-family.nix
 	# also: https://wiki.nixos.org/wiki/CUDA
 	#(mkDevShellCudaWsl system "cudawsl" { })
         #(mkDevenvJulia system "julia" { })
-	(mkDevShellAgda system "agda" { inherit ghc-nixpkgs-unstable haskellPackages; })
-	#(mkDevShellCommonLisp system "commonlisp" { inherit unstable; })
-	#(mkDevenvPlaywright "playwright" { inherit nixpkgs mkShell; })
-	#(mkDevenvPlaywright2 "playwright2" { inherit unstable mkShell; })
-	#(mkDevShellGhcwasm "ghcwasm" { inherit ghc-wasm-meta unstable; })
-#	(mkDevenvHaskell2 "haskell2" { inherit nixpkgs ghciwatch haskellPackages unstable mkShell; })
+	(mkDevShellAgda system "agda" { inherit haskellPackages; })
+	(mkDevShellCommonLisp system "commonlisp" { })
+	(mkDevenvPlaywright system "playwright" { inherit nixpkgs mkShell; })
+	(mkDevenvPlaywright2 system "playwright2" { inherit unstable mkShell; })
+	(mkDevShellGhcwasm system "ghcwasm" { inherit ghc-wasm-meta; })
+	(mkDevenvHaskell2 system "haskell2" { inherit nixpkgs ghciwatch haskellPackages unstable mkShell; })
       ] /*// {
         #template = (nixpkgs.mkShell.override { stdenv = nixpkgs.stdenvAdapters.useMoldLinker nixpkgs.stdenv; });
         # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix

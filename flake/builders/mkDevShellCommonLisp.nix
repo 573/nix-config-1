@@ -1,9 +1,10 @@
 { system, pkgsFor, name, args, ... }:
 # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
 let
-  pkgs = unstable;
+  pkgs = pkgsFor.${system};
 in
 pkgs.mkShell {
+  inherit name;
   nativeBuildInputs = [
     (pkgs.sbcl.withPackages
       (sbclPackageSet: builtins.attrValues {
@@ -19,4 +20,4 @@ pkgs.mkShell {
           ;
       }))
   ];
-};
+}

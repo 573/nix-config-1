@@ -4,21 +4,15 @@
 , pkgsSet ? inputs.nixpkgs
 , nixOnDroid ? false
 , config ? {
-    # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
-    #allowAliases = false;
-    #allowUnfree = true;
-    #cudaSupport = true;
-    #cudnnSupport = true;
-    #cudaVersion = "12";
-    # https://discourse.nixos.org/t/laggy-mouse-when-use-nvidia-driver/38410
-    nvidia.acceptLicense = true;
+      # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
+      allowAliases = false;
+      allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+     "google-chrome"
+      ];
   }
 }:
 import pkgsSet {
   inherit config system rootPath;
-  #config = {
-  #    permittedInsecurePackages = [ "openssl-1.1.1w" ];
-  #  };
   overlays =
     [
       #inputs.rust-overlay.overlays.default # now commented out due to:  error: attribute 'rust-analyzer' missing https://github.com/573/nix-config-1/actions/runs/4923802480/jobs/8796067915#step:6:826 # rustc still 1.64 when building as opposed to nix shell 1.67
@@ -123,13 +117,5 @@ import pkgsSet {
       inputs.nix-on-droid.overlays.default
       # prevent uploads to remote builder, https://ryantm.github.io/nixpkgs/functions/prefer-remote-fetch
       (final: prev: prev.prefer-remote-fetch final prev)
-      (final: prev: {
-        # https://discourse.nixos.org/t/overriding-torch-with-torch-bin-for-all-packages/37086/2
-        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-          (py-final: py-prev: {
-            torch = py-final.torch-bin;
-          })
-        ];
-      })
     ];
 }

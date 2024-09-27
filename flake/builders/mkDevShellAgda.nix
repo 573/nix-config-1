@@ -1,4 +1,4 @@
-{ system, ghcpkgsFor, inputs, name, args, ... }:
+{ system, ghcpkgsFor, name, args, ... }:
 let
   pkgs = ghcpkgsFor.${system};
   myagda = (pkgs.agdaPackages.override {
@@ -11,5 +11,6 @@ let
   });
 in
 pkgs.mkShell {
+  inherit name;
   packages = [ myagda ];
 }

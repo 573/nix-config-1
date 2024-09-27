@@ -11,7 +11,10 @@ let
 
   pkgsCudaFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system;
     config = {
-      #allowUnfree = true;
+      cudnnSupport = true;
+      cudaVersion = "12";
+      # https://discourse.nixos.org/t/laggy-mouse-when-use-nvidia-driver/38410
+      nvidia.acceptLicense = true;
       cudaSupport = true;
       # https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
       allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [

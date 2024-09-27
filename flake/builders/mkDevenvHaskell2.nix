@@ -1,15 +1,17 @@
-{ system, pkgsFor, name, args, ... }:
+{ system, ghcpkgsFor, inputs, name, args, ... }:
 # try https://github.com/cachix/devenv/issues/585
 let
   inherit (args) ghciwatch haskellPackages unstable mkShell;
-  pkgs = pkgsFor.${system};
+  pkgs = ghcpkgsFor.${system};
   hiPrio = pkg: pkgs.lib.updateManyAttrsByPath (builtins.map (output: { path = [ output ]; update = pkgs.hiPrio; }) pkg.outputs) pkg;
 in
 mkShell {
-  inherit pkgs name;
+  inherit inputs pkgs;
   modules = [
     ({ ... }:
       {
+        inherit name;
+
         packages = [
           ghciwatch
           (hiPrio (unstable.stack)) # still the stack from ghc-nixpkgs-unstable seemingly

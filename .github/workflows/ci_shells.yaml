@@ -1,4 +1,5 @@
-name: Build and test flake outputs (using gh caches)
+name: Build and test flake devshells (using gh caches)
+
 on:
   push:
   workflow_dispatch:
@@ -16,55 +17,35 @@ on:
 
 jobs:
   nix:
+    runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
-        yamlbasename:
-          - ci_experimental.yml
-        os:
-          - ubuntu-latest
         system:
           - aarch64
           - x86_64
-        shell:
-          - devShells.$_system.ruby
-        nix-command:
-          - flake info
-
-        include:
-          - legacy-openssl: false
-          - legacy-openssl: true
-            shell: devShells.$_system.ruby
-            command: ruby --version
-
-          - nix-command: eval .#apps.$_system.nixos-shell.program
-            system: aarch64
-
-          - nix-command: eval .#apps.$_system.setup.program
-            system: aarch64
-
-          - nix-command: eval .#apps.$_system.nixos-shell.program
-            system: x86_64
-
-          - nix-command: eval .#apps.$_system.setup.program
-            system: x86_64
-
-          - nix-command: eval .#devShells.$_system.ghcwasm
-            system: x86_64
-
-          - nix-command: build .#homeConfigurations."dani@maiziedemacchiato".activationPackage
-            system: x86_64
-            deploy-agent: maiziedemacchiato
-
-          - nix-command: build .#nixOnDroidConfigurations.sams9.activationPackage --impure --print-build-logs --log-lines 9999
-            system: aarch64
-            deploy-agent: sams9
-
-          - nix-command: build .#nixosConfigurations.DANIELKNB1.config.system.build.toplevel
-            system: x86_64
-            deploy-agent: DANIELKNB1
-
-    runs-on: ubuntu-latest
+        shell: 
+          - jdk21
+          - jvmlanguages-devenv --impure
+          - deno --impure
+          - flutter --impure
+          - ocaml --impure
+          - ruby
+          - rubyNix
+          - rubyShell
+          - rust --impure
+          - rustwasm32 --impure
+          - haskell --impure
+          - yaocaml
+          - rustyShell --impure
+          - python
+          - agda
+          - commonlisp
+          - playwright --impure
+          - playwright2 --impure
+          - ghcwasm
+          - haskell2 --impure
 
     steps:
       - name: Checkout repository
@@ -73,7 +54,7 @@ jobs:
           ref: ${{ inputs.branch }}
 
       - name: Free Disk Space (Ubuntu)
-        if: contains(matrix.nix-command, 'activationPackage') || contains(matrix.nix-command, 'toplevel') || contains(matrix.nix-command, 'ruby') || contains(matrix.nix-command, 'haskellShell')
+        if: contains(matrix.shell, 'ruby')
         env:
           _system: ${{ matrix.system }}-linux
         uses: jlumbroso/free-disk-space@main
@@ -138,31 +119,15 @@ jobs:
           name: 573-bc
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: My shells
+      - name: Eval
         env:
           _system: ${{ matrix.system }}-linux
-          NIXPKGS_ALLOW_INSECURE: ${{ matrix.legacy-openssl == true && 1 || 0 }}
-          NIXPKGS_ALLOW_BROKEN: ${{ matrix.legacy-openssl == true && 1 || 0 }}
-        uses: nicknovitski/nix-develop@v1.1.0
-        with:
-          arguments: .#${{ (matrix.shell == '') && format('formatter.{0}', env._system) || matrix.shell }} --impure
-      - run: |
-            echo "::group::Development shells command"
-            cachix use 573-bc
-            cachix use nix-on-droid
-            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'ruby')) && 'cachix watch-exec 573-bc -- \' || '' }}
-            ${{ (matrix.command == '') && 'echo "ignore this pls"' || matrix.command }}
-
-      - name: Build command
-        env:
-          _system: ${{ matrix.system }}-linux
-        timeout-minutes: 360 # Consider increasing timeout
         run: |
-            echo "::group::Build command"
+            echo "::group::Eval command"
             cachix use 573-bc
             cachix use nix-on-droid
-            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'homeConfigurations')) && 'cachix watch-exec 573-bc -- \' || '' }}
-            nix ${{ (matrix.nix-command == '') && 'flake info' || matrix.nix-command }}
+            ${{ (matrix.system == 'aarch64') && 'cachix watch-exec 573-bc -- \' || '' }}
+            nix eval .#devShells.$_system.${{ matrix.shell }} ${{ matrix.impure && '--impure' || '' }}
 
       - name: Deploy cachix-agent spec
         if: github.ref == 'refs/heads/wsl2' && matrix.deploy-agent

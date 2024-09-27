@@ -1,11 +1,11 @@
-{ system, pkgsFor, name, args, ... }:
+{ system, pkgsFor, inputs, name, args, ... }:
 # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
 let
-  inherit (args) nixpkgs mkShell;
-  pkgs = nixpkgs;
+  inherit (args) mkShell;
+  pkgs = pkgsFor.${system};
 in
 mkShell {
-  inherit pkgs;
+  inherit inputs pkgs;
   modules =
     let
       playwright-driver = pkgs.playwright-driver;

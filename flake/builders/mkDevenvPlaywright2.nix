@@ -1,10 +1,10 @@
-{ system, pkgsFor, name, args, ... }:
+{ system, pkgsFor, inputs, name, args, ... }:
 let
-  inherit (args) unstable mkShell;
-  pkgs = unstable;
+  inherit (args) mkShell;
+  pkgs = pkgsFor.${system};
 in
 mkShell {
-  inherit pkgs;
+  inherit inputs pkgs;
   modules = [
     ({ pkgs, ... }: {
       packages = builtins.attrValues {
