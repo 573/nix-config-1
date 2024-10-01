@@ -1,5 +1,6 @@
 source @bashLib@
 
+# see https://discourse.nixos.org/t/confused-about-nix-copying-nixpkgs/53737/3, some more general info https://discourse.nixos.org/t/meaning-of-self-in-flake-changes-when-used-as-an-input/35465/4
 nix_config="${HOME}/.nix-config"
 
 _log() {
@@ -49,7 +50,7 @@ if _is_nixos; then
     sudo nixos-rebuild \
 	boot \
 	--show-trace --verbose \
-	--flake "${nix_config}#${hostname}" || :
+	--flake "git+file:///${nix_config}#${hostname}" || :
 
     _log "Don't forget to set passwd for ${USER} and root!"
     _log "In case you need to userdel the nixos user, '\$ wsl -d NixOS -u root' and see https://gist.github.com/573/131629a55c0ef91305532c6f977934e6."
@@ -61,7 +62,7 @@ elif [[ "${USER}" == "nix-on-droid" ]]; then
 #	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
 #        --option extra-substituters "https://nix-on-droid.cachix.org/" \
 #        --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
-#	--flake "${nix_config}#sams9"
+#	--flake "git+file:///${nix_config}#sams9"
     nix build \
         --option extra-substituters "https://573-bc.cachix.org/" \
 	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
@@ -73,13 +74,13 @@ elif [[ "${USER}" == "nix-on-droid" ]]; then
 	--option extra-trusted-public-keys "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA=" \
 	--option extra-substituters "https://yazi.cachix.org" \
 	--option extra-trusted-public-keys "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" \
-	"${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
+	"git+file:///${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
 else
     _log "Build home-manager activationPackage..."
     nix build \
         --option extra-substituters "https://573-bc.cachix.org/" \
 	--option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
-	"${nix_config}#homeConfigurations.${USER}@$(hostname).activationPackage"
+	"git+file:///${nix_config}#homeConfigurations.${USER}@$(hostname).activationPackage"
 	
 
     _log "Run activate script..."

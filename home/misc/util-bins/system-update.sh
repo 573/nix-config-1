@@ -73,29 +73,29 @@ _pull_changes "nix-config"  "${nix_config}"
 # TODO: use scripts defined in home/development/nix
 if _is_nixos; then
     _log "nix" "build nixos configuration"
-    sudo nix build --builders '' --verbose "${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel"
+    sudo nix build --builders '' --verbose "git+file:///${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel"
     _show_result_diff "/nix/var/nix/profiles/system"
 
     _log "nix" "switch nixos configuration"
-    sudo nixos-rebuild switch --flake "${nix_config}"
+    sudo nixos-rebuild switch --flake "git+file:///${nix_config}"
 fi
 
 if [[ "${USER}" == "nix-on-droid" ]] && _available nix-on-droid; then
     _log "nix" "build nix-on-droid configuration"
-    nix build --show-trace -vv "${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure
+    nix build --show-trace -vv "git+file:///${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure
     _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
 
     _log "nix" "switch nix-on-droid configuration"
-    nix-on-droid switch --flake "${nix_config}#sams9"
+    nix-on-droid switch --flake "git+file:///${nix_config}#sams9"
 fi
 
 if ! _is_nixos && _available home-manager; then
     _log "nix" "build home-manager configuration"
-    nix build --builders '' --log-format internal-json --verbose "${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
+    nix build --builders '' --log-format internal-json --verbose "git+file:///${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
     _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
     _log "nix" "switch home-manager configuration"
-    home-manager switch --flake "${nix_config}" -b hm-bak
+    home-manager switch --flake "git+file:///${nix_config}" -b hm-bak
 fi
 
 
