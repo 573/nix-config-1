@@ -29,6 +29,6 @@ pkgs.mkShell {
 
   shellHook = ''
     echo testfile
-    irb -rgmail-britta
+    ${rootPath}/home/misc/britta-filter.sh
   '';
 }
