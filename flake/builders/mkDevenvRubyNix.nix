@@ -26,4 +26,9 @@ pkgs.mkShell {
       bundix
       ;
   };
+
+  shellHook = ''
+    echo testfile
+    irb -rgmail-britta
+  '';
 }

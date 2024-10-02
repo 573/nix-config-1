@@ -179,6 +179,56 @@ let
       ;;  (require 'ox-odt)
         (require 'org-extra-emphasis)
 
+(setenv "DICPATH" "${pkgs.hunspellDicts.de_DE}/share/hunspell:${pkgs.hunspellDicts.en_US}/share/hunspell")
+
+      ;; FROM HERE: https://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs/
+      ;; and https://www.reddit.com/r/emacs/comments/10336qd/comment/j2xmb7g/
+      ;; find aspell and hunspell automatically
+(cond
+ ;; try hunspell at first
+  ;; if hunspell does NOT exist, use aspell
+ ((executable-find "hunspell")
+  (setq ispell-program-name "hunspell"
+   flyspell-issue-message-flag t
+   ispell-highlight-p t
+   ispell-silently-savep t
+   ispell-current-dictionary "de_DE,en_US")
+   (setq ispell-hunspell-dict-paths-alist ;; /nix/store/8icvklwcdm08ksfzkjy6m610ycrd6c2d-home-manager-path/share/hunspell/de_DE.aff
+   '(("de_DE" "${pkgs.hunspellDicts.de_DE.outPath}/share/hunspell/de_DE.aff")
+     ("en_US" "${pkgs.hunspellDicts.en_US.outPath}/share/hunspell/en_US.aff")))
+  (setq ispell-local-dictionary "de_DE")
+  (setq ispell-local-dictionary-alist
+        ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
+        ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
+        '(("de_DE,en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "de_DE,en_US") nil utf-8)))
+ 
+  ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
+  ;; If it's nil, Emacs tries to automatically set up the dictionaries.
+  (when (boundp 'ispell-hunspell-dictionary-alist)
+    (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist))
+;; Configure German and English.
+   (setq ispell-dictionary "de_DE,en_US")
+
+     ;; ispell-set-spellchecker-params has to be called before ispell-hunspell-add-multi-dic will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "de_DE,en_US")
+  ;; For saving words to the personal dictionary, don't infer it from
+  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
+  (setq ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
+
+  ;; The personal dictionary file has to exist, otherwise hunspell will
+  ;; silently not use it.
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0))
+
+    ;; for ispell see https://emacs.stackexchange.com/questions/42508/how-to-use-an-ispell-dictionary-in-company-mode and https://emacs.stackexchange.com/a/17238 and https://github.com/company-mode/company-mode/issues/1146
+    )
+
+  ((executable-find "aspell")
+  (setq ispell-program-name "aspell")
+  ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
+  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=de_DE"))))
+
       ;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
       (defun my/initial-layout ()
         "Create my initial screen layout."
@@ -340,8 +390,10 @@ in
 
       home.packages = builtins.attrValues {
         inherit (pkgs)
-        nuspell
+        hunspell
+	aspell
 	;
+
 	inherit
         (pkgs.hunspellDicts) 
 	en_US
