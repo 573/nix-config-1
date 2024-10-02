@@ -27,14 +27,14 @@ jobs:
           - aarch64
           - x86_64
         shell:
-          - devShells.$_system.ruby
+          - devShells.$_system.rubyNix
         nix-command:
           - flake info
 
         include:
           - legacy-openssl: false
           - legacy-openssl: true
-            shell: devShells.$_system.ruby
+            shell: devShells.$_system.rubyNix
             command: ruby --version
 
           - nix-command: eval .#apps.$_system.nixos-shell.program
@@ -47,9 +47,6 @@ jobs:
             system: x86_64
 
           - nix-command: eval .#apps.$_system.setup.program
-            system: x86_64
-
-          - nix-command: eval .#devShells.$_system.ghcwasm
             system: x86_64
 
           - nix-command: build .#homeConfigurations."dani@maiziedemacchiato".activationPackage
@@ -150,7 +147,7 @@ jobs:
             echo "::group::Development shells command"
             cachix use 573-bc
             cachix use nix-on-droid
-            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'ruby')) && 'cachix watch-exec 573-bc -- \' || '' }}
+            ${{ (matrix.system == 'aarch64' || contains(matrix.nix-command, 'rubyNix')) && 'cachix watch-exec 573-bc -- \' || '' }}
             ${{ (matrix.command == '') && 'echo "ignore this pls"' || matrix.command }}
 
       - name: Build command
