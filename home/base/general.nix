@@ -134,11 +134,8 @@ in
             backblaze-b2
             attr
 
-            # poc
-            age
-
             nix-inspect
-            zellij
+#            zellij
             viddy
             zoxide
             ;
@@ -146,8 +143,7 @@ in
           inherit
             (unstable)
             eza
-            yazi
-	    cyme
+#            yazi
             ;
 
         }; # replaces with pkgs; [], i. e. because nixd catches duplicates this way
@@ -227,6 +223,11 @@ in
           strace
           lineselect
           git-annex
+	  cyme
+
+            # poc
+            age
+
           #git-annex-remote-googledrive
           #haskellPackages.feedback
           #haskellPackages.pushme # broken

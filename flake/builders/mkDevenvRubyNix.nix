@@ -28,7 +28,7 @@ pkgs.mkShell {
   };
 
   shellHook = ''
-    echo testfile
-    ${rootPath}/home/misc/britta-filter.sh
+    chmod +x ${rootPath}/home/misc/britta-filter.rb
+    ${rootPath}/home/misc/britta-filter.rb
   '';
 }

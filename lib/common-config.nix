@@ -3,7 +3,7 @@ _:
 { lib, pkgs, homeModules ? [ ], inputs, rootPath, ... }:
 let
   inherit (pkgs.stdenv) isLinux isAarch64;
-  inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions) nix_2_20
+  inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions) nix_2_24
 ; in
 {
 /**
@@ -85,7 +85,7 @@ see also ./../flake/builders/mkHome.nix `homeManagerConfiguration.extraSpecialAr
     };
 
 
-    package = nix_2_20;
+    package = nix_2_24;
     # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
     
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613

@@ -90,6 +90,59 @@ let
     pname = "default.el";
     version = "0";
     src = pkgs.writeText "default.el" ''
+;; FIXME https://github.com/Gavinok/emacs.d/blob/main/init.el#L725
+;;;; Code Completion
+(use-package corfu
+  :disabled
+  :ensure t
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                 ; Allows cycling through candidates
+  (corfu-auto t)                  ; Enable auto completion
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.1)
+  (corfu-popupinfo-delay '(0.5 . 0.2))
+  (corfu-preview-current 'insert) ; insert previewed candidate
+  (corfu-preselect 'prompt)
+  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (:map corfu-map
+              ("M-SPC"      . corfu-insert-separator)
+              ("TAB"        . corfu-next)
+              ([tab]        . corfu-next)
+              ("S-TAB"      . corfu-previous)
+              ([backtab]    . corfu-previous)
+              ("S-<return>" . corfu-insert)
+              ("RET"        . nil))
+
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode)) ; Popup completion info
+
+(use-package cape
+  :ensure t
+  :defer 10
+  :bind ("C-c f" . cape-file)
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (defun my/add-shell-completion ()
+    (interactive)
+    (add-to-list 'completion-at-point-functions 'cape-history)
+    (add-to-list 'completion-at-point-functions 'pcomplete-completions-at-point))
+  (add-hook 'shell-mode-hook #'my/add-shell-completion nil t)
+  :config
+  ;; Make capfs composable
+  (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
+
+  ;; Silence then pcomplete capf, no errors or messages!
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+
+  ;; Ensure that pcomplete does not write to the buffer
+  ;; and behaves as a pure `completion-at-point-function'.
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
+
       (use-package gcmh
         :ensure t
         :diminish
@@ -355,6 +408,8 @@ in
         no-littering
         gcmh
         olivetti
+				cape 
+				corfu
 	;
       } ++ [
         org-novelist

@@ -596,7 +596,7 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
 		  ;
 	      inherit
 	        (nixpkgs.nixVersions)
-	          nix_2_20
+	          nix_2_24
 		  ;
 	   };
 
