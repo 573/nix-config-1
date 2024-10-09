@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -18,7 +18,6 @@ in
     custom.programs.alacritty.enable = mkEnableOption "alacritty config";
 
   };
-
 
   ###### implementation
 

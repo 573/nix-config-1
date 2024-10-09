@@ -33,7 +33,10 @@ let
 
       users.users.root = {
         password = "nixos";
-        openssh.authorizedKeys.keyFiles = [ "${rootPath}/files/keys/id_ed25519.daniel.pub" "${rootPath}/files/keys/id_ed25519.danielwdws.pub" ];
+        openssh.authorizedKeys.keyFiles = [
+          "${rootPath}/files/keys/id_ed25519.daniel.pub"
+          "${rootPath}/files/keys/id_ed25519.danielwdws.pub"
+        ];
       };
     };
 

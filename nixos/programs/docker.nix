@@ -1,9 +1,13 @@
 /**
-see ./../../flake/builders/mkNixos.nix line `++ customLibFor.${system}.listNixFilesRecursive "${rootPath}/nixos";` and ./../../flake/default.nix `customLibFor` declaration
+  see ./../../flake/builders/mkNixos.nix line `++ customLibFor.${system}.listNixFilesRecursive "${rootPath}/nixos";` and ./../../flake/default.nix `customLibFor` declaration
 
-Same as written in ./../../flake/builders/mkNixos.nix should apply here (regarding `specialArgs` injection) as the anonymous module is a module next to `"${rootPath}/hosts/${name}/configuration.nix"` there
+  Same as written in ./../../flake/builders/mkNixos.nix should apply here (regarding `specialArgs` injection) as the anonymous module is a module next to `"${rootPath}/hosts/${name}/configuration.nix"` there
 */
-{ config, lib, /* unstable,*/ pkgs, inputs, ... }:
+{
+  config,
+  lib, # unstable,
+  ...
+}:
 
 let
   inherit (lib)
@@ -29,7 +33,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -50,14 +53,15 @@ in
           enable = true;
           # for the "whole" discussion of it (rootless or not) i. e. https://discourse.nixos.org/t/docker-rootless-with-nvidia-support/37069
           setSocketVariable = true; # false for driver exact support
-          /*	daemon.settings = {
-                                        				runtimes = {
-                                                					nvidia = {
-                                    			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
-                                  			};
-                                        				};
+          /*
+            daemon.settings = {
+                                                    				runtimes = {
+                                                               					nvidia = {
+                                             			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
+                                           			};
+                                                    				};
             };
-                                              	    */
+          */
         };
       };
     };

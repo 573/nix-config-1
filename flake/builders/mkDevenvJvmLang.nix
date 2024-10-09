@@ -1,4 +1,10 @@
-{ system, pkgsFor, inputs, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  inputs,
+  args,
+  ...
+}:
 
 let
   pkgs = pkgsFor.${system};

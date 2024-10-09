@@ -1,6 +1,6 @@
 revert() {
-    xset s off
-    xset -dpms
+  xset s off
+  xset -dpms
 }
 
 trap revert HUP INT TERM

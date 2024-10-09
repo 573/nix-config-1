@@ -1,4 +1,11 @@
-{ config, lib, pkgs, inputs, rootPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  rootPath,
+  ...
+}:
 
 let
   inherit (builtins)
@@ -40,14 +47,18 @@ in
 
   imports = [ inputs.homeage.homeManagerModules.homeage ];
 
-
   ###### interface
 
   options = {
 
     custom.misc.homeage = {
       secrets = mkOption {
-        type = types.listOf (types.enum [ "ssh-private" "ssh-vcs" ]);
+        type = types.listOf (
+          types.enum [
+            "ssh-private"
+            "ssh-vcs"
+          ]
+        );
         default = [ ];
         description = ''
           Secrets to install.
@@ -64,7 +75,6 @@ in
     };
 
   };
-
 
   ###### implementation
 
@@ -84,9 +94,8 @@ in
       mount = cfg.directory;
 
       file = listToAttrs (
-        map
-          (entry: nameValuePair entry.name (removeAttrs entry [ "name" ]))
-          (flatten (
+        map (entry: nameValuePair entry.name (removeAttrs entry [ "name" ])) (
+          flatten (
             (optional (elem "ssh-private" cfg.secrets) [
               (buildSshConfig "private")
               (buildSshKey "private" "private")
@@ -96,7 +105,8 @@ in
               (buildSshConfig "vcs")
               (buildSshKey "vcs" "vcs")
             ])
-          ))
+          )
+        )
       );
     };
 

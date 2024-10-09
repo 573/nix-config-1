@@ -1,4 +1,9 @@
-{ config, lib, inputs, ... }:
+{
+  config,
+  lib,
+  inputs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -19,7 +24,6 @@ in
     custom.services.flatpaks.enable = mkEnableOption "flatpaks config";
 
   };
-
 
   ###### implementation
 

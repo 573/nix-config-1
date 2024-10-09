@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, rootPath, ... }:
+{
+  config,
+  lib,
+  inputs,
+  rootPath,
+  ...
+}:
 
 let
   inherit (lib)
@@ -11,28 +17,36 @@ let
 
   cfg = config.custom.agenix;
 
-  buildConfig = { name, host, user, fileName ? name }: mkIf (elem name cfg.secrets) {
-    ${name} = {
-      file = "${rootPath}/secrets/${host}/${fileName}.age";
-      owner = user;
-      group = user;
+  buildConfig =
+    {
+      name,
+      host,
+      user,
+      fileName ? name,
+    }:
+    mkIf (elem name cfg.secrets) {
+      ${name} = {
+        file = "${rootPath}/secrets/${host}/${fileName}.age";
+        owner = user;
+        group = user;
+      };
     };
-  };
 in
 
 {
 
   imports = [ inputs.agenix.nixosModules.age ];
 
-
   ###### interface
 
   options = {
 
     custom.agenix.secrets = mkOption {
-      type = types.listOf (types.enum [
-        "wireless-config"
-      ]);
+      type = types.listOf (
+        types.enum [
+          "wireless-config"
+        ]
+      );
       default = [ ];
       description = ''
         Secrets to install.
@@ -40,7 +54,6 @@ in
     };
 
   };
-
 
   ###### implementation
 

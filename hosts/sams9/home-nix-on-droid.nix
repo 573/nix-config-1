@@ -1,7 +1,11 @@
-{ config, lib, pkgs, unstable, rootPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  inherit
-    (lib)
+  inherit (lib)
     attrValues
     ;
 in
@@ -24,6 +28,7 @@ in
     development.nix.nix-on-droid.enable = true;
 
     programs = {
+      yazi.enable = lib.mkForce false;
       tex.enable = true;
       hledger.enable = true;
       shell = {
@@ -55,16 +60,16 @@ in
     packages = attrValues {
       # with pkgs; [
       /*
-      (writeShellScriptBin "tailscale" ''
-          ${pkgs.sysvtools}/bin/pidof tailscaled &>/dev/null || {
-         echo "starting tailscaled"
-         nohup ${pkgs.busybox}/bin/setsid ${pkgs.tailscale}/bin/tailscaled -tun userspace-networking </dev/null &>/dev/null & jobs -p %1
-        }
+        (writeShellScriptBin "tailscale" ''
+            ${pkgs.sysvtools}/bin/pidof tailscaled &>/dev/null || {
+           echo "starting tailscaled"
+           nohup ${pkgs.busybox}/bin/setsid ${pkgs.tailscale}/bin/tailscaled -tun userspace-networking </dev/null &>/dev/null & jobs -p %1
+          }
 
-        [[ -n $1 ]] && {
-         ${unstable.tailscale}/bin/tailscale "$@"
-         }
-      '')
+          [[ -n $1 ]] && {
+           ${unstable.tailscale}/bin/tailscale "$@"
+           }
+        '')
       */
       #hydra-check
       #pandoc
@@ -72,27 +77,30 @@ in
       #mermaid-cli
       #chafa
       #      asciinema
-      inherit
-        (pkgs)
+      inherit (pkgs)
         nix-inspect
         ;
     };
 
-    activation = let inherit config; in {
-      copyFont =
-        let
-          font_src = "${pkgs.carlito}/share/fonts/truetype/.";
-          font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
-        in
-        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          		       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
-          		if [ $? -ne 0 ]
-          		then
-          		  mkdir -p "${font_dst}"
-          		  cp -R "${font_src}" "${font_dst}"
-          		fi
-          	      '';
-    };
+    activation =
+      let
+        inherit config;
+      in
+      {
+        copyFont =
+          let
+            font_src = "${pkgs.carlito}/share/fonts/truetype/.";
+            font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
+          in
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            	       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
+            	if [ $? -ne 0 ]
+            	then
+            	  mkdir -p "${font_dst}"
+            	  cp -R "${font_src}" "${font_dst}"
+            	fi
+                  '';
+      };
   };
 
   # FIXME: without overrides produces warnings

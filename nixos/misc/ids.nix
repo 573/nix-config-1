@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -20,7 +20,9 @@ in
   options = {
 
     custom.ids = {
-      enable = mkEnableOption "custom uids and gids" // { default = true; };
+      enable = mkEnableOption "custom uids and gids" // {
+        default = true;
+      };
 
       uids = mkOption {
         type = types.attrs;
@@ -40,7 +42,6 @@ in
     };
 
   };
-
 
   ###### implementation
 

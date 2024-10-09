@@ -1,9 +1,14 @@
 /**
-Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+  Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
-For `[latest]` and `[unstable]` parameters determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+  For `[latest]` and `[unstable]` parameters determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, /*unstable,*/ ... }:
+{
+  config,
+  lib,
+  pkgs, # unstable,
+  ...
+}:
 
 let
   inherit (lib)
@@ -25,20 +30,17 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
     home.packages = attrValues {
       # with pkgs; [
-      inherit
-        (pkgs)
+      inherit (pkgs)
         qpwgraph
         helio-workstation
         ;
 
-      inherit
-        (pkgs)
+      inherit (pkgs)
         pwvucontrol
         ;
     };

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, rootPath, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -29,7 +29,6 @@ in
     };
 
   };
-
 
   ###### implementation
 
