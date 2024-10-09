@@ -1,12 +1,11 @@
-{ config
-, lib
-, inputs
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
-  inherit
-    (lib)
+  inherit (lib)
     mkIf
     mkEnableOption
     optionalAttrs
@@ -32,12 +31,17 @@ in
   #];
 
   options.custom.wsl.scanner = {
-    enable = mkEnableOption "Support the Canon LiDE 30 USB-scanner" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable =
+      mkEnableOption "Support the Canon LiDE 30 USB-scanner"
+      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {
     #users.groups.scanner.members = [ "dkahlenberg" ]; # see https://nixos.wiki/wiki/Scanners and https://github.com/nix-community/NixOS-WSL/commit/7f6189c658963fce68ab38fa9200729a6328f280 usbip
-    users.users.nixos.extraGroups = [ "scanner" "lp" ];
+    users.users.nixos.extraGroups = [
+      "scanner"
+      "lp"
+    ];
 
     environment.systemPackages = [
       #pkgs.gscan2pdf
@@ -66,7 +70,7 @@ in
     services.udev = {
       # TODO Here it is different though (scanner): https://unix.stackexchange.com/questions/184367/scanimage-does-not-find-scanner-unless-sudoed-but-shows-up-with-sane-find-scan
       extraRules = optionalString config.custom.wsl.usbip.enable ''
-        	ATTR{idVendor}=="04a9", ATTR{idProduct}=="220e", MODE="0664", GROUP="scanner", ENV{libsane_matched}="yes"
+        ATTR{idVendor}=="04a9", ATTR{idProduct}=="220e", MODE="0664", GROUP="scanner", ENV{libsane_matched}="yes"
       '';
       # TODO Still needed ?
       # ATTR{idVendor}=="04a9", ATTR{idProduct}=="220e", MODE="0666", GROUP="scanner"

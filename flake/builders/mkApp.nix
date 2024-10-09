@@ -1,11 +1,16 @@
-{ system, pkgsFor, customLibFor, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  customLibFor,
+  name,
+  args,
+  ...
+}:
 
 let
-  script = customLibFor.${system}.mkScript
-    name
-    args.file
-    (args.path pkgsFor.${system})
-    (args.envs or { });
+  script = customLibFor.${system}.mkScript name args.file (args.path pkgsFor.${system}) (
+    args.envs or { }
+  );
 in
 
 {

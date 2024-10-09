@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -12,41 +12,43 @@ let
 
   cfg = config.custom.utils.systemd;
 
-  timerOpts = { name, config, ... }: {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = ''
-          Name of timer and service.
-        '';
+  timerOpts =
+    { name, config, ... }:
+    {
+      options = {
+        name = mkOption {
+          type = types.str;
+          description = ''
+            Name of timer and service.
+          '';
+        };
+
+        description = mkOption {
+          type = types.str;
+          description = ''
+            Description of timer and service.
+          '';
+        };
+
+        interval = mkOption {
+          type = types.str;
+          description = ''
+            Systemd calendar expression when to run service. See {manpage}`systemd.time(7)`.
+          '';
+        };
+
+        serviceConfig = mkOption {
+          type = types.attrs;
+          description = ''
+            Config for service.
+          '';
+        };
       };
 
-      description = mkOption {
-        type = types.str;
-        description = ''
-          Description of timer and service.
-        '';
-      };
-
-      interval = mkOption {
-        type = types.str;
-        description = ''
-          Systemd calendar expression when to run service. See {manpage}`systemd.time(7)`.
-        '';
-      };
-
-      serviceConfig = mkOption {
-        type = types.attrs;
-        description = ''
-          Config for service.
-        '';
+      config = {
+        name = mkDefault name;
       };
     };
-
-    config = {
-      name = mkDefault name;
-    };
-  };
 
 in
 
@@ -66,13 +68,12 @@ in
 
   };
 
-
   ###### implementation
 
   config = {
 
-    systemd = mkMerge (flip map (attrValues cfg.timers) (
-      timer: {
+    systemd = mkMerge (
+      flip map (attrValues cfg.timers) (timer: {
         timers.${timer.name} = {
           description = "${timer.description} timer";
           wantedBy = [ "timers.target" ];
@@ -91,8 +92,8 @@ in
           }
           timer.serviceConfig
         ];
-      }
-    ));
+      })
+    );
 
   };
 

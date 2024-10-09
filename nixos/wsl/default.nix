@@ -1,8 +1,9 @@
-{ config
-, lib
-, pkgs
-, inputs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
 }:
 let
   inherit (lib)
@@ -18,7 +19,9 @@ in
   imports = [ inputs.nix-ld-rs.nixosModules.nix-ld ];
 
   options.custom.wsl = {
-    enable = mkEnableOption "Wsl settings" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable =
+      mkEnableOption "Wsl settings"
+      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {
@@ -47,12 +50,14 @@ in
         stdenv.cc.cc # for libstdc++.so.6
       ];
     };
-    /*environment.variables = {
+    /*
+      environment.variables = {
         NIX_LD_LIBRARY_PATH = lib.mkDefault (lib.makeLibraryPath [
           pkgs.stdenv.cc.cc
         ]);
         #NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker"; #"${pkgs.glibc}/lib/ld-linux-x86-64.so.2";
         NIX_LD = lib.mkDefault pkgs.stdenv.cc.bintools.dynamicLinker;
-      };*/
+      };
+    */
   };
 }

@@ -26,6 +26,8 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
       # Make sure to override the nixpkgs version to follow your flake,
@@ -43,7 +45,7 @@
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
     # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.32.3&fullName=hledger-1.32.3&keyName=haskellPackages.hledger&revision=05bbf675397d5366259409139039af8077d695ce&channel=nixpkgs-unstable#instructions
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/05bbf675397d5366259409139039af8077d695ce"; #e1ee359d16a1886f0771cc433a00827da98d861c";
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -133,12 +135,14 @@
       url = "https://github.com/jubnzv/virtual-types.nvim/archive/9ef9f31c58cc9deb914ee728b8bda8f217f9d1c7.tar.gz";
     };
 
-    /*neovim-flake = {
-      url = "github:nix-community/neovim-nightly-overlay"; # &rev=d321deb4a9b05e9d81b79ac166274f4a6e7981bf"; # the commit used in neovim-nightly-overlay itself, i. e. https://github.com/nix-community/neovim-nightly-overlay/commit/e5a94bb91c94dc079e7c714494a0be7814b51c6d
-      # FIXME Gerschtli rather follows nixpkgs for all inputs, should I too ?
-      #inputs.nixpkgs.follows = "unstable";
-      #inputs.flake-utils.follows = "flake-utils";
-    };*/
+    /*
+      neovim-flake = {
+        url = "github:nix-community/neovim-nightly-overlay"; # &rev=d321deb4a9b05e9d81b79ac166274f4a6e7981bf"; # the commit used in neovim-nightly-overlay itself, i. e. https://github.com/nix-community/neovim-nightly-overlay/commit/e5a94bb91c94dc079e7c714494a0be7814b51c6d
+        # FIXME Gerschtli rather follows nixpkgs for all inputs, should I too ?
+        #inputs.nixpkgs.follows = "unstable";
+        #inputs.flake-utils.follows = "flake-utils";
+      };
+    */
 
     # TODO https://github.com/nix-community/neovim-nightly-overlay/blob/89fdda1/flake.nix#L39
     neovim-nightly-overlay = {
@@ -195,6 +199,27 @@
       url = "github:Gerschtli/nix-formatter-pack";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nmd.follows = "nmd";
+    };
+
+    yazi-compress = {
+      url = "github:KKV9/compress.yazi";
+      flake = false;
+    };
+
+    ouch-yazi = {
+      url = "github:ndtoan96/ouch.yazi";
+      flake = false;
+    };
+
+    ouch-xplr = {
+      url = "github:dtomvan/ouch.xplr";
+      flake = false;
+    };
+
+    # https://github.com/sxyazi/yazi/issues/1726
+    yazi = {
+      url = "github:sxyazi/yazi";
+      #inputs.nixpkgs.follows = "unstable";
     };
 
     ml_env = {
@@ -283,15 +308,15 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "unstable";
     };
- poetry2nix.url = "github:nix-community/poetry2nix";
-#      poetry2nix.inputs.flake-utils.follows = "flake-utils";
-poetry2nix.inputs.nixpkgs.follows = "unstable";
+    poetry2nix.url = "github:nix-community/poetry2nix";
+    #      poetry2nix.inputs.flake-utils.follows = "flake-utils";
+    poetry2nix.inputs.nixpkgs.follows = "unstable";
 
     jupyenv.url = "github:tweag/jupyenv?ref=refs/pull/524/head"; # "github:573/jupyenv-aarch64-experimental";
 
     nixpkgs-ruby = {
       url = "github:bobvanderlinden/nixpkgs-ruby";
-   #   inputs.nixpkgs.follows = "nixpkgs";
+      #   inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ocaml-overlay = {
@@ -332,7 +357,10 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
       flake = false;
     };
 
-    firefox-addons = { url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons"; inputs.nixpkgs.follows = "nixpkgs"; };
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     mistty = {
       url = "github:szermatt/mistty";
@@ -341,7 +369,7 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
 
     wsl-vpnkit = {
       # misusing the github api a bit here, see https://docs.github.com/de/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request--code-samples, a ?ref= would not work, but hash is correctly resolved to pull/250/commits/hash
-      url = "github:sakai135/wsl-vpnkit/6845578336b5bcc3484f23dce51c4f6ac37baba6"; #28992229fedfa64979faa9ec84b1b4bcf5c8f449"; #/?dir=pulls/250";
+      url = "github:sakai135/wsl-vpnkit/6845578336b5bcc3484f23dce51c4f6ac37baba6"; # 28992229fedfa64979faa9ec84b1b4bcf5c8f449"; #/?dir=pulls/250";
       flake = false;
     };
 
@@ -394,21 +422,60 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , nix-formatter-pack
-    , ...
-    } @ inputs:
+    {
+      self,
+      nixpkgs,
+      nix-formatter-pack,
+      ...
+    }@inputs:
     let
       rootPath = self;
-      forEachSystem = nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ];
+      forEachSystem = nixpkgs.lib.genAttrs [
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+
+      # Eval the treefmt modules from ./treefmt.nix
+      treefmtEval = forEachSystem (
+        system:
+        inputs.treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} {
+          # Used to find the project root
+          projectRootFile = "flake.nix";
+          programs = {
+            deadnix = {
+              enable = true;
+              no-lambda-arg = true;
+              no-lambda-pattern-names = true;
+            };
+            nixpkgs-fmt = {
+              enable = true;
+              package = inputs.unstable.legacyPackages.${system}.nixfmt-rfc-style;
+            };
+            #shellcheck.enable = true;
+            shfmt = {
+              enable = true;
+              # https://flake.parts/options/treefmt-nix.html#opt-perSystem.treefmt.programs.shfmt.indent_size
+              # 0 causes shfmt to use tabs
+              #indent_size = 0;
+            };
+          };
+          # En
+        }
+      );
+
       /**
-      "includes" ./flake/default.nix (function) and provides it the attributes `inputs rootPath forEachSystem` from "environment" as parameters
+        "includes" ./flake/default.nix (function) and provides it the attributes `inputs rootPath forEachSystem` from "environment" as parameters
       */
-      flakeLib = import ./flake /* /default.nix */ {
-        inherit inputs rootPath /*specialArgs*/ forEachSystem;
-	#inherit (nixpkgs.pkgs.stdenv.hostPlatform) system;
-      };
+      flakeLib =
+        import ./flake # /default.nix
+          {
+            inherit
+              inputs
+              rootPath # specialArgs
+              forEachSystem
+              ;
+            #inherit (nixpkgs.pkgs.stdenv.hostPlatform) system;
+          };
 
       formatterPackArgsFor = forEachSystem (system: {
         inherit nixpkgs system;
@@ -419,7 +486,7 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
             enable = true;
             noLambdaPatternNames = true;
           };
-	  # TODO see https://github.com/nix-community/nixd/blob/9355fa2/flake.nix#L60
+          # TODO see https://github.com/nix-community/nixd/blob/9355fa2/flake.nix#L60
           nixpkgs-fmt.enable = true;
           statix = {
             enable = true;
@@ -430,37 +497,63 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
       });
 
       inherit (nixpkgs.lib) listToAttrs attrValues;
-      inherit (flakeLib) mkApp mkHome mkNixOnDroid mkNixos mkDevenvJvmLang mkDevenvDeno mkDevenvFlutter mkDevenvOcaml mkDevenvRust mkDevenvMachnix mkDevenvJupyenv mkDevenvRuby mkDevenvHaskell mkDevenvRustWasm32 mkDevShellJdk mkDevenvRubyNix mkDevenvRubyVar3  mkDevShellOcaml mkDevenvRust2 mkDevShellPython mkDevShellCudaWsl mkDevenvJulia  mkDevShellAgda mkDevShellCommonLisp mkDevenvPlaywright mkDevenvPlaywright2 mkDevShellGhcwasm  mkDevenvHaskell2;
+      inherit (flakeLib)
+        mkApp
+        mkHome
+        mkNixOnDroid
+        mkNixos
+        mkDevenvJvmLang
+        mkDevenvDeno
+        mkDevenvFlutter
+        mkDevenvOcaml
+        mkDevenvRust
+        mkDevenvRuby
+        mkDevenvHaskell
+        mkDevenvRustWasm32
+        mkDevShellJdk
+        mkDevenvRubyNix
+        mkDevenvRubyVar3
+        mkDevShellOcaml
+        mkDevenvRust2
+        mkDevShellPython
+        mkDevShellAgda
+        mkDevShellCommonLisp
+        mkDevenvPlaywright
+        mkDevenvPlaywright2
+        mkDevShellGhcwasm
+        mkDevenvHaskell2
+        ;
 
       # NOTE https://discourse.nixos.org/t/installing-only-a-single-package-from-unstable/5598/30
       #  and https://discourse.nixos.org/t/add-an-option-to-home-manager-as-a-nixos-module-using-flake/38731/4
       #  and https://discourse.nixos.org/t/how-do-specialargs-work/50615/4
       #  and https://discourse.nixos.org/t/access-inputs-via-specialargs-in-mkshell/51905/5
       /**
-      "Used" like this: `specialArgs.${system}`
+        "Used" like this: `specialArgs.${system}`
       */
       specialArgs = forEachSystem (system: {
         inherit system;
-	nixpkgs = inputs.nixpkgs.legacyPackages.${system};
+        nixpkgs = inputs.nixpkgs.legacyPackages.${system};
         latest = inputs.latest.legacyPackages.${system};
         unstable = inputs.unstable.legacyPackages.${system};
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
-	ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
+        ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
         fenix = inputs.fenix.packages.${system};
-	nixpkgs-ruby-overlay = inputs.nixpkgs-ruby.overlays.default;
+        nixpkgs-ruby-overlay = inputs.nixpkgs-ruby.overlays.default;
         ghciwatch = inputs.ghciwatch.packages.${system}.default;
         ghc-wasm-meta = inputs.ghc-wasm-meta.packages.${system}.all_9_8;
+        inherit (inputs.yazi.packages.${system}) yazi;
         inherit (inputs.devenv.lib) mkShell;
         inherit (inputs.nixpkgs-ruby.lib) packageFromRubyVersionFile;
         inherit (inputs.jupyenv.lib.${system}) mkJupyterlabNew;
-    });
+      });
     in
     {
       homeConfigurations = listToAttrs [
         /**
-	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
-	*/
+             	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
+        */
         (mkHome "aarch64-linux" "u0_a210@localhost")
         (mkHome "x86_64-linux" "dani@maiziedemacchiato")
       ];
@@ -488,32 +581,39 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
         # inherit ((colmena.lib.makeHive self.colmena).introspect (x: x)) nodes;
       };
 
-      apps = forEachSystem (system:
+      apps = forEachSystem (
+        system:
         (listToAttrs [
           (
             # TODO Also try https://github.com/IllustratedMan-code/tick_egg_paper/blob/bf14af5/flake.nix#L44
             let
               inherit (inputs.jupyenv.lib.${system}) mkJupyterlabNew;
-              jupyterlab = mkJupyterlabNew ({ ... }: {
-                nixpkgs = inputs.nixpkgs;
-                imports = [
-                  ({ pkgs, ... }: {
-                    kernel.python.science = {
-                      enable = true;
-                    };
-                    #kernel.ocaml.minimal-example = {
-                    #  enable = true;
-                    #};
-                    #kernel.julia.minimal-example = {
-                    #  enable = true;
-                    #  julia = pkgs.julia-bin;
-                    #};
-                    kernel.rust.minimal-example = {
-                      enable = true;
-                    };
-                  })
-                ];
-              });
+              jupyterlab = mkJupyterlabNew (
+                { ... }:
+                {
+                  nixpkgs = inputs.nixpkgs;
+                  imports = [
+                    (
+                      { ... }:
+                      {
+                        kernel.python.science = {
+                          enable = true;
+                        };
+                        #kernel.ocaml.minimal-example = {
+                        #  enable = true;
+                        #};
+                        #kernel.julia.minimal-example = {
+                        #  enable = true;
+                        #  julia = pkgs.julia-bin;
+                        #};
+                        kernel.rust.minimal-example = {
+                          enable = true;
+                        };
+                      }
+                    )
+                  ];
+                }
+              );
             in
             {
               name = "jupyenv-app";
@@ -526,166 +626,233 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
 
           (mkApp system "nvim" rec {
             file = builtins.toFile "file" ''
-              	    source @bashLib@
-              	    nvim
-              	    '';
-            path = pkgs: with pkgs; (map (x: "${x.custom.programs.neovim.lightweight.outPath}") ((
-              let inherit (pkgs.stdenv) isLinux isx86_64; in lib.optionals (isLinux && isx86_64) [
-                self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
-                self.homeConfigurations."dani@maiziedemacchiato".config
-              ]
-            ) ++ (
-              let inherit (pkgs.stdenv) isLinux isAarch64; in lib.optionals (isLinux && isAarch64) [
-                self.nixOnDroidConfigurations.sams9.config.home-manager.config
-              ]
-            )));
+              source @bashLib@
+              nvim
+            '';
+            path =
+              pkgs:
+              with pkgs;
+              (map (x: "${x.custom.programs.neovim.lightweight.outPath}") (
+                (
+                  let
+                    inherit (pkgs.stdenv) isLinux isx86_64;
+                  in
+                  lib.optionals (isLinux && isx86_64) [
+                    self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
+                    self.homeConfigurations."dani@maiziedemacchiato".config
+                  ]
+                )
+                ++ (
+                  let
+                    inherit (pkgs.stdenv) isLinux isAarch64;
+                  in
+                  lib.optionals (isLinux && isAarch64) [
+                    self.nixOnDroidConfigurations.sams9.config.home-manager.config
+                  ]
+                )
+              ));
           })
 
           ({
             name = "nixvim";
-            value = let pkgs = inputs.nixpkgs.legacyPackages.${system}; in {
-              program = builtins.toString (pkgs.writeShellScript "testnixvim" ''
-                	        ${self.inputs.nixvim.packages."${system}".default}/bin/nvim
-                	      '');
-              type = "app";
-            };
+            value =
+              let
+                pkgs = inputs.nixpkgs.legacyPackages.${system};
+              in
+              {
+                program = builtins.toString (
+                  pkgs.writeShellScript "testnixvim" ''
+                      ${self.inputs.nixvim.packages."${system}".default}/bin/nvim
+                  ''
+                );
+                type = "app";
+              };
           })
 
           (mkApp system "emacs" rec {
             file = builtins.toFile "file" ''
-              	    source @bashLib@
-              	    emacs
-              	    '';
-            path = pkgs: with pkgs; (map (x: "${x.custom.programs.emacs.finalPackage.outPath}") ((
-              let inherit (pkgs.stdenv) isLinux isx86_64; in lib.optionals (isLinux && isx86_64) [
-                self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
-                self.homeConfigurations."dani@maiziedemacchiato".config
-              ]
-            ) ++ (
-              let inherit (pkgs.stdenv) isLinux isAarch64; in lib.optionals (isLinux && isAarch64) [
-                self.nixOnDroidConfigurations.sams9.config.home-manager.config
-              ]
-            )));
+              source @bashLib@
+              emacs
+            '';
+            path =
+              pkgs:
+              with pkgs;
+              (map (x: "${x.custom.programs.emacs.finalPackage.outPath}") (
+                (
+                  let
+                    inherit (pkgs.stdenv) isLinux isx86_64;
+                  in
+                  lib.optionals (isLinux && isx86_64) [
+                    self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
+                    self.homeConfigurations."dani@maiziedemacchiato".config
+                  ]
+                )
+                ++ (
+                  let
+                    inherit (pkgs.stdenv) isLinux isAarch64;
+                  in
+                  lib.optionals (isLinux && isAarch64) [
+                    self.nixOnDroidConfigurations.sams9.config.home-manager.config
+                  ]
+                )
+              ));
           })
 
           (mkApp system "nixos-shell" {
             file = ./files/apps/nixos-shell.sh;
-            path = pkgs: attrValues { #pkgs: with pkgs; [ 
-	      inherit (pkgs)
-	        nixos-shell 
-		gawk
-		jq 
-		git
-		;
-	    };
+            path =
+              pkgs:
+              attrValues {
+                #pkgs: with pkgs; [ 
+                inherit (pkgs)
+                  nixos-shell
+                  gawk
+                  jq
+                  git
+                  ;
+              };
           })
 
           (mkApp system "setup" {
             file = ./files/apps/setup.sh;
-            path = pkgs: attrValues {
-	    #pkgs: with pkgs; [ 
-	      inherit
-	        (pkgs)
-		  coreutils
-		  curl
-		  git
-		  gnugrep
-		  hostname
-		  jq
-		  openssh
-		  ;
-	      inherit
-	        (nixpkgs.nixVersions)
-	          nix_2_24
-		  ;
-	   };
+            path =
+              pkgs:
+              attrValues {
+                #pkgs: with pkgs; [ 
+                inherit (pkgs)
+                  coreutils
+                  curl
+                  git
+                  gnugrep
+                  hostname
+                  jq
+                  openssh
+                  ;
+                inherit (nixpkgs.nixVersions)
+                  nix_2_24
+                  ;
+              };
 
             envs._doNotClearPath = true;
           })
 
-        ]) // {
+        ])
+        // {
           nilApp = null;
         }
       );
 
-      checks = forEachSystem (system:
-        {
-          nix-formatter-pack-check = nix-formatter-pack.lib.mkCheck formatterPackArgsFor.${system};
+      checks = forEachSystem (system: {
 
-          /*          neovim-check-config = pkgs.runCommand "neovim-check-config"
+        formatting = treefmtEval.${system}.config.build.check self;
+
+        nix-formatter-pack-check = nix-formatter-pack.lib.mkCheck formatterPackArgsFor.${system};
+
+        /*
+          neovim-check-config = pkgs.runCommand "neovim-check-config"
             {
               buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
             } ''
-                                                                                                                                              	    mkdir -p "$out"
+                                                                                                                                                             	    mkdir -p "$out"
 
                         # prevent E886 ('/home-shelter' error)
-                                                                                                                                              	    export HOME=$TMPDIR
-                                                                                                                                              	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
-                                                                                                                                              	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
-                                                                                                                                              	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
+                                                                                                                                                             	    export HOME=$TMPDIR
+                                                                                                                                                             	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
+                                                                                                                                                             	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
+                                                                                                                                                             	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
 
                         if [ -n "$(cat "$out/nvim.log")" ]; then
-                                                                                                                                                                                                  	      echo "output: "$(cat "$out/nvim.log")""
-                                                                                                                                                                                                  	      exit 1
-                                                                                                                                              	    fi
+                                                                                                                                                                                                                       	      echo "output: "$(cat "$out/nvim.log")""
+                                                                                                                                                                                                                       	      exit 1
+                                                                                                                                                             	    fi
           '';
-                                                                                      	  */
-        });
+        */
+      });
 
       # use like:
       # $ direnv-init jdk11
       # $ lorri-init jdk11
-      devShells = forEachSystem (system: 
-      let 
-        inherit (specialArgs.${system}) mkShell nixpkgs unstable packageFromRubyVersionFile nixpkgs-ruby-overlay haskellPackages fenix ghc-wasm-meta ghciwatch ghc-nixpkgs-unstable mkJupyterlabNew;
-      in listToAttrs [
-        #{ name = "template";  value = nixpkgs.mkShell {}; }
-        # AFAIU the pkgs used herein (mkDevenv*) are with the overlays as in flake/nixpkgs.nix etc. applied, also means any derivation defined therein can be used here then, but is a different derivation than i. e. some binary-cached elsewhere, which can lead to subtle differences i. e. (un)expected rebuilds. To use a binary-cached flake define here directly in flake.nix and add overlays when needed only.
-        (mkDevShellJdk system "jdk21" { jdk = pkgs: pkgs.jdk21; })
-	# TODO wait for https://github.com/tweag/jupyenv/pull/524
-	# until then as in https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/editors/jupyter-kernels/coq/default.nix (https://github.com/NixOS/nixpkgs/issues/255923, https://github.com/NixOS/nixpkgs/pull/268078 and https://gist.github.com/teto/4d12998d734f982e27f48d8bb001c8ae)
-	# https://discourse.nixos.org/t/install-custom-kernels-into-jupyter-lab/37502
-	# https://github.com/AlexChalk/ml_env/blob/3fb4d915e2ffac3d340b6b406defcf7753a587ad/flake.nix
-	# use i. e.:
-	# nix run --impure --expr 'with import <nixpkgs> {}; jupyter.override { definitions.clojure = clojupyter.definition; }'
-	# (mkDevenvJupyenv system "jupyenv" { inherit mkShell mkJupyterlabNew; })
-        (mkDevenvJvmLang system "jvmlanguages-devenv" { inherit mkShell; })
-        (mkDevenvDeno system "deno" { inherit mkShell; })
-        (mkDevenvFlutter system "flutter" { inherit mkShell; })
-        # TODO https://github.com/c-cube/iter
-        (mkDevenvOcaml system "ocaml" { inherit mkShell; })
-        (mkDevenvRuby system "ruby" { inherit packageFromRubyVersionFile; })
-        (mkDevenvRubyNix system "rubyNix" { })
-        (mkDevenvRubyVar3 system "rubyShell" { inherit nixpkgs-ruby-overlay; inherit (inputs) nixpkgs; })
-        (mkDevenvRust system "rust" { inherit mkShell inputs; })
-        (mkDevenvRustWasm32 system "rustwasm32" { inherit mkShell fenix; })
-        (mkDevenvHaskell system "haskell" { inherit haskellPackages mkShell; })
-	(mkDevShellOcaml system "yaocaml" { inherit unstable; })
-	(mkDevenvRust2 system "rustyShell" { inherit inputs mkShell; })
-	(mkDevShellPython system "python" { inherit unstable; })
-	# DONT probably delusional, rather try https://sourcegraph.com/github.com/nixvital/ml-pkgs/-/blob/overlays/torch-family.nix
-	# also: https://wiki.nixos.org/wiki/CUDA
-	#(mkDevShellCudaWsl system "cudawsl" { })
-        #(mkDevenvJulia system "julia" { })
-	(mkDevShellAgda system "agda" { inherit haskellPackages; })
-	(mkDevShellCommonLisp system "commonlisp" { })
-	(mkDevenvPlaywright system "playwright" { inherit nixpkgs mkShell; })
-	(mkDevenvPlaywright2 system "playwright2" { inherit unstable mkShell; })
-	(mkDevShellGhcwasm system "ghcwasm" { inherit ghc-wasm-meta; })
-	(mkDevenvHaskell2 system "haskell2" { inherit nixpkgs ghciwatch haskellPackages unstable mkShell; })
-      ] /*// {
-        #template = (nixpkgs.mkShell.override { stdenv = nixpkgs.stdenvAdapters.useMoldLinker nixpkgs.stdenv; });
-        # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
-        zigShell = inputs.zig2nix.devShells.${system}.default;
-        rustShell = inputs.rust-dev-template.devShells.${system}.default;
-        cljShell = inputs.clojure-dev-template.devShells.${system}.default;
-        ocamlShell = inputs.ocaml-dev-template.devShells.${system}.default;
-        nixdShell = inputs.nixd.devShells.${system}.default;
-	jupyShell = inputs.ml_env.devShells.${system}.default;
-      }*/);
+      devShells = forEachSystem (
+        system:
+        let
+          inherit (specialArgs.${system})
+            mkShell
+            nixpkgs
+            unstable
+            packageFromRubyVersionFile
+            nixpkgs-ruby-overlay
+            haskellPackages
+            fenix
+            ghc-wasm-meta
+            ghciwatch
+            ;
+        in
+        listToAttrs [
+          #{ name = "template";  value = nixpkgs.mkShell {}; }
+          # AFAIU the pkgs used herein (mkDevenv*) are with the overlays as in flake/nixpkgs.nix etc. applied, also means any derivation defined therein can be used here then, but is a different derivation than i. e. some binary-cached elsewhere, which can lead to subtle differences i. e. (un)expected rebuilds. To use a binary-cached flake define here directly in flake.nix and add overlays when needed only.
+          (mkDevShellJdk system "jdk21" { jdk = pkgs: pkgs.jdk21; })
+          # TODO wait for https://github.com/tweag/jupyenv/pull/524
+          # until then as in https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/editors/jupyter-kernels/coq/default.nix (https://github.com/NixOS/nixpkgs/issues/255923, https://github.com/NixOS/nixpkgs/pull/268078 and https://gist.github.com/teto/4d12998d734f982e27f48d8bb001c8ae)
+          # https://discourse.nixos.org/t/install-custom-kernels-into-jupyter-lab/37502
+          # https://github.com/AlexChalk/ml_env/blob/3fb4d915e2ffac3d340b6b406defcf7753a587ad/flake.nix
+          # use i. e.:
+          # nix run --impure --expr 'with import <nixpkgs> {}; jupyter.override { definitions.clojure = clojupyter.definition; }'
+          # (mkDevenvJupyenv system "jupyenv" { inherit mkShell mkJupyterlabNew; })
+          (mkDevenvJvmLang system "jvmlanguages-devenv" { inherit mkShell; })
+          (mkDevenvDeno system "deno" { inherit mkShell; })
+          (mkDevenvFlutter system "flutter" { inherit mkShell; })
+          # TODO https://github.com/c-cube/iter
+          (mkDevenvOcaml system "ocaml" { inherit mkShell; })
+          (mkDevenvRuby system "ruby" { inherit packageFromRubyVersionFile; })
+          (mkDevenvRubyNix system "rubyNix" { })
+          (mkDevenvRubyVar3 system "rubyShell" {
+            inherit nixpkgs-ruby-overlay;
+            inherit (inputs) nixpkgs;
+          })
+          (mkDevenvRust system "rust" { inherit mkShell inputs; })
+          (mkDevenvRustWasm32 system "rustwasm32" { inherit mkShell fenix; })
+          (mkDevenvHaskell system "haskell" { inherit haskellPackages mkShell; })
+          (mkDevShellOcaml system "yaocaml" { inherit unstable; })
+          (mkDevenvRust2 system "rustyShell" { inherit inputs mkShell; })
+          (mkDevShellPython system "python" { inherit unstable; })
+          # DONT probably delusional, rather try https://sourcegraph.com/github.com/nixvital/ml-pkgs/-/blob/overlays/torch-family.nix
+          # also: https://wiki.nixos.org/wiki/CUDA
+          #(mkDevShellCudaWsl system "cudawsl" { })
+          #(mkDevenvJulia system "julia" { })
+          (mkDevShellAgda system "agda" { inherit haskellPackages; })
+          (mkDevShellCommonLisp system "commonlisp" { })
+          (mkDevenvPlaywright system "playwright" { inherit nixpkgs mkShell; })
+          (mkDevenvPlaywright2 system "playwright2" { inherit unstable mkShell; })
+          (mkDevShellGhcwasm system "ghcwasm" { inherit ghc-wasm-meta; })
+          (mkDevenvHaskell2 system "haskell2" {
+            inherit
+              nixpkgs
+              ghciwatch
+              haskellPackages
+              unstable
+              mkShell
+              ;
+          })
+        ]
+        /*
+          // {
+            #template = (nixpkgs.mkShell.override { stdenv = nixpkgs.stdenvAdapters.useMoldLinker nixpkgs.stdenv; });
+            # https://github.com/NixOS/nixpkgs/blob/9e860e4/pkgs/development/lisp-modules/shell.nix
+            zigShell = inputs.zig2nix.devShells.${system}.default;
+            rustShell = inputs.rust-dev-template.devShells.${system}.default;
+            cljShell = inputs.clojure-dev-template.devShells.${system}.default;
+            ocamlShell = inputs.ocaml-dev-template.devShells.${system}.default;
+            nixdShell = inputs.nixd.devShells.${system}.default;
+               	jupyShell = inputs.ml_env.devShells.${system}.default;
+          }
+        */
+      );
 
-      formatter = forEachSystem (system: nix-formatter-pack.lib.mkFormatter formatterPackArgsFor.${system});
+      #formatter = forEachSystem (system: nix-formatter-pack.lib.mkFormatter formatterPackArgsFor.${system});
+
+      # for `nix fmt`
+      formatter = forEachSystem (system: treefmtEval.${system}.config.build.wrapper);
 
       nixosModules.nixos-shell-vm = import ./files/nix/nixos-shell-vm.nix rootPath;
 
@@ -703,8 +870,7 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
           cachixDeployOutputNixondroid = cachixDeployOutput (module: module.activationPackage);
           cachixDeployOutputNixos = cachixDeployOutput (module: module.config.system.build.toplevel);
         in
-        nixpkgs.lib.foldl
-          nixpkgs.lib.recursiveUpdate
+        nixpkgs.lib.foldl nixpkgs.lib.recursiveUpdate
           {
             aarch64-linux = {
               rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
@@ -720,9 +886,13 @@ poetry2nix.inputs.nixpkgs.follows = "unstable";
 
             x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
           }
-          (nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
-            ++ [ (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9) (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato") ])
-      ;
+          (
+            nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
+            ++ [
+              (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9)
+              (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato")
+            ]
+          );
     };
 
   nixConfig = {

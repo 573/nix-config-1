@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -78,7 +83,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -107,26 +111,21 @@ in
             script = ''
               cd ${backupDir}
 
-              ${
-                concatMapStringsSep
-                  "\n"
-                  (server: ''
-                    ${pkgs.rsync}/bin/rsync \
-                      --archive \
-                      --compress \
-                      --include "*.age" \
-                      --prune-empty-dirs \
-                      --verbose \
-                      --whole-file \
-                      --rsh "${pkgs.openssh}/bin/ssh \
-                        -o UserKnownHostsFile=/dev/null \
-                        -o StrictHostKeyChecking=no \
-                        -i ${config.age.secrets.id-rsa-backup.path}" \
-                      "${backupUser}@${server.ip}:${config.custom.services.backup.location}/*" \
-                      "${backupDir}/${server.name}"
-                  '')
-                  cfg.server
-              }
+              ${concatMapStringsSep "\n" (server: ''
+                ${pkgs.rsync}/bin/rsync \
+                  --archive \
+                  --compress \
+                  --include "*.age" \
+                  --prune-empty-dirs \
+                  --verbose \
+                  --whole-file \
+                  --rsh "${pkgs.openssh}/bin/ssh \
+                    -o UserKnownHostsFile=/dev/null \
+                    -o StrictHostKeyChecking=no \
+                    -i ${config.age.secrets.id-rsa-backup.path}" \
+                  "${backupUser}@${server.ip}:${config.custom.services.backup.location}/*" \
+                  "${backupDir}/${server.name}"
+              '') cfg.server}
 
               find ${backupDir} -type f -mtime +${toString cfg.expiresAfter} -exec rm {} \+
             '';
@@ -138,7 +137,7 @@ in
     };
 
     # FIXME replace with systemd tmpfiles
-    system.activationScripts.backup = mkIf (! useMount) ''
+    system.activationScripts.backup = mkIf (!useMount) ''
       mkdir -p ${location}
     '';
 

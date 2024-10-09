@@ -1,27 +1,32 @@
 /**
-Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+  Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
-For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+  For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, libreoffice-postscript, inputs, rootPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  libreoffice-postscript,
+  rootPath,
+  ...
+}:
 let
-  inherit
-    (lib)
+  inherit (lib)
     attrValues
     mkDefault
     ;
-  inherit
-    (pkgs)
+  inherit (pkgs)
     writeScriptBin
     runtimeShell
     ;
-/**
-Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
-
-If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
-*/
-  #inherit (pkgs.stdenv.hostPlatform) system;
 in
+/**
+  Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+
+  If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+*/
+#inherit (pkgs.stdenv.hostPlatform) system;
 {
   custom = {
     base = {
@@ -95,8 +100,7 @@ in
 
     packages = attrValues {
       # with pkgs; [
-      inherit
-        (pkgs)
+      inherit (pkgs)
         #my-neovim
         #ranger
         #photoprism
@@ -160,44 +164,41 @@ in
         notepad-next
         ;
 
-      inherit
-        (pkgs.usbutils)
+      inherit (pkgs.usbutils)
         out
         ;
 
-      inherit
-        (pkgs.xorg)
+      inherit (pkgs.xorg)
         libxcvt
         xrandr
         ;
 
-      inherit
-        (pkgs.nixgl)
+      inherit (pkgs.nixgl)
         nixGLIntel
         ;
 
-      inherit
-        (libreoffice-postscript)
+      inherit (libreoffice-postscript)
         libreoffice
         ;
 
-      nerdfonts =
-        pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
+      nerdfonts = pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
 
-      keyboard-de = (writeScriptBin "keyboard-de" ''
-        #!${runtimeShell}
+      keyboard-de = (
+        writeScriptBin "keyboard-de" ''
+          #!${runtimeShell}
 
-        setxkbmap -model pc104 -layout de
-      '');
+          setxkbmap -model pc104 -layout de
+        ''
+      );
 
-      keyboard-en = (writeScriptBin "keyboard-en" ''
-                #!${runtimeShell}
+      keyboard-en = (
+        writeScriptBin "keyboard-en" ''
+                  #!${runtimeShell}
 
-        	setxkbmap -model pc104 -layout us -variant altgr-intl
-      '');
+          	setxkbmap -model pc104 -layout us -variant altgr-intl
+        ''
+      );
     };
-
-
 
     sessionPath = [
       #"${config.home.homeDirectory}/projects/sedo/devops-scripts/bin"

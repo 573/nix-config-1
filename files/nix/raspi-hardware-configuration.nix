@@ -1,9 +1,11 @@
 # source: https://github.com/n8henrie/nixos-btrfs-pi/blob/856722b/nixos/hardware-configuration.nix
 # see https://github.com/NixOS/nixpkgs/blob/master/pkgs/misc/uboot/default.nix as well
-{ lib
-, modulesPath
-, ...
-}: {
+{
+  lib,
+  modulesPath,
+  ...
+}:
+{
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -41,7 +43,10 @@
     "/boot/firmware" = {
       device = "/dev/disk/by-label/FIRMWARE";
       fsType = "vfat";
-      options = [ "nofail" "noauto" ];
+      options = [
+        "nofail"
+        "noauto"
+      ];
     };
   };
 
@@ -53,8 +58,5 @@
   # networking.interfaces.eth0.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlan0.useDHCP = lib.mkDefault true;
 
-  powerManagement.cpuFreqGovernor =
-    lib.mkDefault
-      "ondemand";
+  powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 }
-

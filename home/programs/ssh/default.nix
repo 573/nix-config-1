@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -32,7 +37,13 @@ in
       };
 
       controlMaster = mkOption {
-        type = types.enum [ "yes" "no" "ask" "auto" "autoask" ];
+        type = types.enum [
+          "yes"
+          "no"
+          "ask"
+          "auto"
+          "autoask"
+        ];
         default = "auto";
         description = ''
           Configure sharing of multiple sessions over a single network connection.
@@ -40,7 +51,12 @@ in
       };
 
       modules = mkOption {
-        type = types.listOf (types.enum [ "private" "vcs" ]);
+        type = types.listOf (
+          types.enum [
+            "private"
+            "vcs"
+          ]
+        );
         default = [ ];
         description = "SSH modules to enable.";
       };
@@ -48,7 +64,6 @@ in
     };
 
   };
-
 
   ###### implementation
 

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -10,19 +15,15 @@ let
 
   cfg = config.custom.wm.general;
 
-  lockScreenPackage =
-    config.lib.custom.mkScript
-      "lock-screen"
-      ./lock-screen.sh
-      [ pkgs.xorg.xset ]
-      {
-        _doNotClearPath = cfg.useSlock;
+  lockScreenPackage = config.lib.custom.mkScript "lock-screen" ./lock-screen.sh [ pkgs.xorg.xset ] {
+    _doNotClearPath = cfg.useSlock;
 
-        lockCommand =
-          if cfg.useSlock
-          then "slock"
-          else "${pkgs.i3lock-fancy}/bin/i3lock-fancy --nofork --text '' -- ${pkgs.scrot}/bin/scrot --silent --overwrite";
-      };
+    lockCommand =
+      if cfg.useSlock then
+        "slock"
+      else
+        "${pkgs.i3lock-fancy}/bin/i3lock-fancy --nofork --text '' -- ${pkgs.scrot}/bin/scrot --silent --overwrite";
+  };
 in
 
 {
@@ -48,7 +49,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -56,47 +56,62 @@ in
     custom = {
       #programs.alacritty.enable = true;
 
-      wm.general = { inherit lockScreenPackage; };
+      wm.general = {
+        inherit lockScreenPackage;
+      };
     };
 
-    home.packages = [
-      lockScreenPackage
-      pkgs.pavucontrol
-      pkgs.xdg-utils
+    home.packages =
+      [
+        lockScreenPackage
+        pkgs.pavucontrol
+        pkgs.xdg-utils
 
-      (config.lib.custom.mkScript
-        "inhibit-suspend"
-        ./inhibit-suspend.sh
-        [ lockScreenPackage pkgs.systemd ]
-        { }
-      )
-    ] ++ (
-      map
-        (item:
-          let useSudo = item ? sudo && item.sudo; in
-          config.lib.custom.mkScript
-            (item.name or item.command)
-            ./wm-script.sh
-            [ pkgs.gnome.zenity ]
-            {
-              inherit (item) command message;
+        (config.lib.custom.mkScript "inhibit-suspend" ./inhibit-suspend.sh [
+          lockScreenPackage
+          pkgs.systemd
+        ] { })
+      ]
+      ++ (map
+        (
+          item:
+          let
+            useSudo = item ? sudo && item.sudo;
+          in
+          config.lib.custom.mkScript (item.name or item.command) ./wm-script.sh [ pkgs.gnome.zenity ] {
+            inherit (item) command message;
 
-              _doNotClearPath = useSudo;
+            _doNotClearPath = useSudo;
 
-              systemctlCommand =
-                if useSudo
-                then "sudo systemctl"
-                else "${pkgs.systemd}/bin/systemctl";
-            }
+            systemctlCommand = if useSudo then "sudo systemctl" else "${pkgs.systemd}/bin/systemctl";
+          }
         )
         [
-          { command = "poweroff"; name = "halt"; message = "halt the system"; }
-          { command = "hibernate"; message = "suspend to disk"; sudo = cfg.useSudoForHibernate; }
-          { command = "hybrid-sleep"; message = "suspend to disk and ram"; }
-          { command = "reboot"; message = "reboot"; }
-          { command = "suspend"; name = "sys-suspend"; message = "suspend to ram"; }
+          {
+            command = "poweroff";
+            name = "halt";
+            message = "halt the system";
+          }
+          {
+            command = "hibernate";
+            message = "suspend to disk";
+            sudo = cfg.useSudoForHibernate;
+          }
+          {
+            command = "hybrid-sleep";
+            message = "suspend to disk and ram";
+          }
+          {
+            command = "reboot";
+            message = "reboot";
+          }
+          {
+            command = "suspend";
+            name = "sys-suspend";
+            message = "suspend to ram";
+          }
         ]
-    );
+      );
 
     services = {
       network-manager-applet.enable = config.custom.base.desktop.laptop;

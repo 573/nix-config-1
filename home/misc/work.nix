@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -38,7 +38,6 @@ in
     };
 
   };
-
 
   ###### implementation
 

@@ -1,4 +1,4 @@
-{ config, lib, inputs, ... }:
+{ config, lib, ... }:
 let
   inherit (lib)
     mkEnableOption
@@ -13,7 +13,6 @@ in
     #    inputs.agenix.nixosModules.default
     #    inputs.agenix-rekey.nixosModules.default
   ];
-
 
   ###### interface
 

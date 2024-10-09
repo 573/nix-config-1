@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -20,31 +25,28 @@ in
 
   };
 
-
   ###### implementation
-  config = mkIf cfg.enable
-    (mkMerge [
-      (mkIf (cfg.custom.base.non-nixos) {
-        programs.ssh.extraConfig = ''
-          Host eu.nixbuild.net
-            PubkeyAcceptedKeyTypes ssh-ed25519	
-            ServerAliveInterval 60
-            IPQoS throughput
-            IdentityFile /root/.ssh/my-nixbuild-key
-        '';
+  config = mkIf cfg.enable (mkMerge [
+    (mkIf (cfg.custom.base.non-nixos) {
+      programs.ssh.extraConfig = ''
+        Host eu.nixbuild.net
+          PubkeyAcceptedKeyTypes ssh-ed25519	
+          ServerAliveInterval 60
+          IPQoS throughput
+          IdentityFile /root/.ssh/my-nixbuild-key
+      '';
 
-        #        custom.base.non-nixos.builders = [
-        #	"eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
-        #        ];
-      })
+      #        custom.base.non-nixos.builders = [
+      #	"eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
+      #        ];
+    })
 
-      {
-        home.packages = builtins.attrValues {
-	  inherit
-	    (pkgs)
-            rlwrap
-	    ;
-        };
-      }
-    ]);
+    {
+      home.packages = builtins.attrValues {
+        inherit (pkgs)
+          rlwrap
+          ;
+      };
+    }
+  ]);
 }

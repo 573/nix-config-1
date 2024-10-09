@@ -1,23 +1,30 @@
 /**
-Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+  Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
-Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
-For `[inputs]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+  Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
+  For `[inputs]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, inputs, unstable, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  unstable,
+  ...
+}:
 let
   inherit (lib)
     attrValues
     concatStringsSep
     mkEnableOption
+    mkAfter
     mkIf
     mkMerge
     ;
-/**
-Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+  /**
+    Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
 
-If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
-*/
+    If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+  */
   #inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.general;
   localeGerman = "de_DE.UTF-8";
@@ -28,38 +35,47 @@ in
 
   options = {
     custom.base.general = {
-      enable = mkEnableOption "basic config" // { default = true; };
+      enable = mkEnableOption "basic config" // {
+        default = true;
+      };
 
-      lightWeight =
-        mkEnableOption "light weight config for low performance hosts" // { default = false; };
+      lightWeight = mkEnableOption "light weight config for low performance hosts" // {
+        default = false;
+      };
 
       wsl = mkEnableOption "config for NixOS-WSL instances";
 
       minimal = mkEnableOption "minimal config";
 
-      /*
-      FIXME https://github.com/nix-community/nix-on-droid/issues/257
-      */
+      # FIXME https://github.com/nix-community/nix-on-droid/issues/257
       termux = mkEnableOption "config for the non-nixos termux android app";
     };
   };
 
-
-
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
-     {
+    {
       custom.programs = {
-        emacs-novelist.enable = true;
+        #emacs-novelist.enable = true;
+        emacs-no-el.enable = true;
         emacs-nano.enable = true;
         bash.enable = true;
+        shell = {
+          initExtra = mkAfter ''
+                        eval "$(${pkgs.zoxide}/bin/zoxide init bash)"
+                        eval "$(${unstable.bat-extras.batpipe}/bin/batpipe)"
+            	  '';
+        };
         htop.enable = true;
         nix-index.enable = true;
+	helix.enable = true;
+	yazi.enable = true;
+        xplr.enable = true;
         neovim = {
           enable = true;
-	  # not inherit not same attr
-	  lightWeight = cfg.lightWeight;
+          # not inherit not same attr
+          lightWeight = cfg.lightWeight;
         };
       };
 
@@ -101,7 +117,7 @@ in
             mmv-go
             nmap
             ncdu
-            nload# network traffic monitor
+            nload # network traffic monitor
             pwgen
             #ripgrep # build broken on aarch64-linux, https://github.com/573/nix-config-1/actions/runs/6309380420/job/17129186691, also build unmaintained currently
             silver-searcher
@@ -114,10 +130,10 @@ in
             xz
             zip
 
-            bind# dig
+            bind # dig
             netcat
 
-            psmisc# killall
+            psmisc # killall
             whois
 
             sqlite
@@ -135,16 +151,26 @@ in
             attr
 
             nix-inspect
-#            zellij
+            #            zellij
             viddy
             zoxide
             ;
 
-          inherit
-            (unstable)
+          inherit (unstable)
+            bat
             eza
-#            yazi
+            #            yazi
             ;
+
+          inherit (unstable.bat-extras)
+            batman
+            ;
+
+          #	  batman = (unstable.bat-extras.batman.overrideAttrs (oldAttrs: {
+          #    propagatedBuildInputs = [
+          #      unstable.bat
+          #    ];
+          #  }));
 
         }; # replaces with pkgs; [], i. e. because nixd catches duplicates this way
 
@@ -157,9 +183,9 @@ in
           ];
           PAGER = "${pkgs.less}/bin/less";
           SHELL = "bash";
-	  # TODO how does that interfere with same attr in neovim.nix
-          EDITOR = "vi";
-          VISUAL = "vi";
+          # TODO how does that interfere with same attr in neovim.nix
+          #EDITOR = "vi";
+          VISUAL = config.home.sessionVariables.EDITOR;
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html
@@ -213,7 +239,7 @@ in
     (mkIf (!cfg.lightWeight) {
       custom.programs = {
         tmux.enable = true;
-        emacs.enable = true;
+        #emacs.enable = true;
       };
 
       home.packages = attrValues {
@@ -223,10 +249,10 @@ in
           strace
           lineselect
           git-annex
-	  cyme
+          cyme
 
-            # poc
-            age
+          # poc
+          age
 
           #git-annex-remote-googledrive
           #haskellPackages.feedback
