@@ -51,7 +51,8 @@ in
   config = mkIf cfg.enable (mkMerge [
      {
       custom.programs = {
-        emacs-novelist.enable = true;
+	#emacs-novelist.enable = true;
+	emacs-no-el.enable = true;
         emacs-nano.enable = true;
         bash.enable = true;
         htop.enable = true;
@@ -213,7 +214,7 @@ in
     (mkIf (!cfg.lightWeight) {
       custom.programs = {
         tmux.enable = true;
-        emacs.enable = true;
+	#emacs.enable = true;
       };
 
       home.packages = attrValues {

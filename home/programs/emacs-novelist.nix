@@ -90,67 +90,28 @@ let
     pname = "default.el";
     version = "0";
     src = pkgs.writeText "default.el" ''
-;; FIXME https://github.com/Gavinok/emacs.d/blob/main/init.el#L725
-;;;; Code Completion
-(use-package corfu
-  :disabled
-  :ensure t
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                 ; Allows cycling through candidates
-  (corfu-auto t)                  ; Enable auto completion
-  (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.1)
-  (corfu-popupinfo-delay '(0.5 . 0.2))
-  (corfu-preview-current 'insert) ; insert previewed candidate
-  (corfu-preselect 'prompt)
-  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
-  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (:map corfu-map
-              ("M-SPC"      . corfu-insert-separator)
-              ("TAB"        . corfu-next)
-              ([tab]        . corfu-next)
-              ("S-TAB"      . corfu-previous)
-              ([backtab]    . corfu-previous)
-              ("S-<return>" . corfu-insert)
-              ("RET"        . nil))
-
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  (corfu-popupinfo-mode)) ; Popup completion info
-
-(use-package cape
-  :ensure t
-  :defer 10
-  :bind ("C-c f" . cape-file)
-  :init
-  ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  (defun my/add-shell-completion ()
-    (interactive)
-    (add-to-list 'completion-at-point-functions 'cape-history)
-    (add-to-list 'completion-at-point-functions 'pcomplete-completions-at-point))
-  (add-hook 'shell-mode-hook #'my/add-shell-completion nil t)
-  :config
-  ;; Make capfs composable
-  (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
-  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
-
-  ;; Silence then pcomplete capf, no errors or messages!
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
-
-  ;; Ensure that pcomplete does not write to the buffer
-  ;; and behaves as a pure `completion-at-point-function'.
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
-
+      ;; https://git.rossabaker.com/ross/cromulent/src/commit/8bc7c365ad6e0ab16328cec3c34515b1f2554f94/gen/flake/emacs/init.el
       (use-package gcmh
         :ensure t
         :diminish
         :init (setq gc-cons-threshold (* 80 1024 1024))
         :hook (emacs-startup . gcmh-mode))
 
+(use-package zoom
+  :ensure t
+  :custom
+  `(zoom-size ,(let ((phi (- (/ (+ 1 (sqrt 5)) 2) 1)))
+                (cons phi phi))))
+
+
       (use-package which-key
-        :hook (on-first-input . which-key-mode))
+        :hook (on-first-input . which-key-mode)
+  :diminish
+  :custom
+  (which-key-show-early-on-C-h t)
+  (which-key-idle-delay most-positive-fixnum)
+  (which-key-idle-secondary-delay 1e-9)
+	)
 
       (use-package no-littering
         :ensure t
@@ -163,19 +124,30 @@ let
             (expand-file-name  "eln-cache/" no-littering-var-directory)))))
 
       (use-package bind-key
-        :demand t
-        :bind
-        (:prefix-map rab/files-map
-         :prefix "C-c f")
-        :bind
-        (:prefix-map rab/toggles-map
-         :prefix "C-c t"))
+        :demand t)
 
       (use-package diminish :ensure t)
 
-      (use-package corfu-terminal
-        :ensure t
-        :hook (on-first-buffer . global-corfu-mode))
+(use-package corfu
+  :ensure t
+    ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+;;  :hook (on-first-buffer . global-corfu-mode)
+;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
+  :init
+  (global-corfu-mode))
 
       (use-package emacs-lock
         :config
@@ -198,10 +170,34 @@ let
 
 
       (use-package emacs
-        :bind
-        ([remap capitalize-word] . capitalize-dwim)
-        ([remap downcase-word] . downcase-dwim)
-        ([remap upcase-word] . upcase-dwim))
+      :custom
+  ;; TAB cycle if there are only few candidates
+  ;; (completion-cycle-threshold 3)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent 'complete)
+
+  ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
+  ;; try `cape-dict'.
+ ;; (text-mode-ispell-word-completion nil)
+
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p))
+
+	;; Use Dabbrev with Corfu!
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
       (use-package titlecase
         :ensure t
@@ -209,13 +205,20 @@ let
 
       (setopt cursor-type 'bar)
 
-      (use-package olivetti
-        :demand t
-        :init
-        (setq olivetti-body-width 40)
-        (setq olivetti-style 'fancy)
-        (setq olivetti-minimum-body-width 30)
-        :ensure t)
+
+
+;; https://elektrubadur.se/emacs-configuration/
+(use-package orderless
+  :custom
+  (completition-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion))))
+  :config
+  (let ((hook (defun my/minibuffer-setup ()
+                (setq-local completion-styles '(orderless basic)))))
+    (remove-hook 'minibuffer-setup-hook hook)
+    (add-hook 'minibuffer-setup-hook hook 1)))
+
 
       (use-package  org-novelist
         :ensure nil
@@ -232,70 +235,47 @@ let
       ;;  (require 'ox-odt)
         (require 'org-extra-emphasis)
 
-(setenv "DICPATH" "${pkgs.hunspellDicts.de_DE}/share/hunspell:${pkgs.hunspellDicts.en_US}/share/hunspell")
+	
+;; Add extensions
+(use-package cape
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;;(add-hook 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+;; ...
+;; https://github.com/minad/cape/issues/131
+  ;; https://sourcegraph.com/github.com/erikbackman/nixos-config/-/blob/modules/programs/emacs/config/ebn-init.el?L777&rev=26a7a26
+  ;;:config
+  ;;(setq cape-dict-file "${pkgs.scowl}/share/dict/words.txt")
+)
 
-      ;; FROM HERE: https://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs/
-      ;; and https://www.reddit.com/r/emacs/comments/10336qd/comment/j2xmb7g/
-      ;; find aspell and hunspell automatically
-(cond
- ;; try hunspell at first
-  ;; if hunspell does NOT exist, use aspell
- ((executable-find "hunspell")
-  (setq ispell-program-name "hunspell"
-   flyspell-issue-message-flag t
-   ispell-highlight-p t
-   ispell-silently-savep t
-   ispell-current-dictionary "de_DE,en_US")
-   (setq ispell-hunspell-dict-paths-alist ;; /nix/store/8icvklwcdm08ksfzkjy6m610ycrd6c2d-home-manager-path/share/hunspell/de_DE.aff
-   '(("de_DE" "${pkgs.hunspellDicts.de_DE.outPath}/share/hunspell/de_DE.aff")
-     ("en_US" "${pkgs.hunspellDicts.en_US.outPath}/share/hunspell/en_US.aff")))
-  (setq ispell-local-dictionary "de_DE")
-  (setq ispell-local-dictionary-alist
-        ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
-        ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
-        '(("de_DE,en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "de_DE,en_US") nil utf-8)))
- 
-  ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
-  ;; If it's nil, Emacs tries to automatically set up the dictionaries.
-  (when (boundp 'ispell-hunspell-dictionary-alist)
-    (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist))
-;; Configure German and English.
-   (setq ispell-dictionary "de_DE,en_US")
+;;(setq-local
+;; cape--dict-words '(the be to of and a in that have I it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us)
+;; completion-at-point-functions (list #'cape-dict)
+;; corfu-auto-delay 0
+;; corfu-auto-prefix 0)
 
-     ;; ispell-set-spellchecker-params has to be called before ispell-hunspell-add-multi-dic will work
-  (ispell-set-spellchecker-params)
-  (ispell-hunspell-add-multi-dic "de_DE,en_US")
-  ;; For saving words to the personal dictionary, don't infer it from
-  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
-  (setq ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
+(use-package jinx
+  :bind (("M-?" . jinx-correct)
+	 ("M-C-k" . jinx-languages))
+  :init
+  (add-hook 'emacs-startup-hook #'global-jinx-mode)
+  )
 
-  ;; The personal dictionary file has to exist, otherwise hunspell will
-  ;; silently not use it.
-  (unless (file-exists-p ispell-personal-dictionary)
-    (write-region "" nil ispell-personal-dictionary nil 0))
-
-    ;; for ispell see https://emacs.stackexchange.com/questions/42508/how-to-use-an-ispell-dictionary-in-company-mode and https://emacs.stackexchange.com/a/17238 and https://github.com/company-mode/company-mode/issues/1146
-    )
-
-  ((executable-find "aspell")
-  (setq ispell-program-name "aspell")
-  ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
-  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=de_DE"))))
-
-      ;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
-      (defun my/initial-layout ()
-        "Create my initial screen layout."
-        (interactive)
-        ;; 2. having org-mode launch in scratch buffer from the beginning, and
-        (switch-to-buffer "*scratch*")
-        (org-mode)
-        ;; (org-indent-mode)
-        ;; 3. to have olivetti mode enabled too.
-        ;; (olivetti-mode)
-        ;; (delete-other-windows)
-        )
-
-      (my/initial-layout)
     '';
     /*''
               (add-to-list 'load-path "${inputs.sensible-defaults.outPath}")
@@ -403,14 +383,20 @@ in
         persist-state
         ibuffer-vc
         emacs
-        corfu-terminal
+				#corfu-terminal
         diminish
         no-littering
         gcmh
         olivetti
 				cape 
 				corfu
+				zoom
+orderless	
 	;
+
+	inherit (epkgs.elpaPackages)
+					jinx
+				;
       } ++ [
         org-novelist
         my-default-el
@@ -447,6 +433,7 @@ in
         inherit (pkgs)
         hunspell
 	aspell
+					enchant
 	;
 
 	inherit
