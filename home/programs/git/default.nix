@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (builtins)
@@ -19,9 +24,7 @@ let
 
   externGitAlias = alias: "!${alias}";
 
-  ignoreList = map
-    readFile
-    (filesystem.listFilesRecursive ./gitignores);
+  ignoreList = map readFile (filesystem.listFilesRecursive ./gitignores);
 
   commitMsgTemplate = prefix: ''
     ${prefix}
@@ -48,39 +51,44 @@ let
     openssh
   ];
 
-  hooksIncludes = map
-    (filename:
-      let file = ./includes + "/${filename}"; in
-      config.lib.custom.mkScriptPlain
-        "hooks-include-${extractName file}"
-        file
-        hooksPathPackages
-        { hooksLib = ./lib.hooks.sh; }
-    )
-    (attrNames (readDir ./includes));
+  hooksIncludes = map (
+    filename:
+    let
+      file = ./includes + "/${filename}";
+    in
+    config.lib.custom.mkScriptPlain "hooks-include-${extractName file}" file hooksPathPackages {
+      hooksLib = ./lib.hooks.sh;
+    }
+  ) (attrNames (readDir ./includes));
 
   hooksPath = pkgs.linkFarm "git-hooks" (
     map
-      (file:
-        let name = extractName file; in
+      (
+        file:
+        let
+          name = extractName file;
+        in
         {
           inherit name;
-          path = config.lib.custom.mkScriptPlain
-            "hooks-${name}"
-            file
-            hooksPathPackages
-            { hooksLib = ./lib.hooks.sh; includes = hooksIncludes; };
-        })
-      ([
-        ./post-checkout.sh
-        ./post-commit.sh
-        ./post-merge.sh
-        ./post-rewrite.sh
-        ./pre-commit.sh
-        ./pre-push.sh
-      ] ++ optionals config.custom.misc.work.enable [
-        ./prepare-commit-msg.sh
-      ])
+          path = config.lib.custom.mkScriptPlain "hooks-${name}" file hooksPathPackages {
+            hooksLib = ./lib.hooks.sh;
+            includes = hooksIncludes;
+          };
+        }
+      )
+      (
+        [
+          ./post-checkout.sh
+          ./post-commit.sh
+          ./post-merge.sh
+          ./post-rewrite.sh
+          ./pre-commit.sh
+          ./pre-push.sh
+        ]
+        ++ optionals config.custom.misc.work.enable [
+          ./prepare-commit-msg.sh
+        ]
+      )
   );
 
   writeFile = name: content: toString (pkgs.writeText name content);
@@ -96,7 +104,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -104,13 +111,10 @@ in
     home.packages = [
       pkgs.git-absorb
       pkgs.tig
-      (
-        config.lib.custom.mkScript
-          "git-initial-commit"
-          ./git-initial-commit.sh
-          [ pkgs.coreutils pkgs.git ]
-          { }
-      )
+      (config.lib.custom.mkScript "git-initial-commit" ./git-initial-commit.sh [
+        pkgs.coreutils
+        pkgs.git
+      ] { })
       pkgs.lefthook
     ];
 
@@ -134,8 +138,9 @@ in
         ca = "commit -q --branch --status --verbose --amend";
         cl = externGitAlias "git clone --recursive --progress";
         cm = "commit --branch --status --verbose";
-        cn = externGitAlias ''git reflog expire --all && git fsck --unreachable --full && git prune && \
-          git gc --aggressive --quiet && git repack -Adq && git prune-packed --quiet'';
+        cn = externGitAlias ''
+          git reflog expire --all && git fsck --unreachable --full && git prune && \
+                    git gc --aggressive --quiet && git repack -Adq && git prune-packed --quiet'';
         df = "diff";
         di = "diff --ignore-all-space";
         ds = "diff --staged";
@@ -185,8 +190,9 @@ in
 
         aliases = ''config --get-regexp "^alias"'';
 
-        bclean = externGitAlias ''git for-each-ref --format "%(refname:short)" refs/heads |
-          ${pkgs.gnugrep}/bin/grep -Ev "master|$(git branch-name)" | ${pkgs.findutils}/bin/xargs git bd'';
+        bclean = externGitAlias ''
+          git for-each-ref --format "%(refname:short)" refs/heads |
+                    ${pkgs.gnugrep}/bin/grep -Ev "master|$(git branch-name)" | ${pkgs.findutils}/bin/xargs git bd'';
 
         branch-name = externGitAlias ''git for-each-ref --format="%(refname:short)" $(git symbolic-ref HEAD)'';
         total-clean = externGitAlias "git co -f && git clean -dfx && git clean -dfX";
@@ -262,11 +268,9 @@ in
           tool = "vi";
 
           age.textconv = toString (
-            config.lib.custom.mkScriptPlain
-              "age-textconv"
-              ./age-textconv.sh
-              [ pkgs.age ]
-              { HOME = config.home.homeDirectory; }
+            config.lib.custom.mkScriptPlain "age-textconv" ./age-textconv.sh [ pkgs.age ] {
+              HOME = config.home.homeDirectory;
+            }
           );
 
           gpg.textconv = "${pkgs.gnupg}/bin/gpg --use-agent -q --batch --decrypt";
@@ -373,18 +377,17 @@ in
 
           contents = {
             alias.bcf = externGitAlias (
-              config.lib.custom.mkScriptPlain
-                "git-alias-bcf"
-                ./git-alias-bcf.sh
-                [ pkgs.git ]
-                { }
+              config.lib.custom.mkScriptPlain "git-alias-bcf" ./git-alias-bcf.sh [ pkgs.git ] { }
             );
 
             commit.template = writeFile "commit.msg" (commitMsgTemplate "PREFIX");
 
             core.excludesfile =
               let
-                ignoreListWork = ignoreList ++ [ ".envrc" "shell.nix" ];
+                ignoreListWork = ignoreList ++ [
+                  ".envrc"
+                  "shell.nix"
+                ];
                 content = concatStringsSep "\n" ignoreListWork + "\n";
               in
               writeFile "gitignore" content;

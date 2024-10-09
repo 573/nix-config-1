@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -53,7 +58,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -64,10 +68,11 @@ in
     };
 
     home.packages = [
-      (config.lib.custom.mkScript
-        "local-backup"
-        ./local-backup.sh
-        [ pkgs.openssh pkgs.rsync ]
+      (config.lib.custom.mkScript "local-backup" ./local-backup.sh
+        [
+          pkgs.openssh
+          pkgs.rsync
+        ]
         {
           inherit (cfg) directories;
           inherit rsyncOptions;

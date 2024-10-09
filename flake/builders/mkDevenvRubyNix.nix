@@ -1,4 +1,10 @@
-{ system, rootPath, pkgsInsecFor, inputs, name, args, ... }:
+{
+  system,
+  rootPath,
+  pkgsInsecFor,
+  name,
+  ...
+}:
 
 let
   pkgs = pkgsInsecFor.${system};
@@ -12,7 +18,12 @@ let
     lockfile = "${rootPath}/home/misc/Gemfile.lock";
     # TODO Find out, why moving the generated gemset.nix to some other folder does not work
     gemset = "${rootPath}/flake/builders/gemset.nix";
-    groups = [ "default" "production" "development" "test" ];
+    groups = [
+      "default"
+      "production"
+      "development"
+      "test"
+    ];
   };
 in
 pkgs.mkShell {
@@ -21,8 +32,7 @@ pkgs.mkShell {
       gems
       ruby
       ;
-    inherit
-      (pkgs)
+    inherit (pkgs)
       bundix
       ;
   };

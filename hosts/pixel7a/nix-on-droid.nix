@@ -1,4 +1,10 @@
-{ config, lib, pkgs, homeModules, inputs, rootPath, ... }@configArgs:
+{
+  config,
+  lib,
+  pkgs,
+  rootPath,
+  ...
+}@configArgs:
 
 let
   sshdTmpDirectory = "${config.user.home}/sshd-tmp";
@@ -64,7 +70,9 @@ in
     config = commonConfig.homeManager.userConfig "pixel7a" "nix-on-droid";
   };
 
-  nix = { inherit (commonConfig.nix) package; };
+  nix = {
+    inherit (commonConfig.nix) package;
+  };
 
   system.stateVersion = "23.11";
 

@@ -3,101 +3,95 @@ source @bashLib@
 nix_config="${HOME}/.nix-config"
 
 _has_unit_enabled() {
-    [[ "$(systemctl is-enabled "${1}" 2> /dev/null)" == "enabled" ]]
+  [[ "$(systemctl is-enabled "${1}" 2>/dev/null)" == "enabled" ]]
 }
 
 _log() {
-    echo
-    echo -e "[${YELLOW}${BOLD}${1}${RESET}] ${BOLD}${2}${RESET}"
-    echo
+  echo
+  echo -e "[${YELLOW}${BOLD}${1}${RESET}] ${BOLD}${2}${RESET}"
+  echo
 }
 
 _migration_remove() {
-    local file="${1}"
-    local ask="${2:-}"
+  local file="${1}"
+  local ask="${2:-}"
 
-    if [[ -e "${file}" && -w "${file}" ]] && ( [[ "${ask}" != "1" ]] || _read_boolean "Remove ${file//"${HOME}"/"~"}?" ); then
-        _log "migration" "remove ${file//"${HOME}"/"~"}"
-        rm -vrf "${file}"
-    fi
+  if [[ -e ${file} && -w ${file} ]] && ([[ ${ask} != "1" ]] || _read_boolean "Remove ${file//"${HOME}"/"~"}?"); then
+    _log "migration" "remove ${file//"${HOME}"/"~"}"
+    rm -vrf "${file}"
+  fi
 }
 
 _pull_changes() {
-    if [[ -d "${2}" && -w "${2}" ]]; then
-        _log "pull changes" "update ${1} project"
-        git -C "${2}" pull --prune
-    fi
+  if [[ -d ${2} && -w ${2} ]]; then
+    _log "pull changes" "update ${1} project"
+    git -C "${2}" pull --prune
+  fi
 }
 
 _show_result_diff() {
-    echo
+  echo
 
-    nvd diff "${1}" ./result
+  nvd diff "${1}" ./result
 
-    rm result
+  rm result
 }
 
-
 if _is_root; then
-    _log "Please don't run this script with root!"
-    exit 1
+  _log "Please don't run this script with root!"
+  exit 1
 fi
-
 
 # add key
 #_log "keychain" "add key"
 #keychain "${HOME}/.ssh/keys/id_rsa.vcs"
 
-
 # update ubuntu
 if _available apt; then
-    _log "apt" "update"
-    sudo apt update
-    _log "apt" "upgrade"
-    sudo apt upgrade -y
-    _log "apt" "autoclean"
-    sudo apt autoclean -y
-    _log "apt" "autoremove"
-    sudo apt autoremove -y
+  _log "apt" "update"
+  sudo apt update
+  _log "apt" "upgrade"
+  sudo apt upgrade -y
+  _log "apt" "autoclean"
+  sudo apt autoclean -y
+  _log "apt" "autoremove"
+  sudo apt autoremove -y
 fi
 
-
 # update projects
-_pull_changes "nix-config"  "${nix_config}"
+_pull_changes "nix-config" "${nix_config}"
 #_pull_changes "atom"        "${HOME}/.atom"
 #_pull_changes "files"       "${HOME}/.files"
 #_pull_changes "pass"        "${HOME}/.password-store"
 
-
 # nix updates
 # TODO: use scripts defined in home/development/nix
 if _is_nixos; then
-    _log "nix" "build nixos configuration"
-    sudo nix build --builders '' --verbose "git+file:///${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel"
-    _show_result_diff "/nix/var/nix/profiles/system"
+  _log "nix" "build nixos configuration"
+  sudo nix build --builders '' --verbose "git+file:///${nix_config}#nixosConfigurations.$(hostname).config.system.build.toplevel"
+  _show_result_diff "/nix/var/nix/profiles/system"
 
-    _log "nix" "switch nixos configuration"
-    sudo nixos-rebuild switch --flake "git+file:///${nix_config}"
+  _log "nix" "switch nixos configuration"
+  sudo nixos-rebuild switch --flake "git+file:///${nix_config}"
 fi
 
-if [[ "${USER}" == "nix-on-droid" ]] && _available nix-on-droid; then
-    _log "nix" "build nix-on-droid configuration"
-    nix build --show-trace -vv "git+file:///${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure
-    _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
+if [[ ${USER} == "nix-on-droid" ]] && _available nix-on-droid; then
+  _log "nix" "build nix-on-droid configuration"
+  nix build --show-trace -vv "git+file:///${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" --impure
+  _show_result_diff "/nix/var/nix/profiles/nix-on-droid"
 
-    _log "nix" "switch nix-on-droid configuration"
-    nix-on-droid switch --flake "git+file:///${nix_config}#sams9"
+  _log "nix" "switch nix-on-droid configuration"
+  nix-on-droid switch --flake "git+file:///${nix_config}#sams9"
 fi
 
 if ! _is_nixos && _available home-manager; then
-    _log "nix" "build home-manager configuration"
-    nix build --builders '' --log-format internal-json --verbose "git+file:///${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
-    _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
+  _log "nix" "build home-manager configuration"
+  nix build --builders '' --log-format internal-json --verbose "git+file:///${nix_config}#homeConfigurations.\"$(whoami)@$(hostname)\".activationPackage" |& nom --json
+  _show_result_diff "/home/${USER}/.local/state/nix/profiles/home-manager"
 
-    _log "nix" "switch home-manager configuration"
-    home-manager switch --flake "git+file:///${nix_config}" -b hm-bak
+  _log "nix" "switch home-manager configuration"
+  home-manager switch --flake "git+file:///${nix_config}" -b hm-bak
 fi
-
 
 # general migrations
 #if [[ ! -f "${HOME}/.age/key.txt" || -L "${HOME}/.age" ]] && _read_boolean "Generate ~/.age/key.txt?"; then

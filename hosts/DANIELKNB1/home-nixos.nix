@@ -1,9 +1,13 @@
 /**
-Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+  Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
-For `[latest]` and `[unstable]` parameters determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+  For `[latest]` and `[unstable]` parameters determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ lib, pkgs, /*latest, unstable,*/ ... }:
+{
+  lib,
+  pkgs, # latest, unstable,
+  ...
+}:
 let
   inherit (lib)
     attrValues
@@ -49,7 +53,6 @@ in
   #    doomPrivateDir = "${rootPath}/home/misc/doom.d";
   #  };
 
-
   # https://discourse.nixos.org/t/whats-the-difference-between-extraargs-and-specialargs-for-lib-eval-config-nix/5281/2
   #  disabledModules = [ "programs/password-store.nix" ];
   # hyprland has no module in home-manager@release-23.05
@@ -70,8 +73,7 @@ in
 
   home.packages = attrValues {
     #with pkgs; [   
-    inherit
-      (pkgs)
+    inherit (pkgs)
       #alejandra
       shellharden
       shfmt
@@ -119,25 +121,27 @@ in
       hurl
       ;
 
-    /*inherit
+    /*
+      inherit
       (unstable)
       oxker
-      ;*/
+      ;
+    */
 
-    inherit
-      (pkgs.python310Packages)
+    inherit (pkgs.python310Packages)
       pudb
       ;
 
-    inherit
-      (pkgs.nixgl)
+    inherit (pkgs.nixgl)
       nixGLIntel
       ;
 
-    /*inherit
+    /*
+      inherit
       (latest)
       csvlens
-      ;*/
+      ;
+    */
   };
   /*
     home.file = {
@@ -150,7 +154,8 @@ in
   xdg.enable = true;
 
   # see https://github.com/nix-community/neovim-nightly-overlay/wiki/Tree-sitter
-  /*xdg.configFile."nvim/parser/lua.so".source =
+  /*
+    xdg.configFile."nvim/parser/lua.so".source =
     "${pkgs.tree-sitter.builtGrammars.tree-sitter-lua}/parser";
     xdg.configFile."nvim/parser/python.so".source =
     "${pkgs.tree-sitter.builtGrammars.tree-sitter-python}/parser";
@@ -167,5 +172,6 @@ in
     xdg.configFile."nvim/parser/comment.so".source =
     "${pkgs.tree-sitter.builtGrammars.tree-sitter-comment}/parser";
     xdg.configFile."nvim/parser/latex.so".source =
-    "${pkgs.tree-sitter.builtGrammars.tree-sitter-latex}/parser";*/
+    "${pkgs.tree-sitter.builtGrammars.tree-sitter-latex}/parser";
+  */
 }

@@ -1,7 +1,12 @@
 /**
-`@configArgs` as below provided to `commonConfig`, latter defined in ./../../lib/common-config.nix and bound in ./../../lib/default.nix as well as in ./../../flake/default.nix under the attribute name `customLibFor` where also a module with a mere attribute `lib.custom`is included with the `homeModulesFor` function
+  `@configArgs` as below provided to `commonConfig`, latter defined in ./../../lib/common-config.nix and bound in ./../../lib/default.nix as well as in ./../../flake/default.nix under the attribute name `customLibFor` where also a module with a mere attribute `lib.custom`is included with the `homeModulesFor` function
 */
-{ config, lib, pkgs, ... }@configArgs:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}@configArgs:
 
 let
   inherit (lib)
@@ -27,8 +32,9 @@ in
     custom.base.non-nixos = {
       enable = mkEnableOption "config for non NixOS systems";
 
-      installNix = mkEnableOption "nix installation" // { default = true; }
-      ;
+      installNix = mkEnableOption "nix installation" // {
+        default = true;
+      };
 
       builders = mkOption {
         type = types.listOf types.str;
@@ -39,9 +45,7 @@ in
       };
     };
 
-
   };
-
 
   ###### implementation
 
@@ -73,7 +77,6 @@ in
         registry
         ;
     };
-
 
     targets.genericLinux.enable = true;
   };

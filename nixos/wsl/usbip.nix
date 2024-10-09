@@ -1,11 +1,11 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
-  inherit
-    (lib)
+  inherit (lib)
     mkIf
     mkEnableOption
     optionalAttrs
@@ -20,7 +20,9 @@ let
 in
 {
   options.custom.wsl.usbip = {
-    enable = mkEnableOption "Customisation of USB/IP integration" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable =
+      mkEnableOption "Customisation of USB/IP integration"
+      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
 
     autoAttach = lib.mkOption {
       type = with lib.types; listOf str;
@@ -44,15 +46,13 @@ in
   config = mkIf (cfg.enable) {
 
     environment.systemPackages = builtins.attrValues {
-      inherit
-        (pkgs.linuxPackages)
+      inherit (pkgs.linuxPackages)
         usbip
-	;
-      inherit 
-        (pkgs.usbutils)
-	out
         ;
-   };
+      inherit (pkgs.usbutils)
+        out
+        ;
+    };
 
     services.udev.enable = true;
 
@@ -67,23 +67,21 @@ in
 
         scriptArgs = "%i";
         path = builtins.attrValues {
-	  inherit
-	    (pkgs)
+          inherit (pkgs)
             iproute2
-	    ;
-	  inherit
-	    (pkgs.linuxPackages)
-	    usbip
-	    ;
+            ;
+          inherit (pkgs.linuxPackages)
+            usbip
+            ;
         };
 
         script = ''
-          	  busid="$1"
-          	  ip="${cfg.snippetIpAddress}"
+            busid="$1"
+            ip="${cfg.snippetIpAddress}"
 
-          	  echo "Starting auto attach for busid $busid on $ip."
-          	  source ${usbipd-win-auto-attach} "$ip" "$busid"
-          	'';
+            echo "Starting auto attach for busid $busid on $ip."
+            source ${usbipd-win-auto-attach} "$ip" "$busid"
+        '';
       };
 
       # https://search.nixos.org/options?channel=24.05&show=systemd.targets.%3Cname%3E.wants&from=0&size=50&sort=relevance&type=packages&query=systemd.targets

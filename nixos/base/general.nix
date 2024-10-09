@@ -1,4 +1,10 @@
-{ config, lib, pkgs, homeModules, inputs, rootPath, unstable, ... }@configArgs:
+{
+  pkgs,
+  config,
+  lib,
+  inputs,
+  ...
+}@configArgs:
 # TODO https://github.com/search?q=repo%3AGerschtli%2Fnix-config%20custom.base.desktop&type=code
 let
   inherit (lib)
@@ -30,18 +36,22 @@ in
 
   options = {
     custom.base.general = {
-      enable = mkEnableOption "basic config" // { default = true; };
+      enable = mkEnableOption "basic config" // {
+        default = true;
+      };
 
       wsl = mkEnableOption "nixos-wsl specific config";
 
       hostname = mkOption {
-        type = types.enum [ "DANIELKNB1" "twopi" ];
+        type = types.enum [
+          "DANIELKNB1"
+          "twopi"
+        ];
         description = "Host name.";
       };
     };
 
   };
-
 
   ###### implementation
 
@@ -72,7 +82,9 @@ in
           useUserPackages
           ;
 
-        users = genAttrs ([ "root" ] ++ optional (!cfg.wsl) "dani" ++ optional cfg.wsl "nixos") (commonConfig.homeManager.userConfig cfg.hostname);
+        users = genAttrs ([ "root" ] ++ optional (!cfg.wsl) "dani" ++ optional cfg.wsl "nixos") (
+          commonConfig.homeManager.userConfig cfg.hostname
+        );
       };
 
       i18n.supportedLocales = [

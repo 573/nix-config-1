@@ -1,159 +1,168 @@
-;; TODO Use / Integrate with https://github.com/radian-software/straight.el#integration-with-use-package-1 to also have things like https://github.com/rougier/nano-emacs possible
-;;(eval-when-compile
-;;  (require 'use-package))
-;; Disable startup message.
-(setq inhibit-startup-screen t
-      ;; https://github.com/emacs-dashboard/emacs-dashboard#emacs-daemon
-      initial-buffer-choice (lambda () (get-buffer "*Deft*"))
-      ;; initial-buffer-choice 'ignore
-      inhibit-startup-echo-area-message (user-login-name))
+;; @out@
+;; @scowl@/share/dict/words.txt
+;; @hunspellDicts_de_DE@/share/hunspell/de_DE.aff
+;; my legacy stolen configs https://github.com/573/nix-config-1/commit/b534362097b3ca0d4011561b1085de40df0a7292#diff-9038ab981032e7f24c7ee557adf7d2ea5fbb6702153e6242d80dc61b3e256051
+(message "https://www.gnu.org/software/emacs/manual/html_node/efaq/Learning-how-to-do-something.html")
+(message "configuration is %S" "templated from home/misc/emacs.el: @out@ see C-x b *Messages* for the real path of emacs.el")
+(message "works")
 
-(use-package company-emoji
-  :config (add-to-list 'company-backends 'company-emoji))
+;; A simple way to manage personal keybindings.
+;; needed by use-package
+;; M-x describe-personal-keybindings
+ (use-package bind-key
+   :demand t)
 
-(use-package org
-  ;;  :bind (
-  ;;    ("C-c l" . org-store-link)
-  ;;    :map org-mode-map
-  ;;    ("C-c SPC" . nil)
-  ;;    ("C-c SPC" . nil)
-  ;;  )
-  ;; https://orgmode.org/manual/Dynamic-Headline-Numbering.html - https://github.com/bzg/org-mode/blob/5dc8ea0/lisp/org.el#L1026
-  :init (setq org-startup-numerated t)
-  :hook 
-  (org-mode . (lambda ()
-		(setq-local delete-trailing-lines nil)))
-  :config
-  ;; Add some todo keywords.
-  ;; https://orgmode.org/list/8763vfa9hl.fsf@legolas.norang.ca/
-  (setq org-log-done t
-	org-use-fast-todo-selection t
-	)
-  ;; https://orgmode.org/manual/Dynamic-Headline-Numbering.html#Dynamic-Headline-Numbering (numbered headlines in orgmode)
+;; stolen from here:
+;; https://github.com/minad/corfu?tab=readme-ov-file#configuration (example configuration)
+(use-package corfu
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+   (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-  ;; M-x list-colors-display (https://www.gnu.org/software/emacs/manual/html_node/elisp/Color-Names.html)
-  ;;(setq org-todo-keyword-faces
-  ;;      '(("TODO"  . (:foreground "red" :weight bold))
-  ;;("NEXT"  . (:foreground "red" :weight bold))
-  ;;	("DONE"  . (:foreground "forest green" :weight bold))
-  ;;	("WAITING"  . (:foreground "orange" :weight bold))
-  ;;	("RETEST"  . (:foreground "brightred" :weight bold))
-  ;;	("CANCELLED"  . (:foreground "forest green" :weight bold))
-  ;;	("SOMEDAY"  . (:foreground "orange" :weight bold))
-  ;;	("OPEN"  . (:foreground "red" :weight bold))
-  ;;	("CLOSED"  . (:foreground "forest green" :weight bold))
-  ;;	("ONGOING"  . (:foreground "orange" :weight bold))))
+  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
 
-  ;; (setq org-todo-keywords
-  ;;       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
-  ;; 	(sequence "WAITING(w@/!)" "RETEST(r@/!)" "|" "CANCELLED(c!/!)")
-  ;; 	(sequence "SOMEDAY(s!/!)" "|")
-  ;; 	(sequence "OPEN(O!)" "|" "CLOSED(C!)")
-  ;;     	(sequence "ONGOING(o)" "|")))
-
-  ;; Unfortunately org-mode tends to take over keybindings that
-  ;; start with C-c.
-  )
-
-;; https://fortune-teller-amy-88756.netlify.app/knusper#org7704e78
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(setq org-log-done t)
-
-
-
-;; https://github.com/EFLS/zetteldeft/blob/a16a02e/docs/index.html#L628 - source for https://efls.github.io/zetteldeft/ that is linked here https://github.com/EFLS/zetteldeft/blame/0e56fe3b0bf8fddca6e3537abdc79128c93408f7/README.org#L13
-(use-package deft
-  ;;  :after org-super-links ;; does not work, needed ?
-  ;;  :bind ("C-<f12>" . deft)
-  :commands (deft)
-  :config ;; https://github.com/jrblevin/deft/blame/462dd37db34a7c13baf3e2295c988d783ca9680b/README.md#L220
-  (setq deft-extensions '("org")
-	deft-directory "~/meinzettelkasten"
-	deft-recursive t
-        ;; deft-new-file-format "%Y-%m-%dT%H%M"
-	deft-use-filename-as-title t
-        ;; I tend to write org-mode titles with #+title: (i.e., uncapitalized). Also other org-mode code at the beginning is written in lower case.
-        ;; In order to filter these from the deft summary, let’s alter the regular expression:
-	deft-strip-summary-regexp
-        (concat "\\("
-                "[\n\t]" ;; blank
-                "\\|^#\\+[a-zA-Z_]+:.*$" ;;org-mode metadata
-                "\\)")
-        ;; Its original value was \\([\n ]\\|^#\\+[[:upper:]_]+:.*$\\).
-        
-	deft-default-extension "org"))
-
-(use-package zetteldeft
-  :after deft
-  :config (zetteldeft-set-classic-keybindings))
-
-
-;;(org-babel-do-load-languages
- ;;'org-babel-load-languages
- ;;'((emacs-lisp . nil)
- ;;  (mermaid . t)
- ;;  (scheme . t)
- ;;  (shell . t)))
-
-;; https://github.com/joostkremers/visual-fill-column - Emacs mode for wrapping visual-line-mode buffers at fill-column. See https://stackoverflow.com/a/4879934/3320256 and https://gitlab.com/ndw/dotfiles/-/blob/16a02b38bbf7c5a750f0009fcd19636b039d2006/emacs.d/emacs.org#L1136 as well
-;; (setq line-move-visual nil)
-;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-;; (use-package visual-fill-column
-;; :hook visual-line-mode)
-
-;;(global-visual-line-mode)
-;;(setq-default visual-fill-column-width 103)
-;;(global-visual-fill-column-mode)
-
-;;(use-package tree-sitter)
-
-;;(use-package tree-sitter-langs
-;;  :after tree-sitter)
-
-;; (use-package nix-mode
-;;   :mode ("\\.nix\\'" "\\.nix.in\\'"))
-;; (use-package nix-drv-mode
-;;   :ensure nix-mode
-;;   :mode "\\.drv\\'")
-;; (use-package nix-shell
-;;   :ensure nix-mode
-;;   :commands (nix-shell-unpack nix-shell-configure nix-shell-build))
-;; (use-package nix-repl
-;;   :ensure nix-mode
-;;   :commands (nix-repl))
-
-;; https://fortune-teller-amy-88756.netlify.app/knusper#orgfa7de9d
-(use-package org-bullets
-  :ensure t
+  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
   :init
-  (setq org-bullets-bullet-list
-        '("◉" "◎" "⚫" "○" "►" "◇"))
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (global-corfu-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :custom
+  ;; TAB cycle if there are only few candidates
+  ;; (completion-cycle-threshold 3)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent 'complete)
+
+  ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
+  ;; try `cape-dict'.
+  ;;(text-mode-ispell-word-completion nil)
+
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p))
+
+;; Use Dabbrev with Corfu!
+;;(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+;;  :bind (("M-/" . dabbrev-completion)
+;;         ("C-M-/" . dabbrev-expand))
+;;  :config
+  ;;(add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+;;  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+;;  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+;;  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+
+;; stolen from here:
+;; https://github.com/minad/cape?tab=readme-ov-file#configuration
+;; Enable Corfu completion UI
+;; See the Corfu README for more configuration tips.
+;; Add extensions
+(use-package cape
+  ;;:after corfu
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  (add-hook 'completion-at-point-functions #'cape-dict)
+  ;; https://sourcegraph.com/github.com/MiniApollo/kickstart.emacs/-/blob/init.el?L320-322
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
+  ;; ...
+  :config ;; start emacs ; C-x b *scratch* ; start typing ; C-c p w should suggest from dictionary now
+  (setq cape-dict-file "@scowl@/share/dict/words.txt")
+  ;; https://github.com/minad/cape/blob/ae98ec2/README.org#capf-transformers
+  ;; Example 3: Create a Capf with debugging messages
+  ;;(setq-local completion-at-point-functions (list (cape-capf-debug #'cape-dict)))
+  ;; https://github.com/minad/cape?tab=readme-ov-file#super-capf---merging-multiple-capfs
+;; Merge the dabbrev, dict and keyword capfs, display candidates together.
+;;(setq-local completion-at-point-functions
+;;            (list (cape-capf-super #'cape-dabbrev #'cape-dict #'cape-keyword)))
+
+;; Alternative: Define named Capf instead of using the anonymous Capf directly
+(defun cape-dabbrev-dict-keyword ()
+  (cape-wrap-super #'cape-dabbrev #'cape-dict #'cape-keyword))
+  (setq-local completion-at-point-functions (list #'cape-dabbrev-dict-keyword))
   )
-(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
-			  (sequence "⚑ WAITING(w)" "|")
-			  (sequence "|" "✘ CANCELED(c)")))
 
-;; https://mstempl.netlify.app/post/beautify-org-mode/
-;;(use-package org-bullets
-;;  :custom
-;;  (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
-;;  (org-ellipsis "⤵")
-;;  :hook org-mode)
 
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([+]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
+;;M-? triggers correction for the misspelled word before point.
+;;C-u M-? triggers correction for the entire buffer.
+;;C-u C-u M-? forces correction of the word at point, even if it is not misspelled.
+(use-package jinx
+  :bind (("M-?" . jinx-correct)
+	 ("M-C-k" . jinx-languages))
+  :init
+  (add-hook 'emacs-startup-hook #'global-jinx-mode))
 
-;; i. e. https://github.com/DougBeney/emacs/blob/e55430a4c5fa6fc238676f3b3565f0afe6ee8e70/sanemacs.el#L56 does something annoying at least for me, see also https://stackoverflow.com/a/14164500/3320256 and for a cool workaround see https://emacs.stackexchange.com/questions/14438/remove-hooks-for-specific-modes
-(remove-hook 'before-save-hook 'delete-trailing-whitespace t)
+;; TODO https://github.com/jiahaoli95/el-fly-indent-mode.el
+(use-package el-fly-indent-mode
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'el-fly-indent-mode))
 
-;; TODO how to create a dynamic headline (rendered only) line in emacs
+;; stolen here: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
+;; Technical details
+;;
+;;    based on ac-ispell
+;;    lazy load of ispell-mode to speed Emacs startup
+;;    add a fallback dictionary "english-words.txt" so autocompletion never fails
+;;    `ispell-lookup-words` or `lookup-words` simply does grep thing, so english-words.txt is just a plain text file.
+;;(global-set-key (kbd "M-/") 'hippie-expand)
 
-(deft)
+;; The actual expansion function
+(defun try-expand-by-dict (old)
+  ;; old is true if we have already attempted an expansion
+  (unless (bound-and-true-p ispell-minor-mode)
+    (ispell-minor-mode 1))
+
+  ;; @scowl@/share/dict/words.txt is the fallback dicitonary
+  (if (not ispell-alternate-dictionary)
+      (setq ispell-alternate-dictionary (file-truename "@scowl@/share/dict/words.txt")))
+  (let ((lookup-func (if (fboundp 'ispell-lookup-words)
+                       'ispell-lookup-words
+                       'lookup-words)))
+    (unless old
+      (he-init-string (he-lisp-symbol-beg) (point))
+      (if (not (he-string-member he-search-string he-tried-table))
+        (setq he-tried-table (cons he-search-string he-tried-table)))
+      (setq he-expand-list
+            (and (not (equal he-search-string ""))
+                 (funcall lookup-func (concat (buffer-substring-no-properties (he-lisp-symbol-beg) (point)) "*")))))
+    (if (null he-expand-list)
+      (if old (he-reset-string))
+      (he-substitute-string (car he-expand-list))
+      (setq he-expand-list (cdr he-expand-list))
+      t)
+    ))
+
+;;(setq hippie-expand-try-functions-list
+;;      '(;; try-expand-dabbrev
+;;        ;; try-expand-dabbrev-all-buffers
+;;        try-expand-by-dict))

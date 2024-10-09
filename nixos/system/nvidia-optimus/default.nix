@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -42,7 +42,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -55,12 +54,7 @@ in
     ];
 
     environment.systemPackages = [
-      (config.lib.custom.mkScript
-        "nvidia-offload"
-        ./nvidia-offload.sh
-        [ ]
-        { _doNotClearPath = true; }
-      )
+      (config.lib.custom.mkScript "nvidia-offload" ./nvidia-offload.sh [ ] { _doNotClearPath = true; })
     ];
 
     hardware.nvidia.prime = {

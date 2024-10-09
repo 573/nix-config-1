@@ -1,4 +1,11 @@
-{ config, lib, pkgs, homeModules, inputs, rootPath, system, ... }@configArgs:
+{
+  config,
+  lib,
+  pkgs,
+  rootPath,
+  system,
+  ...
+}@configArgs:
 
 let
   sshdTmpDirectory = "${config.user.home}/sshd-tmp";
@@ -39,44 +46,49 @@ in
   environment = {
     etcBackupExtension = ".nod-bak";
     motd = null;
-    packages = builtins.attrValues {
-      inherit (pkgs)
-      diffutils
-      findutils
-      gawk
-      gnugrep
-      gnused
-      gnutar
-      hostname
-      man
-      ncurses
-      procps
-      psmisc
-      # TODO Maybe do sshd-start here as gerschtli does
-      gzip
-      which
-      micro
-      kalker
-      ;
-    } ++ (let
-      inherit (pkgs)
-        writeScriptBin
-        runtimeShell
-	openssh
-      ;
-      in [
-      (writeScriptBin "debug-ssl" ''
-        #!${runtimeShell}
+    packages =
+      builtins.attrValues {
+        inherit (pkgs)
+          diffutils
+          findutils
+          gawk
+          gnugrep
+          gnused
+          gnutar
+          hostname
+          man
+          ncurses
+          procps
+          psmisc
+          # TODO Maybe do sshd-start here as gerschtli does
+          gzip
+          which
+          micro
+          kalker
+          ;
+      }
+      ++ (
+        let
+          inherit (pkgs)
+            writeScriptBin
+            runtimeShell
+            openssh
+            ;
+        in
+        [
+          (writeScriptBin "debug-ssl" ''
+            #!${runtimeShell}
 
-        openssl s_client -connect nixos.org:443
-      '')
-      (writeScriptBin "sshd-start" ''
-        #!${runtimeShell}
+            openssl s_client -connect nixos.org:443
+          '')
+          (writeScriptBin "sshd-start" ''
+            #!${runtimeShell}
 
-        echo "Starting sshd in non-daemonized way on port 8022"
-        ${openssh}/bin/sshd -f "${sshdDirectory}/sshd_config" -D
-      '')
-    ]);
+            echo "Starting sshd in non-daemonized way on port 8022"
+            ${openssh}/bin/sshd -f "${sshdDirectory}/sshd_config" -D
+          '')
+        ]
+      );
   };
 
   home-manager = {
@@ -107,12 +119,12 @@ in
       # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-experimental-features nix --version 2.15.2
       # see https://github.com/nix-community/nix-on-droid/blob/ae0569f/modules/environment/nix.nix#L107 and https://github.com/nix-community/nix-on-droid/issues/166
       extraOptions = ''
-        		  keep-derivations = true
-        		  keep-outputs = true
-        		  experimental-features = ${concatStringsSep " " experimental-features}
-        	  flake-registry =
-        		  log-lines = ${toString log-lines}
-        	  '';
+        	  keep-derivations = true
+        	  keep-outputs = true
+        	  experimental-features = ${concatStringsSep " " experimental-features}
+          flake-registry =
+        	  log-lines = ${toString log-lines}
+          '';
     };
 
   # FIXME: update when released

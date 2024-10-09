@@ -1,12 +1,10 @@
-{ config
-, lib
-, inputs
-, pkgs
-, ...
+{
+  config,
+  lib,
+  ...
 }:
 let
-  inherit
-    (lib)
+  inherit (lib)
     mkIf
     mkEnableOption
     ;
@@ -14,7 +12,9 @@ let
 in
 {
   options.custom.ui.gtk = {
-    enable = mkEnableOption "gtk config" // { default = true; };
+    enable = mkEnableOption "gtk config" // {
+      default = true;
+    };
   };
 
   config = mkIf (cfg.enable) {

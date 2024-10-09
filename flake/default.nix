@@ -1,49 +1,81 @@
-{ inputs, rootPath, forEachSystem }:
+{
+  inputs,
+  rootPath,
+  forEachSystem,
+}:
 
 let
   pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; });
 
-  ghcpkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; pkgsSet = inputs.ghc-nixpkgs-unstable; });
+  ghcpkgsFor = forEachSystem (
+    system:
+    import ./nixpkgs.nix {
+      inherit inputs rootPath system;
+      pkgsSet = inputs.ghc-nixpkgs-unstable;
+    }
+  );
 
-  pkgsInsecFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; config.permittedInsecurePackages = [
-            "openssl-1.1.1w"
-          ]; });
-
-  pkgsCudaFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system;
-    config = {
-      cudnnSupport = true;
-      cudaVersion = "12";
-      # https://discourse.nixos.org/t/laggy-mouse-when-use-nvidia-driver/38410
-      nvidia.acceptLicense = true;
-      cudaSupport = true;
-      # https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
-      allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-        "torch"
-	"cuda_nvtx"
-	"cuda_cudart"
-	"cuda_cupti"
-	"cuda_nvrtc"
-	"cudnn"
-	"libcublas"
-	"libcufft"
-	"libcurand"
-	"libcusolver"
-	"libnvjitlink"
-	"libcusparse"
-	"cuda_nvcc"
-	"cuda_cccl"
-        "triton"
+  pkgsInsecFor = forEachSystem (
+    system:
+    import ./nixpkgs.nix {
+      inherit inputs rootPath system;
+      config.permittedInsecurePackages = [
+        "openssl-1.1.1w"
       ];
-    };
-  });
+    }
+  );
 
-  pkgsNixOnDroidFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; nixOnDroid = true; });
+  pkgsCudaFor = forEachSystem (
+    system:
+    import ./nixpkgs.nix {
+      inherit inputs rootPath system;
+      config = {
+        cudnnSupport = true;
+        cudaVersion = "12";
+        # https://discourse.nixos.org/t/laggy-mouse-when-use-nvidia-driver/38410
+        nvidia.acceptLicense = true;
+        cudaSupport = true;
+        # https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
+        allowUnfreePredicate =
+          pkg:
+          builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+            "torch"
+            "cuda_nvtx"
+            "cuda_cudart"
+            "cuda_cupti"
+            "cuda_nvrtc"
+            "cudnn"
+            "libcublas"
+            "libcufft"
+            "libcurand"
+            "libcusolver"
+            "libnvjitlink"
+            "libcusparse"
+            "cuda_nvcc"
+            "cuda_cccl"
+            "triton"
+          ];
+      };
+    }
+  );
 
-  customLibFor = forEachSystem (system: import "${rootPath}/lib" {
-    pkgs = pkgsFor.${system};
-  });
+  pkgsNixOnDroidFor = forEachSystem (
+    system:
+    import ./nixpkgs.nix {
+      inherit inputs rootPath system;
+      nixOnDroid = true;
+    }
+  );
 
-  homeModulesFor = forEachSystem (system:
+  customLibFor = forEachSystem (
+    system:
+    import "${rootPath}/lib" {
+      pkgs = pkgsFor.${system};
+    }
+  );
+
+  homeModulesFor = forEachSystem (
+    system:
     [
       {
         _file = ./default.nix;
@@ -54,37 +86,52 @@ let
   );
 
   /**
+    # Example
 
-  # Example
+    ```nix
+    mkApp = wrapper ./builders/mkApp.nix
+    ```
 
-  ```nix
-  mkApp = wrapper ./builders/mkApp.nix
-  ```
+    A function (i. e. `mkApp` or `mkHome`) declared like that might be called like:
 
-  A function (i. e. `mkApp` or `mkHome`) declared like that might be called like:
+    ```nix
+    mkHome "x86_64-linux" "dani@maiziedemacchiato"
+    ```
 
-  ```nix
-  mkHome "x86_64-linux" "dani@maiziedemacchiato"  	
-  ```
+    # Arguments
 
-  # Arguments
-
-  - [builder] Path of a nix file
-  - [system] String describing the system to build attribute set for (i. e. `"aarch64-linux"`)
-  - [name] String to name the config for example i. e. `dani@maiziedemacchiato`, see `homeConfigurations` in flake.nix
-  - [args] Attribute set of further arguments
+    - [builder] Path of a nix file
+    - [system] String describing the system to build attribute set for (i. e. `"aarch64-linux"`)
+    - [name] String to name the config for example i. e. `dani@maiziedemacchiato`, see `homeConfigurations` in flake.nix
+    - [args] Attribute set of further arguments
   */
-  wrapper = builder: system: name: args:
-    inputs.nixpkgs.lib.nameValuePair
-      name
-      (import builder {
-        inherit inputs rootPath system ghcpkgsFor pkgsFor pkgsCudaFor pkgsInsecFor pkgsNixOnDroidFor customLibFor homeModulesFor name args;
-      });
+  wrapper =
+    builder: system: name: args:
+    inputs.nixpkgs.lib.nameValuePair name (
+      import builder {
+        inherit
+          inputs
+          rootPath
+          system
+          ghcpkgsFor
+          pkgsFor
+          pkgsCudaFor
+          pkgsInsecFor
+          pkgsNixOnDroidFor
+          customLibFor
+          homeModulesFor
+          name
+          args
+          ;
+      }
+    );
 
   /**
-  wraps `wrapper` simplified in a manner that `wrapper`'s parameter `args` is an empty attribute set (`{}`)
+    wraps `wrapper` simplified in a manner that `wrapper`'s parameter `args` is an empty attribute set (`{}`)
   */
-  simpleWrapper = builder: system: name: wrapper builder system name { };
+  simpleWrapper =
+    builder: system: name:
+    wrapper builder system name { };
 
 in
 
