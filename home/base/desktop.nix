@@ -1,7 +1,13 @@
 /**
-Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
+  Parameter `[inputs]` here is a deviation from the orinal author's intent (doing that via overlay) and should maybe be fixed
 */
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -9,11 +15,11 @@ let
     mkIf
     attrValues
     ;
-/**
-Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+  /**
+    Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
 
-If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
-*/
+    If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+  */
   inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.custom.base.desktop;
 
@@ -56,13 +62,14 @@ If I want to rid overlays I might have to find a way with less potentially bad i
   };
 
   /*
-    mpv = config.lib.custom.wrapProgram {
-    name = "mpv";
-    desktopFileName = "mpv";
-    source = pkgs.mpv;
-    path = "/bin/mpv";
-    fixGL = false;
-  };*/
+      mpv = config.lib.custom.wrapProgram {
+      name = "mpv";
+      desktopFileName = "mpv";
+      source = pkgs.mpv;
+      path = "/bin/mpv";
+      fixGL = false;
+    };
+  */
 
   #  simple-scan = pkgs.symlinkJoin {
   #    name = "${pkgs.lib.getName pkgs.simple-scan}-wrapper";
@@ -75,11 +82,11 @@ If I want to rid overlays I might have to find a way with less potentially bad i
   #    '';
   #  };
 
-  #xsecurelock = pkgs.xsecurelock.overrideAttrs (oldAttrs: rec {
-  #  # FIXME --with-pam-service-name=authproto_pam belongs added after removing --with-pam-service-name=??
-  #  configureFlags = (remove "--with-pam-service-name=login" (flatten oldAttrs.configureFlags ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ])); # ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ];
-  # });
 in
+#xsecurelock = pkgs.xsecurelock.overrideAttrs (oldAttrs: rec {
+#  # FIXME --with-pam-service-name=authproto_pam belongs added after removing --with-pam-service-name=??
+#  configureFlags = (remove "--with-pam-service-name=login" (flatten oldAttrs.configureFlags ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ])); # ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ];
+# });
 
 {
 
@@ -96,7 +103,6 @@ in
     };
 
   };
-
 
   ###### implementation
 
@@ -126,11 +132,13 @@ in
     # above not working, FIXME override differently see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
     # creates the .config/systemd/user/xss-lock.service file and 
     # running just systemctl status --user xss-lock.service succeeds
-    /*services.screen-locker = {
-      enable = true;
-      lockCmd = "${pkgs.i3lock}/bin/i3lock -n -c 000000";
-      inactiveInterval = 1;
-    };*/
+    /*
+      services.screen-locker = {
+        enable = true;
+        lockCmd = "${pkgs.i3lock}/bin/i3lock -n -c 000000";
+        inactiveInterval = 1;
+      };
+    */
 
     programs.firefox = {
       enable = true;
@@ -268,41 +276,40 @@ in
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 
-    home.packages = [
-      chrome
-      ausweisapp
-    ] ++ (attrValues {
+    home.packages =
+      [
+        chrome
+        ausweisapp
+      ]
+      ++ (attrValues {
 
-      inherit
-        (pkgs)
-        zen-browser
-        pavucontrol
-        pdftk
-        qpdfview
-        # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
-        obconf
-        # DONT home-manager on non-nixos can't manage system files i. e. /etc/pam.d/* see https://github.com/NixOS/nixpkgs/issues/157112
-        #xss-lock # reason for slock not being on this list: https://gist.github.com/573/5ce58db3b72913648968968dbfa59d86
-        # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
-        #xsecurelock # lxdm not shown
-        xscreensaver
-        droidcam# host-install v4l2loopback
-        vlc
-        mediathekview
-        xclip
-        age-plugin-yubikey# arch: https://github.com/str4d/age-plugin-yubikey
-        ;
-      inherit
-        (pkgs.xorg)
-        # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
-        #xorg.xset
-        xev
-        ;
-      inherit
-        (pkgs.lxde)
-        lxsession
-        ;
-    });
+        inherit (pkgs)
+          zen-browser
+          pavucontrol
+          pdftk
+          qpdfview
+          # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
+          obconf
+          # DONT home-manager on non-nixos can't manage system files i. e. /etc/pam.d/* see https://github.com/NixOS/nixpkgs/issues/157112
+          #xss-lock # reason for slock not being on this list: https://gist.github.com/573/5ce58db3b72913648968968dbfa59d86
+          # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
+          #xsecurelock # lxdm not shown
+          xscreensaver
+          droidcam # host-install v4l2loopback
+          vlc
+          mediathekview
+          xclip
+          age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
+          ;
+        inherit (pkgs.xorg)
+          # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
+          #xorg.xset
+          xev
+          ;
+        inherit (pkgs.lxde)
+          lxsession
+          ;
+      });
 
     # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb
     # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl

@@ -1,4 +1,5 @@
-{ config, lib, pkgs, rootPath, inputs, ... }: {
+{ pkgs, ... }:
+{
 
   custom = {
     base = {

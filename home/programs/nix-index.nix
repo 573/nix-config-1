@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }@configArgs:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}@configArgs:
 
 let
   inherit (lib)
@@ -19,7 +25,6 @@ in
     custom.programs.nix-index.enable = mkEnableOption "nix-index";
 
   };
-
 
   ###### implementation
 

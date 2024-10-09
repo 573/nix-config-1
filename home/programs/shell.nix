@@ -1,4 +1,10 @@
-{ config, lib, pkgs, /*unstable,*/ ... }:
+{
+  config,
+  lib,
+  pkgs,
+  unstable,
+  ...
+}:
 
 let
   inherit (lib)
@@ -40,7 +46,10 @@ let
       shellAliases = mkOption {
         default = { };
         type = types.attrsOf types.str;
-        example = { ll = "ls -l"; ".." = "cd .."; };
+        example = {
+          ll = "ls -l";
+          ".." = "cd ..";
+        };
         description = ''
           An attribute set that maps aliases (the top level attribute names in
           this option) to command strings or directly to build outputs.
@@ -91,88 +100,88 @@ let
     umask 022
   '';
 
-  shellAliases = {
-    #ls = "ls --color=auto";
-    la = "ls -AFv";
-    l1 = "ls -AFh1v";
-    ll = "ls -AFhlv";
-    llr = "ll /nix/var/nix/gcroots/auto --color=always | grep result";
+  shellAliases =
+    {
+      #ls = "ls --color=auto";
+      la = "ls -AFv";
+      l1 = "ls -AFh1v";
+      ll = "ls -AFhlv";
+      llr = "ll /nix/var/nix/gcroots/auto --color=always | grep result";
 
-    cp = "cp -iav";
-    mv = "mv -iv";
-    rm = "rm -iv";
-    ln = "ln -iv";
+      cp = "cp -iav";
+      mv = "mv -iv";
+      rm = "rm -iv";
+      ln = "ln -iv";
 
-    cat = "${pkgs.bat}/bin/bat --color=always --style=plain";
+      cat = "${unstable.bat}/bin/bat --color=always --paging=never --style=plain";
 
-    ytmp3 = ''${pkgs.yt-dlp}/bin/yt-dlp -x --continue --add-metadata --embed-thumbnail --audio-format mp3 --audio-quality 0 --metadata-from-title="%(artist)s - %(title)s" --prefer-ffmpeg -o "%(title)s.%(ext)s"'';
+      ytmp3 = ''${pkgs.yt-dlp}/bin/yt-dlp -x --continue --add-metadata --embed-thumbnail --audio-format mp3 --audio-quality 0 --metadata-from-title="%(artist)s - %(title)s" --prefer-ffmpeg -o "%(title)s.%(ext)s"'';
 
-    grep = "grep --color=auto";
-    fgrep = "fgrep --color=auto";
-    egrep = "egrep --color=auto";
+      grep = "grep --color=auto";
+      fgrep = "fgrep --color=auto";
+      egrep = "egrep --color=auto";
 
-    sort-vn = "sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n";
+      sort-vn = "sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n";
 
-    ".." = "cd ..";
-    "..." = "cd ../..";
-    "...." = "cd ../../..";
-    "....." = "cd ../../../..";
-    "......" = "cd ../../../../..";
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      "...." = "cd ../../..";
+      "....." = "cd ../../../..";
+      "......" = "cd ../../../../..";
 
-    fcd = "cd $(${pkgs.fd}/bin/fd --type d | ${pkgs.skim}/bin/sk)";
+      fcd = "cd $(${pkgs.fd}/bin/fd --type d | ${pkgs.skim}/bin/sk)";
 
-    e = "nvim";
+      e = "nvim";
 
-    bc = "bc -l";
+      bc = "bc -l";
 
-    df = "df --human-readable --local --print-type";
-    du = "du --human-readable --one-file-system --time --time-style=+'%Y-%m-%d' --total";
+      df = "df --human-readable --local --print-type";
+      du = "du --human-readable --one-file-system --time --time-style=+'%Y-%m-%d' --total";
 
-    rg = "rg --ignore-case --sort=path";
+      rg = "rg --ignore-case --sort=path";
 
-    ls = "${pkgs.eza}/bin/eza -alh --icons --git --group-directories-first";
+      ls = "${pkgs.eza}/bin/eza -alh --icons --git --group-directories-first";
 
-    open = "xdg-open";
+      open = "xdg-open";
 
-    pwgen = "pwgen -cns";
-    pgen = "pwgen 30 1";
+      pwgen = "pwgen -cns";
+      pgen = "pwgen 30 1";
 
-    tailf = "tail -f";
+      tailf = "tail -f";
 
-    tree = "tree -F --dirsfirst";
-    treea = "tree -a";
-    treei = "treea -I '.git|.idea'";
+      tree = "tree -F --dirsfirst";
+      treea = "tree -a";
+      treei = "treea -I '.git|.idea'";
 
-    ghlimits = "${pkgs.coreutils}/bin/date --date @`${pkgs.curl.bin}/bin/curl -s -i https://api.github.com/users/573 | ${pkgs.gnugrep}/bin/grep x-ratelimit-reset | ${pkgs.gawk}/bin/awk '{print $2}'`";
-    dateviaepoch = "date --date @$(echo $EPOCHSECONDS)";
-    nvimscaffold = "echo import os | nvim +\":set autochdir\" - +'file main.py' # https://neovim.io/doc/user/starting.html";
+      ghlimits = "${pkgs.coreutils}/bin/date --date @`${pkgs.curl.bin}/bin/curl -s -i https://api.github.com/users/573 | ${pkgs.gnugrep}/bin/grep x-ratelimit-reset | ${pkgs.gawk}/bin/awk '{print $2}'`";
+      dateviaepoch = "date --date @$(echo $EPOCHSECONDS)";
+      nvimscaffold = "echo import os | nvim +\":set autochdir\" - +'file main.py' # https://neovim.io/doc/user/starting.html";
 
-    nvi = "nvim -u NONE -i NONE";
+      nvi = "nvim -u NONE -i NONE";
 
-    nix-stray-roots = "nix-store --gc --print-roots | egrep -v '^(/nix/var|/run/\w+-system|\{memory|\{censored|/proc/maps/)'";
-  }
-  // cfg.shellAliases
-  // (optionalAttrs (dynamicShellInit != "") {
-    refresh-shell = "source ${pkgs.writeText "refresh-shell" dynamicShellInit}";
-  });
+      nix-stray-roots = "nix-store --gc --print-roots | egrep -v '^(/nix/var|/run/\w+-system|\{memory|\{censored|/proc/maps/)'";
+    }
+    // cfg.shellAliases
+    // (optionalAttrs (dynamicShellInit != "") {
+      refresh-shell = "source ${pkgs.writeText "refresh-shell" dynamicShellInit}";
+    });
 
   dynamicShellInit = concatStringsSep "\n" (
-    map
-      (options:
-        if (options.initExtra == "" && options.shellAliases == { })
-        then ""
-        else
-          ''
-            if ${options.condition}; then
-              ${concatStringsSep "\n" (
-                mapAttrsToList (k: v: "alias ${k}=${escapeShellArg v}") options.shellAliases
-              )}
+    map (
+      options:
+      if (options.initExtra == "" && options.shellAliases == { }) then
+        ""
+      else
+        ''
+          if ${options.condition}; then
+            ${
+              concatStringsSep "\n" (mapAttrsToList (k: v: "alias ${k}=${escapeShellArg v}") options.shellAliases)
+            }
 
-              ${options.initExtra}
-            fi
-          ''
-      )
-      cfg.dynamicShellInit
+            ${options.initExtra}
+          fi
+        ''
+    ) cfg.dynamicShellInit
   );
 in
 
@@ -221,7 +230,10 @@ in
       shellAliases = mkOption {
         default = { };
         type = types.attrsOf types.str;
-        example = { ll = "ls -l"; ".." = "cd .."; };
+        example = {
+          ll = "ls -l";
+          ".." = "cd ..";
+        };
         description = ''
           An attribute set that maps aliases (the top level attribute names in
           this option) to command strings or directly to build outputs.
@@ -256,7 +268,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -264,8 +275,14 @@ in
     programs = {
       bash = {
         inherit logoutExtra shellAliases;
-        profileExtra = mkMerge [ profileExtra cfg.envExtra ];
-        initExtra = mkMerge [ initExtra cfg.loginExtra ];
+        profileExtra = mkMerge [
+          profileExtra
+          cfg.envExtra
+        ];
+        initExtra = mkMerge [
+          initExtra
+          cfg.loginExtra
+        ];
       };
     };
 

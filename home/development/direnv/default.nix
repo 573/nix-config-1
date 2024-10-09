@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -21,24 +27,14 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
 
     home.packages = [
-      (config.lib.custom.mkScript
-        "lorri-init"
-        ./lorri-init.sh
-        [ ]
-        { _doNotClearPath = true; }
-      )
+      (config.lib.custom.mkScript "lorri-init" ./lorri-init.sh [ ] { _doNotClearPath = true; })
 
-      (config.lib.custom.mkZshCompletion
-        "lorri-init"
-        ./lorri-init-completion.zsh
-        { inherit devShells; }
-      )
+      (config.lib.custom.mkZshCompletion "lorri-init" ./lorri-init-completion.zsh { inherit devShells; })
     ];
 
     programs = {

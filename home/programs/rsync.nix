@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -19,7 +24,6 @@ in
     custom.programs.rsync.enable = mkEnableOption "rsync config";
 
   };
-
 
   ###### implementation
 

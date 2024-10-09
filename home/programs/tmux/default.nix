@@ -1,4 +1,10 @@
-{ config, lib, pkgs, rootPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  rootPath,
+  ...
+}:
 
 let
   inherit (lib)
@@ -172,7 +178,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -187,24 +192,15 @@ in
       };
 
       packages = [
-        (config.lib.custom.mkScript
-          "tprofile"
-          ./tprofile.sh
-          [ pkgs.tmux ]
-          {
-            inherit tmuxProfiles;
-            workDirectory = config.custom.misc.work.directory;
-          }
-        )
+        (config.lib.custom.mkScript "tprofile" ./tprofile.sh [ pkgs.tmux ] {
+          inherit tmuxProfiles;
+          workDirectory = config.custom.misc.work.directory;
+        })
 
-        (config.lib.custom.mkZshCompletion
-          "tprofile"
-          ./tprofile-completion.zsh
-          {
-            inherit tmuxProfiles;
-            workDirectory = config.custom.misc.work.directory;
-          }
-        )
+        (config.lib.custom.mkZshCompletion "tprofile" ./tprofile-completion.zsh {
+          inherit tmuxProfiles;
+          workDirectory = config.custom.misc.work.directory;
+        })
       ];
     };
 
@@ -222,17 +218,20 @@ in
       secureSocket = false;
       escapeTime = 100;
 
-      plugins = with pkgs.tmuxPlugins; (
-        [
-          {
-            plugin = fingers;
-            extraConfig = ''
-              set -g @fingers-compact-hints 0
-              set -g @fingers-ctrl-action '${pkgs.findutils}/bin/xargs ${pkgs.xdg-utils}/bin/xdg-open > /dev/null 2>&1'
-            '';
-          }
-        ] ++ optionals cfg.urlview [ urlview ]
-      );
+      plugins =
+        with pkgs.tmuxPlugins;
+        (
+          [
+            {
+              plugin = fingers;
+              extraConfig = ''
+                set -g @fingers-compact-hints 0
+                set -g @fingers-ctrl-action '${pkgs.findutils}/bin/xargs ${pkgs.xdg-utils}/bin/xdg-open > /dev/null 2>&1'
+              '';
+            }
+          ]
+          ++ optionals cfg.urlview [ urlview ]
+        );
     };
 
   };

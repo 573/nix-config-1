@@ -1,9 +1,22 @@
 { lib, pkgs }:
 
 {
-  wrapProgram = let inherit (lib) stringLength; in { name, desktopFileName ? name, source, path, packages ? [ ], editor ? "", flags ? [ ], fixGL ? false }:
-    if packages == [ ] && flags == [ ] && !fixGL && stringLength editor == 0
-    then source
+  wrapProgram =
+    let
+      inherit (lib) stringLength;
+    in
+    {
+      name,
+      desktopFileName ? name,
+      source,
+      path,
+      packages ? [ ],
+      editor ? "",
+      flags ? [ ],
+      fixGL ? false,
+    }:
+    if packages == [ ] && flags == [ ] && !fixGL && stringLength editor == 0 then
+      source
     else
       pkgs.symlinkJoin {
         name = "${name}-wrapped";
@@ -28,7 +41,9 @@
             lines = splitString "\n" content;
 
             filteredLines = filter (line: !(hasPrefix "#!/" line) && !(hasPrefix "exec " line)) lines;
-            wrapProgramArgsForFixGL = concatMapStringsSep " " (line: "--run ${escapeShellArg line}") filteredLines;
+            wrapProgramArgsForFixGL = concatMapStringsSep " " (
+              line: "--run ${escapeShellArg line}"
+            ) filteredLines;
           in
           ''
                                     # desktop entry
@@ -49,9 +64,11 @@
 
                                     wrapProgram "${out + path}" \
                                       ${lib.optionalString fixGL wrapProgramArgsForFixGL} \
-                                      ${lib.optionalString (packages != []) ''--prefix PATH : "${lib.makeBinPath packages}"''} \
+                                      ${
+                                        lib.optionalString (packages != [ ]) ''--prefix PATH : "${lib.makeBinPath packages}"''
+                                      } \
             			  ${lib.optionalString (stringLength editor != 0) ''--prefix EDITOR : "${editor}"''} \
-                                      ${lib.optionalString (flags != []) ''--add-flags "${toString flags}"''}
+                                      ${lib.optionalString (flags != [ ]) ''--add-flags "${toString flags}"''}
           '';
       };
 }

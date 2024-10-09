@@ -1,17 +1,15 @@
-{ system, pkgsFor, name, args, ... }:
+{ args, ... }:
 let
   pkgs = args.unstable;
 in
 pkgs.mkShell {
   packages = builtins.attrValues {
-    inherit
-      (pkgs)
+    inherit (pkgs)
       ocaml
       ocamlformat
       opam
       ;
-    inherit
-      (pkgs.ocamlPackages)
+    inherit (pkgs.ocamlPackages)
       findlib
       dune_3
       odoc
@@ -20,8 +18,7 @@ pkgs.mkShell {
       utop
       ocp-indent
       ;
-    inherit
-      (pkgs.ocamlPackages.janeStreet)
+    inherit (pkgs.ocamlPackages.janeStreet)
       #async
       base
       core_unix

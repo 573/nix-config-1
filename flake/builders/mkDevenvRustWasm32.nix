@@ -1,4 +1,10 @@
-{ system, pkgsFor, inputs, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  inputs,
+  args,
+  ...
+}:
 
 let
   pkgs = pkgsFor.${system};
@@ -9,24 +15,29 @@ mkShell {
   inherit pkgs inputs;
   modules = [
     # https://matrix.to/#/!plrRoZsBTUYBWzvzIq:matrix.org/$80LefOPCyVvyNl6Hj_VB7cSjonWGaM3TFZhETDTNQTU?via=matrix.org&via=beeper.com&via=lossy.network
-    ({ pkgs, config, ... }:
+    (
+      { pkgs, ... }:
 
       let
-        toolchain = let inherit (fenix) combine latest targets; in (combine (builtins.attrValues {
-          inherit
-            (latest)
-            rustc
-            cargo
-            rust-src
-            clippy
-            rustfmt
-            rust-analyzer
-            ;
-          inherit
-            (targets.wasm32-unknown-unknown.latest)
-            rust-std
-            ;
-        }));
+        toolchain =
+          let
+            inherit (fenix) combine latest targets;
+          in
+          (combine (
+            builtins.attrValues {
+              inherit (latest)
+                rustc
+                cargo
+                rust-src
+                clippy
+                rustfmt
+                rust-analyzer
+                ;
+              inherit (targets.wasm32-unknown-unknown.latest)
+                rust-std
+                ;
+            }
+          ));
       in
 
       {
@@ -49,8 +60,7 @@ mkShell {
         '';
 
         packages = builtins.attrValues {
-          inherit
-            (pkgs)
+          inherit (pkgs)
             wasm-pack
             entr
             ;
@@ -58,7 +68,7 @@ mkShell {
             toolchain
             ;
         };
-      })
+      }
+    )
   ];
 }
-

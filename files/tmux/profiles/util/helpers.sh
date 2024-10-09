@@ -1,4 +1,4 @@
 _cmds() {
-    local IFS=":"
-    echo "$*"
+  local IFS=":"
+  echo "$*"
 }

@@ -1,4 +1,10 @@
-{ system, pkgsFor, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  name,
+  args,
+  ...
+}:
 
 let
   pkgs = pkgsFor.${system};
@@ -7,6 +13,9 @@ in
 
 pkgs.mkShell {
   inherit name;
-  buildInputs = [ jdk pkgs.maven ];
+  buildInputs = [
+    jdk
+    pkgs.maven
+  ];
   JAVA_HOME = jdk;
 }

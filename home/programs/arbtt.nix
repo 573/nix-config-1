@@ -1,9 +1,15 @@
 /**
-Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
+  Original author's home'nix files are always prefixed with `{ config, lib, pkgs, ... }:` header
 
-For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
+  For `[haskellPackages]` parameter determine a solution (./../../nixos/programs/docker.nix also has the issue yet)
 */
-{ config, lib, pkgs, haskellPackages, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  haskellPackages,
+  ...
+}:
 
 let
   inherit (lib)
@@ -13,12 +19,11 @@ let
     mkForce
     ;
 
-/**
-Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
+  /**
+    Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
 
-If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
-*/
-  inherit (pkgs.stdenv.hostPlatform) system;
+    If I want to rid overlays I might have to find a way with less potentially bad implications, IDK are there any ?
+  */
   cfg = config.custom.programs.arbtt;
 in
 {
@@ -30,7 +35,6 @@ in
     custom.programs.arbtt.enable = mkEnableOption "arbtt config";
 
   };
-
 
   ###### implementation
 
@@ -49,11 +53,13 @@ in
             # https://github.com/nix-community/home-manager/tree/release-24.05/modules/services
             Environment =
               let
-                path = builtins.concatStringsSep ":"
-                  (map (p: "${lib.getBin p}/bin")
-                    (attrValues { inherit (haskellPackages) arbtt; inherit (pkgs) coreutils; } # with pkgs; []
-                    )
-                  );
+                path = builtins.concatStringsSep ":" (
+                  map (p: "${lib.getBin p}/bin") (attrValues {
+                    inherit (haskellPackages) arbtt;
+                    inherit (pkgs) coreutils;
+                  } # with pkgs; []
+                  )
+                );
               in
               "PATH=${path}";
             ExecStart =
@@ -61,12 +67,12 @@ in
                 script
                   # TODO more config: https://github.com/NixOS/nixpkgs/blob/release-21.05/nixos/modules/services/monitoring/arbtt.nix
                   = pkgs.writeShellScript "arbtt-capture-start" ''
-                  set -e
-                  DATADIR="''${XDG_DATA_HOME:-$HOME/.local/share/arbtt}"
-                  LOG="''${DATADIR}/''$(date +%Y).capture"
-                  mkdir -p "''${DATADIR}"
-                  arbtt-capture --logfile="''${LOG}"
-                '';
+                    set -e
+                    DATADIR="''${XDG_DATA_HOME:-$HOME/.local/share/arbtt}"
+                    LOG="''${DATADIR}/''$(date +%Y).capture"
+                    mkdir -p "''${DATADIR}"
+                    arbtt-capture --logfile="''${LOG}"
+                  '';
               in
               "${script}";
             Restart = "always";

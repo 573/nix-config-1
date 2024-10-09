@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -27,7 +32,9 @@ in
       links = mkOption {
         type = types.attrs;
         default = { };
-        example = { "link-name" = pkgs.python3; };
+        example = {
+          "link-name" = pkgs.python3;
+        };
         description = ''
           Links to generate in `~/.sdks` directory.
         '';
@@ -36,14 +43,13 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
 
-    home.file = mapAttrs'
-      (name: package: nameValuePair "${sdksDirectory}/${name}" { source = package; })
-      cfg.links;
+    home.file = mapAttrs' (
+      name: package: nameValuePair "${sdksDirectory}/${name}" { source = package; }
+    ) cfg.links;
 
   };
 

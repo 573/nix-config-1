@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -31,13 +37,15 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-gnome ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-gnome
+      ];
       xdgOpenUsePortal = true;
     };
 
@@ -84,7 +92,14 @@ in
           "sound-output-device-chooser@kgshank.net"
           "space-bar@luchrioh"
         ];
-        favorite-apps = [ "firefox.desktop" "code.desktop" "org.gnome.Terminal.desktop" "spotify.desktop" "virt-manager.desktop" "org.gnome.Nautilus.desktop" ];
+        favorite-apps = [
+          "firefox.desktop"
+          "code.desktop"
+          "org.gnome.Terminal.desktop"
+          "spotify.desktop"
+          "virt-manager.desktop"
+          "org.gnome.Nautilus.desktop"
+        ];
       };
       "org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
@@ -118,15 +133,14 @@ in
     };
 
     home.packages = builtins.attrValues {
-      inherit
-        (pkgs.gnomeExtensions)
+      inherit (pkgs.gnomeExtensions)
         user-themes
         tray-icons-reloaded
         vitals
         dash-to-panel
         sound-output-device-chooser
         space-bar
-	;
+        ;
     };
     home.sessionVariables.GTK_THEME = "palenight";
 

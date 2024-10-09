@@ -6,7 +6,7 @@ let
     modules = [
       # = configuration
       (
-        { lib, pkgs, ... }:
+        { lib, ... }:
         {
           systemd.network.enable = true;
           systemd.services.sshd.wantedBy = lib.mkForce [ "multi-user.target" ];
@@ -17,7 +17,7 @@ let
   };
 in
 # https://github.com/NixOS/nixpkgs/blob/5061fe0c2c7743370e1d379d6fa60eed26ff1470/pkgs/misc/uboot/default.nix#L230
-  # https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix#L44
+# https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix#L44
 nixpkgs.writeScript "run-nixos-vm" ''
             #!${nixpkgs.runtimeShell}
 

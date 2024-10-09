@@ -1,4 +1,11 @@
-{ system, pkgsFor, inputs, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  inputs,
+  name,
+  args,
+  ...
+}:
 # TODO integrate sample files as in https://discourse.nixos.org/t/running-playwright-tests/25655/35 or in https://discourse.nixos.org/t/running-playwright-tests/25655/33
 let
   inherit (args) mkShell;
@@ -13,12 +20,9 @@ mkShell {
 
       playright-file = builtins.readFile "${playwright-driver}/package/browsers.json";
       playright-json = builtins.fromJSON playright-file;
-      playwright-chromium-entry = builtins.elemAt
-        (builtins.filter
-          (
-            browser: browser.name == "chromium"
-          )
-          playright-json.browsers) 0;
+      playwright-chromium-entry = builtins.elemAt (builtins.filter (
+        browser: browser.name == "chromium"
+      ) playright-json.browsers) 0;
       playwright-chromium-revision = playwright-chromium-entry.revision;
     in
     [

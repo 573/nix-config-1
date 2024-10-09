@@ -1,11 +1,11 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
-  inherit
-    (lib)
+  inherit (lib)
     mkIf
     mkEnableOption
     optionalAttrs

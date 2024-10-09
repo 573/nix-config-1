@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -48,7 +48,10 @@ in
               };
 
               protocol = mkOption {
-                type = types.enum [ "tcp" "udp" ];
+                type = types.enum [
+                  "tcp"
+                  "udp"
+                ];
                 default = "tcp";
                 description = ''
                   Protocol.
@@ -66,7 +69,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -81,10 +83,14 @@ in
       allowPing = true;
 
       extraCommands =
-        concatMapStringsSep "\n" (address: "iptables -A INPUT -p tcp -s ${address} --destination-port 22 -j DROP") cfg.dropPackets
+        concatMapStringsSep "\n" (
+          address: "iptables -A INPUT -p tcp -s ${address} --destination-port 22 -j DROP"
+        ) cfg.dropPackets
         + "\n"
-        + concatMapStringsSep "\n" (option: "iptables -I INPUT -p ${option.protocol} -s ${option.ip} --dport ${toString option.port} -j ACCEPT") cfg.openPortsForIps
-      ;
+        + concatMapStringsSep "\n" (
+          option:
+          "iptables -I INPUT -p ${option.protocol} -s ${option.ip} --dport ${toString option.port} -j ACCEPT"
+        ) cfg.openPortsForIps;
     };
 
     services.fail2ban = {

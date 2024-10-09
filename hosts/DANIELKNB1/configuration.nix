@@ -1,4 +1,4 @@
-{ config, lib, pkgs, rootPath, unstable, ... }:
+{ config, lib, ... }:
 
 {
   # FIXME currently disabled due to Windows-Update 21.11.23
@@ -35,7 +35,10 @@
   };
   users.users.nixos = {
     uid = lib.mkForce config.custom.ids.uids.nixos;
-    extraGroups = [ "nixos" "users" ];
+    extraGroups = [
+      "nixos"
+      "users"
+    ];
     #isSystemUser = lib.mkForce true;
   };
 }

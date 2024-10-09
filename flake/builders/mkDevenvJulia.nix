@@ -1,4 +1,10 @@
-{ system, pkgsFor, inputs, name, args, ... }:
+{
+  system,
+  pkgsFor,
+  inputs,
+  args,
+  ...
+}:
 
 let
   pkgs = pkgsFor.${system};
@@ -7,8 +13,11 @@ in
 args.mkShell {
   inherit inputs pkgs;
   modules = [
-    ({ pkgs, ... }: {
-      languages.julia.enable = true;
-    })
+    (
+      { ... }:
+      {
+        languages.julia.enable = true;
+      }
+    )
   ];
 }

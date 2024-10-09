@@ -15,6 +15,11 @@ in
 {
   inherit commonConfig;
   inherit (fileList) listNixFilesRecursive;
-  inherit (script) mkScript mkScriptPlain mkScriptPlainNixShell mkZshCompletion;
+  inherit (script)
+    mkScript
+    mkScriptPlain
+    mkScriptPlainNixShell
+    mkZshCompletion
+    ;
   inherit (wrapProgram) wrapProgram;
 }

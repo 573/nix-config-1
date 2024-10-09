@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -13,52 +13,54 @@ let
 
   cfg = config.custom.utils;
 
-  opts = { name, config, ... }: {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = ''
-          Name of user.
-        '';
+  opts =
+    { name, config, ... }:
+    {
+      options = {
+        name = mkOption {
+          type = types.str;
+          description = ''
+            Name of user.
+          '';
+        };
+
+        createHome = mkOption {
+          type = types.bool;
+          default = false;
+          description = ''
+            Whether to create home directory.
+          '';
+        };
+
+        home = mkOption {
+          type = types.str;
+          default = "/var/lib/${name}";
+          description = ''
+            Path of home directory.
+          '';
+        };
+
+        packages = mkOption {
+          type = types.listOf types.package;
+          default = [ ];
+          description = ''
+            List of packages.
+          '';
+        };
+
+        sshKeys = mkOption {
+          type = types.listOf types.path;
+          default = [ ];
+          description = ''
+            List of authorized keys.
+          '';
+        };
       };
 
-      createHome = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to create home directory.
-        '';
-      };
-
-      home = mkOption {
-        type = types.str;
-        default = "/var/lib/${name}";
-        description = ''
-          Path of home directory.
-        '';
-      };
-
-      packages = mkOption {
-        type = types.listOf types.package;
-        default = [ ];
-        description = ''
-          List of packages.
-        '';
-      };
-
-      sshKeys = mkOption {
-        type = types.listOf types.path;
-        default = [ ];
-        description = ''
-          List of authorized keys.
-        '';
+      config = {
+        name = mkDefault name;
       };
     };
-
-    config = {
-      name = mkDefault name;
-    };
-  };
 
 in
 
@@ -78,12 +80,12 @@ in
 
   };
 
-
   ###### implementation
 
   config = {
 
-    users = mkMerge (flip map (attrValues cfg.systemUsers) (user:
+    users = mkMerge (
+      flip map (attrValues cfg.systemUsers) (user:
 
       {
         groups.${user.name} = {
@@ -103,7 +105,8 @@ in
         };
       }
 
-    ));
+      )
+    );
 
   };
 

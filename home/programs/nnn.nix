@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -26,7 +31,6 @@ in
     custom.programs.nnn.enable = mkEnableOption "nnn config";
 
   };
-
 
   ###### implementation
 

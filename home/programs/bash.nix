@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -20,7 +20,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -31,8 +30,16 @@ in
       enable = true;
       historySize = 10000000;
       historyFileSize = 20000000;
-      historyControl = [ "erasedups" "ignorespace" "ignoredups" ];
-      historyIgnore = [ "ls" "cd" "exit" ];
+      historyControl = [
+        "erasedups"
+        "ignorespace"
+        "ignoredups"
+      ];
+      historyIgnore = [
+        "ls"
+        "cd"
+        "exit"
+      ];
 
       # mkBefore is needed because hashing needs to be enabled early in the config
       initExtra = mkBefore ''

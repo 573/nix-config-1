@@ -1,4 +1,13 @@
-{ inputs, rootPath, system, pkgsNixOnDroidFor, customLibFor, homeModulesFor, name, ... }:
+{
+  inputs,
+  rootPath,
+  system,
+  pkgsNixOnDroidFor,
+  customLibFor,
+  homeModulesFor,
+  name,
+  ...
+}:
 
 let
   inherit (pkgsNixOnDroidFor.${system}) lib;
@@ -30,13 +39,17 @@ inputs.nix-on-droid.lib.nixOnDroidConfiguration {
     inherit inputs rootPath;
     unstable = inputs.unstable.legacyPackages.${system};
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
-    emacs = if isLinux && isAarch64
-      then inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
-      else inputs.emacs-overlay.packages.${system}.emacs-unstable;
+    emacs =
+      if isLinux && isAarch64 then
+        inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
+      else
+        inputs.emacs-overlay.packages.${system}.emacs-unstable;
 
-    emacsWithPackagesFromUsePackage = if isLinux && isAarch64 
-      then inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
-      else inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
+    emacsWithPackagesFromUsePackage =
+      if isLinux && isAarch64 then
+        inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
+      else
+        inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
     homeModules = homeModulesFor.${system};
   };
 }

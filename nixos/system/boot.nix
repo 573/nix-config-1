@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -20,10 +20,16 @@ in
 
     custom.system.boot = {
 
-      enable = mkEnableOption "Boot mode and device config" // { default = true; };
+      enable = mkEnableOption "Boot mode and device config" // {
+        default = true;
+      };
 
       mode = mkOption {
-        type = types.enum [ "efi" "grub" "raspberry" ];
+        type = types.enum [
+          "efi"
+          "grub"
+          "raspberry"
+        ];
         description = ''
           Sets mode for boot options.
         '';
@@ -40,7 +46,6 @@ in
 
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable (mkMerge [
@@ -53,48 +58,41 @@ in
       ];
     }
 
-    (mkIf (cfg.mode == "efi")
-      {
-        boot.loader = {
-          efi.canTouchEfiVariables = true;
+    (mkIf (cfg.mode == "efi") {
+      boot.loader = {
+        efi.canTouchEfiVariables = true;
 
-          systemd-boot = {
-            enable = true;
-            editor = false;
-          };
-        };
-      }
-    )
-
-    (mkIf (cfg.mode == "grub")
-      {
-        boot.loader.grub = {
-          inherit (cfg) device;
-
+        systemd-boot = {
           enable = true;
+          editor = false;
         };
-      }
-    )
+      };
+    })
 
-    (mkIf (cfg.mode == "raspberry")
-      {
-        boot = {
-          loader = {
-            generic-extlinux-compatible.enable = true;
+    (mkIf (cfg.mode == "grub") {
+      boot.loader.grub = {
+        inherit (cfg) device;
 
-            grub.enable = false;
-          };
+        enable = true;
+      };
+    })
 
-          kernel.sysctl = {
-            "vm.dirty_background_ratio" = 5;
-            "vm.dirty_ratio" = 80;
-          };
+    (mkIf (cfg.mode == "raspberry") {
+      boot = {
+        loader = {
+          generic-extlinux-compatible.enable = true;
 
-          kernelParams = [ "cma=32M" ];
+          grub.enable = false;
         };
-      }
-    )
 
-  ]
-  );
+        kernel.sysctl = {
+          "vm.dirty_background_ratio" = 5;
+          "vm.dirty_ratio" = 80;
+        };
+
+        kernelParams = [ "cma=32M" ];
+      };
+    })
+
+  ]);
 }

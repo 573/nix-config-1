@@ -2,7 +2,12 @@
 
 let
   configuration =
-    { config, pkgs, modulesPath, ... }:
+    {
+      config,
+      pkgs,
+      modulesPath,
+      ...
+    }:
 
     {
       imports = [

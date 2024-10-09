@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib)
@@ -18,7 +18,6 @@ in
     custom.programs.nixbuild.enable = mkEnableOption "nixbuild";
 
   };
-
 
   ###### implementation
 
@@ -46,7 +45,10 @@ in
           hostName = "eu.nixbuild.net";
           system = "aarch64-linux";
           maxJobs = 100;
-          supportedFeatures = [ "benchmark" "big-parallel" ];
+          supportedFeatures = [
+            "benchmark"
+            "big-parallel"
+          ];
         }
       ];
     };
