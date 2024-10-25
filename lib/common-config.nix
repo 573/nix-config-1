@@ -120,7 +120,8 @@ in
         type = "path";
         path = inputs.nixpkgs-unfree;
       };
+      unstable.flake = inputs.unstable;
     };
-    nixPath = [ "nixpkgs=flake:nixpkgs" ];
+    nixPath = [ "nixpkgs=flake:nixpkgs" "unstable=flake:unstable" "nixpkgs-unfree=flake:nixpkgs-unfree" ];
   };
 }

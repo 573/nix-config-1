@@ -59,25 +59,42 @@ in
       custom.programs = {
         #emacs-novelist.enable = true;
         emacs-no-el.enable = true;
-        emacs-nano.enable = true;
+        #emacs-nano.enable = true;
         bash.enable = true;
-        shell = {
-          initExtra = mkAfter ''
-                        eval "$(${pkgs.zoxide}/bin/zoxide init bash)"
-                        eval "$(${unstable.bat-extras.batpipe}/bin/batpipe)"
-            	  '';
-        };
+        #shell = {
+        #  initExtra = mkAfter ''
+        #                eval "$(${unstable.bat-extras.batpipe}/bin/batpipe)"
+        #    	  '';
+        #};
         htop.enable = true;
         nix-index.enable = true;
 	helix.enable = true;
-	yazi.enable = true;
-        xplr.enable = true;
+	#yazi.enable = true;
+        #xplr.enable = true;
         neovim = {
           enable = true;
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };
       };
+
+	programs = {
+	zoxide = {
+	  enable = true;
+	  package = unstable.zoxide;
+	  enableBashIntegration = true;
+	};
+	bat = {
+	  enable = true;
+	  package = unstable.bat;
+	  extraPackages = with unstable.bat-extras; [ batpipe batman ];
+	};
+	eza = {
+	  enable = true;
+	  enableBashIntegration = true;
+	  package = unstable.eza;
+	};
+	};
 
       home = {
         language = {
@@ -112,13 +129,13 @@ in
             bc
             file
             # httpie   # build for aarch64-linux times out, https://github.com/573/nix-config-1/actions/runs/3744580521/jobs/6358117765#step:5:7429
-            iotop
+            #iotop
             jq
             mmv-go
             nmap
             ncdu
-            nload # network traffic monitor
-            pwgen
+            #nload # network traffic monitor
+            #pwgen
             #ripgrep # build broken on aarch64-linux, https://github.com/573/nix-config-1/actions/runs/6309380420/job/17129186691, also build unmaintained currently
             silver-searcher
             tree
@@ -144,27 +161,23 @@ in
             gist
             fd
             sd
-            pv
+            #pv
 
             # TODO https://www.arthurkoziel.com/restic-backups-b2-nixos
-            backblaze-b2
+            #backblaze-b2
             attr
 
             nix-inspect
             #            zellij
             viddy
-            zoxide
+            #zoxide # rather home module
             ;
 
-          inherit (unstable)
-            bat
-            eza
+          #inherit (unstable)
+           # eza
             #            yazi
-            ;
+            #;
 
-          inherit (unstable.bat-extras)
-            batman
-            ;
 
           #	  batman = (unstable.bat-extras.batman.overrideAttrs (oldAttrs: {
           #    propagatedBuildInputs = [

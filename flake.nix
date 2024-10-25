@@ -26,6 +26,14 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
+deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        nixpkgs.follows = "unstable";
+      };
+    };
+
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
     agenix-rekey = {
@@ -133,6 +141,11 @@
     "virtual-types.nvim" = {
       flake = false;
       url = "https://github.com/jubnzv/virtual-types.nvim/archive/9ef9f31c58cc9deb914ee728b8bda8f217f9d1c7.tar.gz";
+    };
+
+    tree-setter-nvim = {
+      flake = false;
+      url = "github:filNaj/tree-setter";
     };
 
     /*
@@ -502,6 +515,7 @@
         mkHome
         mkNixOnDroid
         mkNixos
+        mkDeploy
         mkDevenvJvmLang
         mkDevenvDeno
         mkDevenvFlutter
@@ -550,6 +564,21 @@
       });
     in
     {
+       /* deploy.nodes.sams9 = { 
+        hostname = "localhost";
+        profiles.system = {
+          user = "nix-on-droid";
+	  sshUser = "nix-on-droid";
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.custom inputs.latest.legacyPackages.aarch64-linux.hello "./bin/hello";
+        };
+      }; */
+
+      # nix shell nixpkgs#deploy-rs --command deploy -s .#sams9 -- --impure
+      deploy.nodes = listToAttrs [
+        (mkDeploy "aarch64-linux" "sams9__aarch64-linux")
+        (mkDeploy "aarch64-linux" "sams9__x86_64-linux")
+      ];
+
       homeConfigurations = listToAttrs [
         /**
              	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
@@ -740,6 +769,9 @@
         // {
           nilApp = null;
         }
+	#// {
+        #  deploy-rs = inputs.deploy-rs.apps.${system}.default;
+	#}
       );
 
       checks = forEachSystem (system: {
@@ -856,6 +888,8 @@
 
       nixosModules.nixos-shell-vm = import ./files/nix/nixos-shell-vm.nix rootPath;
 
+      #deploy = import ./flake/deploy.nix { nixpkgs = inputs.unstable; inherit (inputs) self; };
+
       packages =
         let
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
@@ -894,6 +928,7 @@
             ]
           );
     };
+
 
   nixConfig = {
     # FIXME requires --accept-flake-config but might be better for nix develop

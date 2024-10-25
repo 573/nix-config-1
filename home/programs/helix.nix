@@ -4,6 +4,7 @@
 , inputs
 , unstable
 , makeNixvim
+, rootDir
 , ...
 }:
 
@@ -84,6 +85,12 @@ in
           {
             name = "nix";
             formatter.command = "nixfmt";
+	    language-servers = [
+	      language-server.nixd = with pkgs.nixd; [
+	        command = "${nixd}/bin/nixd";
+		args = ["--inlay-hints" "--semantic-tokens"];
+		config.nixd.options.home-manager.expr = '(builtins.getFlake "${rootDir}").homeConfigurations.nix-on-droid.options';
+	    ];
           }
           {
             name = "css";

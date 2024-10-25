@@ -6,6 +6,11 @@
 
 let
   pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; });
+ 
+  # for deploy (build x86 target aarch): super.stdenv.targetPlatform.system
+  # i. e. deploy from a x86_64-linux machine running the tool deploy a package hello on an aarch64-linux machine, then deployPkgs has to be x86_64-linux 
+  # will be run with --impure anyway so maybe do getenv ?
+  #deployPkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system = ; }); 
 
   ghcpkgsFor = forEachSystem (
     system:
@@ -139,6 +144,7 @@ in
   mkHome = simpleWrapper ./builders/mkHome.nix;
   mkNixOnDroid = simpleWrapper ./builders/mkNixOnDroid.nix;
   mkNixos = simpleWrapper ./builders/mkNixos.nix;
+  mkDeploy = simpleWrapper ./builders/mkDeploy.nix;
 
   mkApp = wrapper ./builders/mkApp.nix;
   mkDevShellJdk = wrapper ./builders/mkDevShellJdk.nix;

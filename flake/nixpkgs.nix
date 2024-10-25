@@ -120,6 +120,7 @@ import pkgsSet {
       #inputs.rust-overlay
       inputs.nixpkgs-ruby
       inputs.neovim-nightly-overlay
+      inputs.deploy-rs
     ])
     ++ [
       (_final: prev: {
@@ -130,6 +131,7 @@ import pkgsSet {
           })
         ];
       })
+      (self: super: { deploy-rs = { inherit (pkgsSet.legacyPackages.${super.stdenv.hostPlatform.system}) deploy-rs; lib = super.deploy-rs.lib; }; })
     ]
     ++ inputs.nixpkgs.lib.optionals nixOnDroid [
       inputs.nix-on-droid.overlays.default

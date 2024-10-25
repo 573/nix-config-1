@@ -10,9 +10,17 @@
 let
   sshdTmpDirectory = "${config.user.home}/sshd-tmp";
   sshdDirectory = "${config.user.home}/sshd";
+
+  # see https://unix.stackexchange.com/a/4953
+  sourceDotProfile = ''command=". ~/.profile; if [ -n \"$SSH_ORIGINAL_COMMAND\" ]; then eval \"$SSH_ORIGINAL_COMMAND\"; else exec \"$SHELL\"; fi"'';
+  
   # UseDNS no\nUsePrivilegeSeparation no\nUsePAM no\nForceCommand eval ". /etc/profiles/per-user/nix-on-droid/etc/profile.d/nix-on-droid-session-init.sh" ; if [ -n "$SSH_ORIGINAL_COMMAND" ]; then $(eval "$SSH_ORIGINAL_COMMAND"); else exec "$SHELL"; fi
   sshdConfig = ''
-    UsePAM=no\nForceCommand eval ". ${config.home-manager.config.home.profileDirectory}/etc/profile.d/nix-on-droid-session-init.sh" ; nice -n20 nix-store --serve --write\nHostKey ${sshdDirectory}/ssh_host_ed25519_key\nPort 8022\n
+    UsePAM=no\nHostKey ${sshdDirectory}/ssh_host_ed25519_key\nPort 8022\nPermitUserEnvironment yes\n
+  '';
+
+  sshEnvironment = ''
+  PATH=/data/data/com.termux.nix/files/usr/etc/profiles/per-user/nix-on-droid/bin:"$PATH"
   '';
 
   commonConfig = config.lib.custom.commonConfig configArgs;
@@ -28,6 +36,7 @@ in
     $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${config.user.home}/.ssh"
     $DRY_RUN_CMD cat "${rootPath}/files/keys/id_ed25519.daniel.pub" > "${config.user.home}/.ssh/authorized_keys"
     $DRY_RUN_CMD cat "${rootPath}/files/keys/id_ed25519.danielwdws.pub" >> "${config.user.home}/.ssh/authorized_keys"
+    # TODO needs manual deletes from time to time or grep before append
     $DRY_RUN_CMD echo "eu.nixbuild.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM" >> "${config.user.home}/.ssh/known_hosts"
 
     if [[ ! -d "${sshdDirectory}" ]]; then
@@ -41,7 +50,16 @@ in
 
       $DRY_RUN_CMD mv $VERBOSE_ARG "${sshdTmpDirectory}" "${sshdDirectory}"
     fi
+    # for ssh localhost
+    $DRY_RUN_CMD cat "${sshdDirectory}/ssh_host_ed25519_key.pub" >> "${config.user.home}/.ssh/authorized_keys"
+    if [[ ! -f "${config.user.home}/.ssh/environment" ]]; then
+      $DRY_RUN_CMD echo "${sshEnvironment}" > "${config.user.home}/.ssh/environment"
+    fi
   '';
+
+  # for deployment, see https://github.com/nix-community/nix-on-droid/issues/94#issuecomment-2380612109
+  user.uid = 10289;
+  user.gid = 10289;
 
   environment = {
     etcBackupExtension = ".nod-bak";
@@ -63,8 +81,7 @@ in
           # TODO Maybe do sshd-start here as gerschtli does
           gzip
           which
-          micro
-          kalker
+          #kalker
           ;
       }
       ++ (
@@ -119,11 +136,12 @@ in
       # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-experimental-features nix --version 2.15.2
       # see https://github.com/nix-community/nix-on-droid/blob/ae0569f/modules/environment/nix.nix#L107 and https://github.com/nix-community/nix-on-droid/issues/166
       extraOptions = ''
-        	  keep-derivations = true
-        	  keep-outputs = true
-        	  experimental-features = ${concatStringsSep " " experimental-features}
+          # https://ianthehenry.com/posts/how-to-learn-nix/saving-your-shell/
+          # keep-derivations = true
+          # keep-outputs = true
+          experimental-features = ${concatStringsSep " " experimental-features}
           flake-registry =
-        	  log-lines = ${toString log-lines}
+          log-lines = ${toString log-lines}
           '';
     };
 

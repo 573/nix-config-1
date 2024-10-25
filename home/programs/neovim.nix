@@ -222,7 +222,7 @@ let
               "<Leader>ff" = {
                 action = "files";
                 settings = {
-                  cwd = "~/.nix-config";
+                  cwd = "~";
                   winopts = {
                     height = 0.1;
                     width = 0.5;
@@ -606,17 +606,24 @@ in
         extraPlugins =
           builtins.attrValues {
             inherit (pkgs.vimPlugins)
-              nnn-vim
               neoterm
               ;
           }
           ++ [
             (pluggo "faster-nvim")
+	    (pluggo "tree-setter-nvim")
           ];
         extraConfigLua = ''
           	  -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
           -- only for cmp-dictionary not for cmp-look	  
           vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
+
+require('nvim-treesitter.configs').setup {
+    tree_setter = {
+        enable = true
+    },
+}
+
                     	vim.g.clipboard = {
                           name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
                             ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
@@ -633,10 +640,22 @@ in
             enable = true;
             profile = "telescope";
             keymaps = {
+	      "<Leader>n" = {
+                action = "files";
+                settings = {
+                  #cwd = "~";
+                  winopts = {
+                    height = 0.1;
+                    width = 0.5;
+                  };
+                };
+                options.silent = true;
+              };
+	      # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
               "<Leader>ff" = {
                 action = "files";
                 settings = {
-                  cwd = "~/.nix-config";
+                  cwd = "~";
                   winopts = {
                     height = 0.1;
                     width = 0.5;
@@ -677,8 +696,22 @@ in
               };
             };
           };
-
+	  mini = {
+enable = true;
+        modules.icons = { };
+        mockDevIcons = true;
+      };
+	  comment.enable = true;
           which-key.enable = true;
+          cmp-buffer = {
+            enable = true;
+          };
+          #cmp-nvim-lsp = {
+          #  enable = true;
+          #};
+          cmp-path = {
+            enable = true;
+          };
           cmp-look = {
             enable = true;
           };
@@ -686,6 +719,9 @@ in
             enable = true;
             settings = {
               sources = [
+                { name = "buffer"; }
+                #{ name = "nvim_lsp"; }
+                { name = "path"; }
                 {
                   name = "look";
                   keyword_length = 2;

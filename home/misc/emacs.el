@@ -16,7 +16,7 @@
 ;; https://github.com/minad/corfu?tab=readme-ov-file#configuration (example configuration)
 (use-package corfu
   ;; Optional customizations
-  ;; :custom
+  :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
    (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-separator ?\s)          ;; Orderless field separator

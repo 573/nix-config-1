@@ -114,7 +114,7 @@ jobs:
         uses: nix-community/cache-nix-action@v5
         with:
           # save a new cache every time ci file changes
-          primary-key: cache-${{ matrix.os }}-${{ hashFiles('.github/workflows/ci.yaml') }}
+          primary-key: cache-${{ matrix.os }}-${{ hashFiles('.github/workflows/ci_experimental.yaml') }}
           restore-prefixes-first-match: cache-${{ matrix.os }}-
           # do purge caches
           purge: true

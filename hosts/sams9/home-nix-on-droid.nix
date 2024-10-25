@@ -25,13 +25,23 @@ in
 
     };
 
-    development.nix.nix-on-droid.enable = true;
+    development = {
+      direnv.enable = true;
+      nix.nix-on-droid.enable = true;
+    };
 
     programs = {
-      yazi.enable = lib.mkForce false;
-      tex.enable = true;
-      hledger.enable = true;
+      #yazi.enable = lib.mkForce false;
+      #tex.enable = true;
+      #hledger.enable = true;
+
+
+
       shell = {
+      envExtra = lib.mkBefore ''
+        . "/etc/profiles/per-user/nix-on-droid/etc/profile.d/nix-on-droid-session-init.sh"
+      '';
+
         logoutExtra = ''
           count="$(ps -e | grep proot-static | wc -l)"
           if [[ -z "$SSH_TTY" && "$SHLVL" == 1 && "$count" == 1 ]]; then
@@ -82,25 +92,25 @@ in
         ;
     };
 
-    activation =
-      let
-        inherit config;
-      in
-      {
-        copyFont =
-          let
-            font_src = "${pkgs.carlito}/share/fonts/truetype/.";
-            font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
-          in
-          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            	       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
-            	if [ $? -ne 0 ]
-            	then
-            	  mkdir -p "${font_dst}"
-            	  cp -R "${font_src}" "${font_dst}"
-            	fi
-                  '';
-      };
+#    activation =
+#      let
+#        inherit config;
+#      in
+#      {
+#        copyFont =
+#          let
+#            font_src = "${pkgs.carlito}/share/fonts/truetype/.";
+#            font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
+#          in
+#          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+#            	       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
+#            	if [ $? -ne 0 ]
+#            	then
+#            	  mkdir -p "${font_dst}"
+#            	  cp -R "${font_src}" "${font_dst}"
+#            	fi
+#                  '';
+#      };
   };
 
   # FIXME: without overrides produces warnings
@@ -111,6 +121,13 @@ in
     numeric = lib.mkForce null;
     time = lib.mkForce null;
   };
+
+  #home.file.".ssh/environment".text = ''
+  #  # https://serverfault.com/a/593487
+  #  BASH_ENV=~/.profile
+  # rather to activation
+  #PATH=/data/data/com.termux.nix/files/usr/etc/profiles/per-user/nix-on-droid/bin:"$PATH"
+  #'';
 
   xdg.enable = true;
 }

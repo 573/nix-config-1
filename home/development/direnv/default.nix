@@ -31,15 +31,17 @@ in
 
   config = mkIf cfg.enable {
 
-    home.packages = [
-      (config.lib.custom.mkScript "lorri-init" ./lorri-init.sh [ ] { _doNotClearPath = true; })
+#    home.packages = [
+#      (config.lib.custom.mkScript "lorri-init" ./lorri-init.sh [ ] { _doNotClearPath = true; })
 
-      (config.lib.custom.mkZshCompletion "lorri-init" ./lorri-init-completion.zsh { inherit devShells; })
-    ];
+#      (config.lib.custom.mkZshCompletion "lorri-init" ./lorri-init-completion.zsh { inherit devShells; })
+#    ];
 
     programs = {
       direnv = {
         enable = true;
+
+        enableBashIntegration = true;
 
         nix-direnv.enable = true;
 
@@ -57,7 +59,7 @@ in
       };
     };
 
-    services.lorri.enable = true;
+#    services.lorri.enable = true;
 
   };
 
