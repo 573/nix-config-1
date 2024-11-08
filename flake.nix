@@ -26,7 +26,7 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
-deploy-rs = {
+    deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs = {
         flake-compat.follows = "flake-compat";
@@ -435,11 +435,10 @@ deploy-rs = {
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nix-formatter-pack,
-      ...
+    { self
+    , nixpkgs
+    , nix-formatter-pack
+    , ...
     }@inputs:
     let
       rootPath = self;
@@ -484,7 +483,7 @@ deploy-rs = {
           {
             inherit
               inputs
-              rootPath # specialArgs
+              rootPath# specialArgs
               forEachSystem
               ;
             #inherit (nixpkgs.pkgs.stdenv.hostPlatform) system;
@@ -564,24 +563,28 @@ deploy-rs = {
       });
     in
     {
-       /* deploy.nodes.sams9 = { 
+      /* deploy.nodes.sams9 = { 
         hostname = "localhost";
         profiles.system = {
           user = "nix-on-droid";
-	  sshUser = "nix-on-droid";
+            	  sshUser = "nix-on-droid";
           path = inputs.deploy-rs.lib.x86_64-linux.activate.custom inputs.latest.legacyPackages.aarch64-linux.hello "./bin/hello";
         };
       }; */
 
       # nix shell nixpkgs#deploy-rs --command deploy -s .#sams9 -- --impure
-      deploy.nodes = listToAttrs [
-        (mkDeploy "aarch64-linux" "sams9__aarch64-linux")
-        (mkDeploy "aarch64-linux" "sams9__x86_64-linux")
-      ];
+      deploy = {
+        autoRollback = false;
+        magicRollback = true;
+        nodes = listToAttrs [
+          (mkDeploy "aarch64-linux" "sams9__aarch64-linux")
+          (mkDeploy "aarch64-linux" "sams9__x86_64-linux")
+        ];
+      };
 
       homeConfigurations = listToAttrs [
         /**
-             	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
+               	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
         */
         (mkHome "aarch64-linux" "u0_a210@localhost")
         (mkHome "x86_64-linux" "dani@maiziedemacchiato")
@@ -653,78 +656,33 @@ deploy-rs = {
             }
           )
 
-          (mkApp system "nvim" rec {
-            file = builtins.toFile "file" ''
-              source @bashLib@
-              nvim
-            '';
-            path =
-              pkgs:
-              with pkgs;
-              (map (x: "${x.custom.programs.neovim.lightweight.outPath}") (
-                (
-                  let
-                    inherit (pkgs.stdenv) isLinux isx86_64;
-                  in
-                  lib.optionals (isLinux && isx86_64) [
-                    self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
-                    self.homeConfigurations."dani@maiziedemacchiato".config
-                  ]
-                )
-                ++ (
-                  let
-                    inherit (pkgs.stdenv) isLinux isAarch64;
-                  in
-                  lib.optionals (isLinux && isAarch64) [
-                    self.nixOnDroidConfigurations.sams9.config.home-manager.config
-                  ]
-                )
-              ));
-          })
-
-          ({
-            name = "nixvim";
-            value =
-              let
-                pkgs = inputs.nixpkgs.legacyPackages.${system};
-              in
-              {
-                program = builtins.toString (
-                  pkgs.writeShellScript "testnixvim" ''
-                      ${self.inputs.nixvim.packages."${system}".default}/bin/nvim
-                  ''
-                );
-                type = "app";
-              };
-          })
-
-          (mkApp system "emacs" rec {
+          (mkApp system "emacs" {
             file = builtins.toFile "file" ''
               source @bashLib@
               emacs
             '';
             path =
               pkgs:
-              with pkgs;
-              (map (x: "${x.custom.programs.emacs.finalPackage.outPath}") (
-                (
-                  let
-                    inherit (pkgs.stdenv) isLinux isx86_64;
-                  in
-                  lib.optionals (isLinux && isx86_64) [
-                    self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
-                    self.homeConfigurations."dani@maiziedemacchiato".config
-                  ]
-                )
-                ++ (
-                  let
-                    inherit (pkgs.stdenv) isLinux isAarch64;
-                  in
-                  lib.optionals (isLinux && isAarch64) [
-                    self.nixOnDroidConfigurations.sams9.config.home-manager.config
-                  ]
-                )
-              ));
+                with pkgs;
+                (map (x: "${x.custom.programs.emacs-no-el.finalPackage.outPath}") (
+                  (
+                    let
+                      inherit (pkgs.stdenv) isLinux isx86_64;
+                    in
+                    lib.optionals (isLinux && isx86_64) [
+                      self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
+                      self.homeConfigurations."dani@maiziedemacchiato".config
+                    ]
+                  )
+                  ++ (
+                    let
+                      inherit (pkgs.stdenv) isLinux isAarch64;
+                    in
+                    lib.optionals (isLinux && isAarch64) [
+                      self.nixOnDroidConfigurations.sams9.config.home-manager.config
+                    ]
+                  )
+                ));
           })
 
           (mkApp system "nixos-shell" {
@@ -769,9 +727,9 @@ deploy-rs = {
         // {
           nilApp = null;
         }
-	#// {
+        #// {
         #  deploy-rs = inputs.deploy-rs.apps.${system}.default;
-	#}
+        #}
       );
 
       checks = forEachSystem (system: {
@@ -786,18 +744,18 @@ deploy-rs = {
               buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
             } ''
-                                                                                                                                                             	    mkdir -p "$out"
+                                                                                                                                                                       	    mkdir -p "$out"
 
                         # prevent E886 ('/home-shelter' error)
-                                                                                                                                                             	    export HOME=$TMPDIR
-                                                                                                                                                             	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
-                                                                                                                                                             	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
-                                                                                                                                                             	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
+                                                                                                                                                                       	    export HOME=$TMPDIR
+                                                                                                                                                                       	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
+                                                                                                                                                                       	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
+                                                                                                                                                                       	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
 
                         if [ -n "$(cat "$out/nvim.log")" ]; then
-                                                                                                                                                                                                                       	      echo "output: "$(cat "$out/nvim.log")""
-                                                                                                                                                                                                                       	      exit 1
-                                                                                                                                                             	    fi
+                                                                                                                                                                                                                                     	      echo "output: "$(cat "$out/nvim.log")""
+                                                                                                                                                                                                                                     	      exit 1
+                                                                                                                                                                       	    fi
           '';
         */
       });
@@ -876,7 +834,7 @@ deploy-rs = {
             cljShell = inputs.clojure-dev-template.devShells.${system}.default;
             ocamlShell = inputs.ocaml-dev-template.devShells.${system}.default;
             nixdShell = inputs.nixd.devShells.${system}.default;
-               	jupyShell = inputs.ml_env.devShells.${system}.default;
+                 	jupyShell = inputs.ml_env.devShells.${system}.default;
           }
         */
       );

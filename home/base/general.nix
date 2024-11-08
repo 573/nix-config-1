@@ -76,6 +76,9 @@ in
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };
+	shell.shellAliases = {
+	  nixbuild-shell = "nix run nixpkgs#rlwrap ssh eu.nixbuild.net shell";
+	};
       };
 
 	programs = {

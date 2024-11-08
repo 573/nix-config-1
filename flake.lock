@@ -4491,6 +4491,7 @@
         "sane-defaults": "sane-defaults",
         "sensible-defaults": "sensible-defaults",
         "talon": "talon",
+        "tree-setter-nvim": "tree-setter-nvim",
         "treefmt-nix": "treefmt-nix_5",
         "unstable": "unstable",
         "virtual-types.nvim": "virtual-types.nvim",
@@ -5181,6 +5182,22 @@
       "original": {
         "owner": "nix-community",
         "repo": "talon-nix",
+        "type": "github"
+      }
+    },
+    "tree-setter-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1728839000,
+        "narHash": "sha256-kNAaKHT35UXMosvKLqdF7hzZXvlfUQm9cIHUsymINVA=",
+        "owner": "filNaj",
+        "repo": "tree-setter",
+        "rev": "ab9064720f0b0a001f6dca7b6eff30335618ad83",
+        "type": "github"
+      },
+      "original": {
+        "owner": "filNaj",
+        "repo": "tree-setter",
         "type": "github"
       }
     },

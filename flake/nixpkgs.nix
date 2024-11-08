@@ -10,6 +10,7 @@
     allowUnfreePredicate =
       pkg:
       builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+        "nvidia-x11"
         "google-chrome"
       ];
   },
@@ -106,7 +107,6 @@ import pkgsSet {
         }
         // genAttrs [
           "nix-inspect"
-          "nixvim-config"
           "bundix"
           "talon"
           "devenv"

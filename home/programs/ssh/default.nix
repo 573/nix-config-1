@@ -119,6 +119,7 @@ in
         keys = [ ];
       };
 
+      # all info is here https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Multiplexing
       ssh = {
         inherit (cfg) controlMaster;
 
@@ -127,7 +128,7 @@ in
         compression = true;
         serverAliveInterval = 30;
         hashKnownHosts = true;
-        controlPath = "~/.ssh/socket-%r@%h-%p";
+        controlPath = "~/.ssh/socket-%C";
         controlPersist = "10m";
 
         includes = [ "~/.ssh/config.d/*" ];

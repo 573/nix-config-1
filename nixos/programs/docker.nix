@@ -3,10 +3,10 @@
 
   Same as written in ./../../flake/builders/mkNixos.nix should apply here (regarding `specialArgs` injection) as the anonymous module is a module next to `"${rootPath}/hosts/${name}/configuration.nix"` there
 */
-{
-  config,
-  lib, # unstable,
-  ...
+{ config
+, lib
+, unstable
+,  ...
 }:
 
 let
@@ -40,12 +40,13 @@ in
     # https://github.com/nix-community/NixOS-WSL/issues/433
     # https://github.com/nix-community/NixOS-WSL/pull/478
     virtualisation = {
+      # see https://github.com/nix-community/NixOS-WSL/issues/578 and https://github.com/nix-community/NixOS-WSL/discussions/487
       docker = {
         enable = true;
-        #package = pkgs.docker_24; #unstable.docker_25;
+        package = unstable.docker_25;
         #       enableNvidia = true;
 
-        storageDriver = "overlay2";
+        ###storageDriver = "overlay2";
         # https://github.com/NVIDIA/nvidia-docker/issues/942
         #virtualisation.docker.enableNvidia = true;
         # TODO Encapsulate in work.enable the case where rootless is not used
@@ -53,15 +54,19 @@ in
           enable = true;
           # for the "whole" discussion of it (rootless or not) i. e. https://discourse.nixos.org/t/docker-rootless-with-nvidia-support/37069
           setSocketVariable = true; # false for driver exact support
-          /*
-            daemon.settings = {
-                                                    				runtimes = {
-                                                               					nvidia = {
-                                             			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
-                                           			};
-                                                    				};
-            };
-          */
+          daemon.settings = {
+            /*                                                    				runtimes = {
+                                                                    					nvidia = {
+                                                			path = "${pkgs.nvidia-docker}/bin/nvidia-container-runtime";
+                                              			};
+            }; */
+            features.cdi = true;
+            cdi-spec-dirs = [ "/home/${config.wsl.wslConf.user.default}/.cdi" ];
+          };
+        };
+        daemon.settings = {
+          features.cdi = true;
+	  cdi-spec-dirs = ["/etc/cdi"];
         };
       };
     };
