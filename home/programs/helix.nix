@@ -1,10 +1,7 @@
 { config
 , lib
 , pkgs
-, inputs
 , unstable
-, makeNixvim
-, rootDir
 , ...
 }:
 
@@ -74,6 +71,8 @@ in
       bash-language-server
       ;
     };
+
+    package = unstable.helix;
 
     ignores = [
   ".build/"

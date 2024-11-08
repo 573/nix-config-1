@@ -46,6 +46,7 @@ in
         type = types.enum [
           "DANIELKNB1"
           "twopi"
+	  "raspinix"
         ];
         description = "Host name.";
       };

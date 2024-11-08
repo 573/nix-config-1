@@ -31,7 +31,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
     inherit inputs rootPath;
     libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
 
-    inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
+    inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim makeNixvimWithModule;
     haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
     ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
     unstable = inputs.unstable.legacyPackages.${system};
@@ -51,6 +51,12 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
       else
         inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
+
+    homeDir =
+      if isLinux && isAarch64 then
+        "/data/data/com.termux.nix/files/home"
+      else
+        "/home/${username}";
   };
 
   modules = [

@@ -445,6 +445,7 @@
       forEachSystem = nixpkgs.lib.genAttrs [
         "aarch64-linux"
         "x86_64-linux"
+	"armv7l-linux"
       ];
 
       # Eval the treefmt modules from ./treefmt.nix
@@ -597,6 +598,7 @@
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
         (mkNixos "aarch64-linux" "twopi")
+        (mkNixos "armv7l-linux" "rasnixpi")
       ];
 
       # Expose the necessary information in your flake so agenix-rekey
@@ -741,6 +743,8 @@
         /*
           neovim-check-config = pkgs.runCommand "neovim-check-config"
             {
+	      # TODO either config.custom.programs.neovim.minimalPackage or
+	      #  nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.minimalPackage
               buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
             } ''

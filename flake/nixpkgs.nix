@@ -78,7 +78,7 @@ import pkgsSet {
                 latest;
             };
           */
-
+          inherit (inputs.unstable.legacyPackages.${system}) nixos-facter;
           /*
             vimUtils =
             prev.vimUtils
@@ -106,7 +106,6 @@ import pkgsSet {
             ;
         }
         // genAttrs [
-          "nix-inspect"
           "bundix"
           "talon"
           "devenv"
@@ -119,7 +118,7 @@ import pkgsSet {
       inputs.nixGL
       #inputs.rust-overlay
       inputs.nixpkgs-ruby
-      inputs.neovim-nightly-overlay
+#      inputs.neovim-nightly-overlay
       inputs.deploy-rs
     ])
     ++ [
