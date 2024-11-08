@@ -1,7 +1,7 @@
 {
   inputs,
   rootPath,
-  forEachSystem,
+  forEachSystem
 }:
 
 let

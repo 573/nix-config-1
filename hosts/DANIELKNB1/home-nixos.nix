@@ -5,7 +5,8 @@
 */
 {
   lib,
-  pkgs, # latest, unstable,
+  pkgs, # latest,
+  unstable,
   ...
 }:
 let
@@ -121,12 +122,10 @@ in
       hurl
       ;
 
-    /*
       inherit
       (unstable)
-      oxker
+      zellij
       ;
-    */
 
     inherit (pkgs.python310Packages)
       pudb

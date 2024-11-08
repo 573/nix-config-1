@@ -3,7 +3,8 @@
 , pkgs
 , inputs
 , unstable
-, makeNixvim
+, makeNixvimWithModule
+, homeDir
 , ...
 }:
 
@@ -33,538 +34,575 @@ let
       version = "0.1";
     };
 
-  configuration = {
-    enableMan = false;
-    colorschemes.catppuccin.enable = true;
-    extraPlugins =
-      builtins.attrValues
+  # keymaps
+  
+  keymaps = [
+    {
+      # Quick exit insert mode using `jj`
+      mode = "i";
+      key = "jj";
+      action = "<Esc>";
+      options.silent = true;
+    }
+
+    # Show which-key
+    {
+      mode = [ "n" "v" ];
+      key = "<C-Space>";
+      action = "<cmd>WhichKey<CR>";
+      options.desc = "Which Key";
+    }
+
+    # Buffers
+    {
+      mode = "n";
+      key = "<leader>bn";
+      action = "<cmd>bn<CR>";
+      options.desc = "Go to next buffer";
+    }
+    {
+      mode = "n";
+      key = "<leader>bp";
+      action = "<cmd>bp<CR>";
+      options.desc = "Go to previous buffer";
+    }
+    {
+      mode = "n";
+      key = "<leader>bd";
+      action = "<cmd>Bdelete<CR>";
+      options.desc = "Delete the current buffer";
+    }
+
+    # Errors/diagnostics
+    {
+      mode = "n";
+      key = "ge";
+      action.__raw = "vim.diagnostic.goto_next";
+      options.desc = "Goto next diagnostic";
+    }
+    {
+      mode = "n";
+      key = "gE";
+      action.__raw = "vim.diagnostic.goto_prev";
+      options.desc = "Goto previous diagnostic";
+    }
+
+    {
+      mode = "n";
+      key = "<leader>ff";
+      action.__raw = "telescope_project_files()";
+      options.desc = "Find files";
+    }
+
+    {
+      mode = "n";
+      key = "z=";
+      action.__raw = ''
+        function()
+          require('telescope.builtin').spell_suggest(
+            require('telescope.themes').get_cursor({ })
+          )
+        end
+      '';
+      options.desc = "Spelling suggestions";
+    }
+  ];
+
+  # plugins
+  trouble.enable = true;
+
+  gitsigns = {
+    enable = true;
+    settings.current_line_blame = false;
+  };
+
+  # https://github.com/MattSturgeon/nix-config/blob/main/nvim/config/completion.nix
+  cmp = {
+    enable = true;
+        # Setting this means we don't need to explicitly enable
+    # each completion source, so long as the plugin is listed
+    # in https://github.com/nix-community/nixvim/blob/cd32dcd50fa98cd03e2916b6fd47e31deffbca24/plugins/completion/cmp/cmp-helpers.nix#L23
+    autoEnableSources = true;
+    settings = {
+      sources = [
+        { name = "nvim_lsp";
+	  groupIndex = 2; }
+        { name = "buffer";
+	  groupIndex = 2; }
+        { name = "path";
+	  option.trailing_slash = true;
+	  groupIndex = 2; }
+        { name = "luasnip";
+	  groupIndex = 3; }
         {
-          inherit (pkgs.vimPlugins)
-            nnn-vim
-            neoterm
-            #grapple-nvim
-            #nvim-web-devicons
-            #vim-abolish
-            ;
+          name = "look";
+	  groupIndex = 1;
+          keyword_length = 2;
+          option.__raw = ''
+            		  {
+                                convert_case = true,
+                                loud = true,
+            		    dict = '${pkgs.scowl}/share/dict/words.txt'
+            		  }
+          '';
         }
-      ++ [
-        (pluggo "faster-nvim")
-        #(pluggo "action-hints.nvim")
       ];
-    #(pkgs.vimPlugins.nvim-treesitter.withPlugins (parsers: with parsers;[ nix markdown markdown_inline ]))
-    extraConfigLua = ''
-      	  -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
-      -- only for cmp-dictionary not for cmp-look	  
-      vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
-                	vim.g.clipboard = {
-                      name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-                        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-                      },
-                      paste = {                                                    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),                                                                 ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                               },                                                       }
+      /*
+                        		{
+                                    		  name = "dictionary";
+                                    		  # FIXME exactly as here https://github.com/uga-rosa/cmp-dictionary/blob/edbd263/doc/cmp-dictionary.txt#L29 and could even use aspell https://github.com/uga-rosa/cmp-dictionary/blob/edbd263/doc/cmp-dictionary.txt#L190
+                                    		  paths.__raw = "{ \"${pkgs.scowl}/share/dict/words.txt\" }";
+                                    		  exact_length.__raw = "2";
+                        		}
+                        		{
+                                    		  name = "look";
+                                    		  keyword_length = 2;
+                                    		  option.__raw = ''
+                                    		  {
+                convert_case = true,
+                loud = true,
+                                      		    dict = '${pkgs.scowl}/share/dict/words.txt'
+                                    		  }
+              '';
+                        		}
+      */
 
-                --require("grapple").setup({
-                --    opts = {
-                --        scope = "git", -- also try out "git_branch"
-                --    },
-                --    event = { "BufReadPost", "BufNewFile" },
-                --    cmd = "Grapple",
-                --    keys = {
-                --        { "<leader>m", "<cmd>Grapple toggle<cr>", desc = "Grapple toggle tag" },
-                --        { "<leader>M", "<cmd>Grapple toggle_tags<cr>", desc = "Grapple open tags window" },
-                --        { "<leader>n", "<cmd>Grapple cycle_tags next<cr>", desc = "Grapple cycle next tag" },
-                --        { "<leader>p", "<cmd>Grapple cycle_tags prev<cr>", desc = "Grapple cycle previous tag" },
-                --    },
-                --})
-                	'';
-    extraPackages = builtins.attrValues {
-      inherit (pkgs)
-        nixfmt-rfc-style
-        ;
+      formatting = {
+        fields = [
+          "abbr"
+          "kind"
+          "menu"
+        ];
+        format =
+          # lua
+          ''
+            function(_, item)
+              local icons = {
+                Namespace = "󰌗",
+                Text = "󰉿",
+                Method = "󰆧",
+                Function = "󰆧",
+                Constructor = "",
+                Field = "󰜢",
+                Variable = "󰀫",
+                Class = "󰠱",
+                Interface = "",
+                Module = "",
+                Property = "󰜢",
+                Unit = "󰑭",
+                Value = "󰎠",
+                Enum = "",
+                Keyword = "󰌋",
+                Snippet = "",
+                Color = "󰏘",
+                File = "󰈚",
+                Reference = "󰈇",
+                Folder = "󰉋",
+                EnumMember = "",
+                Constant = "󰏿",
+                Struct = "󰙅",
+                Event = "",
+                Operator = "󰆕",
+                TypeParameter = "󰊄",
+                Table = "",
+                Object = "󰅩",
+                Tag = "",
+                Array = "[]",
+                Boolean = "",
+                Number = "",
+                Null = "󰟢",
+                String = "󰉿",
+                Calendar = "",
+                Watch = "󰥔",
+                Package = "",
+                Copilot = "",
+                Codeium = "",
+                TabNine = "",
+              }
+              local icon = icons[item.kind] or ""
+              item.kind = string.format("%s %s", icon, item.kind or "")
+              return item
+            end
+          '';
+      };
+      # FIXME Generates error, compare https://github.com/MattSturgeon/nix-config/blob/main/nvim/config/completion.nix and https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
+      #snippet.expand = ''
+  #function(args)
+  #  require('luasnip').lsp_expand(args.body)
+  #end
+#'';
+      mapping = {
+        "<C-n>" = "cmp.mapping.select_next_item()";
+        "<C-p>" = "cmp.mapping.select_prev_item()";
+        "<C-j>" = "cmp.mapping.select_next_item()";
+        "<C-k>" = "cmp.mapping.select_prev_item()";
+        "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+        "<C-f>" = "cmp.mapping.scroll_docs(4)";
+        "<C-Space>" = "cmp.mapping.complete()";
+        "<C-e>" = "cmp.mapping.close()";
+        "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })";
+        # as in: https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
+        "<Tab>" = ''
+                        	    cmp.mapping(function(fallback)
+          			  if cmp.visible() then
+          			    cmp.select_next_item()
+          			  elseif require("luasnip").expand_or_jumpable() then
+          			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
+          			  else
+          			    fallback()
+          			  end
+          			end, {'i', 's'})
+                        		  '';
+        "<S-Tab>" = ''
+                        	    cmp.mapping(function(fallback)
+          			  if cmp.visible() then
+          			    cmp.select_prev_item()
+          			  elseif require("luasnip").jumpable(-1) then
+          			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
+          			  else
+          			    fallback()
+          			  end
+          			end, {'i', 's'})
+                        		  '';
+      };
     };
-    keymaps = [
-      {
-        mode = "n";
-        key = "gd";
-        action = "<cmd>Lspsaga finder def<CR>";
-        options = {
-          desc = "Goto Definition";
-          silent = true;
-        };
-      }
-      {
-        mode = "n";
-        key = "gr";
-        action = "<cmd>Lspsaga finder ref<CR>";
-        options = {
-          desc = "Goto References";
-          silent = true;
-        };
-      }
 
-      # {
-      #   mode = "n";
-      #   key = "gD";
-      #   action = "<cmd>Lspsaga show_line_diagnostics<CR>";
-      #   options = {
-      #     desc = "Goto Declaration";
-      #     silent = true;
-      #   };
-      # }
-
-      {
-        mode = "n";
-        key = "gI";
-        action = "<cmd>Lspsaga finder imp<CR>";
-        options = {
-          desc = "Goto Implementation";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "gT";
-        action = "<cmd>Lspsaga peek_type_definition<CR>";
-        options = {
-          desc = "Type Definition";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "K";
-        action = "<cmd>Lspsaga hover_doc ++keep<CR>";
-        options = {
-          desc = "Hover doc";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "<leader>cw";
-        action = "<cmd>Lspsaga outline<CR>";
-        options = {
-          desc = "Outline";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "<leader>cr";
-        action = "<cmd>Lspsaga rename<CR>";
-        options = {
-          desc = "Rename";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "<leader>ca";
-        action = "<cmd>Lspsaga code_action<CR>";
-        options = {
-          desc = "Code Action";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "<leader>cd";
-        action = "<cmd>Lspsaga show_line_diagnostics<CR>";
-        options = {
-          desc = "Line Diagnostics";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "[d";
-        action = "<cmd>Lspsaga diagnostic_jump_next<CR>";
-        options = {
-          desc = "Next Diagnostic";
-          silent = true;
-        };
-      }
-
-      {
-        mode = "n";
-        key = "]d";
-        action = "<cmd>Lspsaga diagnostic_jump_prev<CR>";
-        options = {
-          desc = "Previous Diagnostic";
-          silent = true;
-        };
-      }
-    ];
-    plugins = {
-      treesitter = {
-        enable = true;
-        nixGrammars = true;
-        #indent = true;
-        settings.ensure_installed = [
-          "nix"
-          "bash"
-          "yaml"
-          "json"
-          "markdown"
-          "markdown_inline"
+      filetype = {
+      gitcommit = {
+        sources = [
+          { name = "conventionalcommits"; }
+          { name = "git"; }
+          { name = "emoji"; }
+          { name = "path"; }
         ];
       };
-      fzf-lua = {
-        enable = true;
-        profile = "telescope";
-        keymaps = {
-          "<Leader>ff" = {
-            action = "files";
-            settings = {
-              cwd = "~";
-              winopts = {
-                height = 0.1;
-                width = 0.5;
-              };
-            };
-            options.silent = true;
-          };
-          "<Leader>fg" = "live_grep";
-          "<C-x><C-f>" = {
-            mode = "i";
-            action = "complete_file";
-            settings = {
-              cmd = "rg --files";
-              winopts.preview.hidden = "nohidden";
-            };
-            options = {
-              silent = true;
-              desc = "Fuzzy complete file";
-            };
-          };
-        };
-        settings = {
-          grep = {
-            prompt = "Grep  ";
-          };
-          winopts = {
-            height = 0.4;
-            width = 0.93;
-            row = 0.99;
-            col = 0.3;
-          };
-          files = {
-            find_opts.__raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
-            prompt = "Files❯ ";
-            multiprocess = true;
-            file_icons = true;
-            color_icons = true;
-          };
-        };
-      };
-      mini = {
-        enable = true;
-        modules.icons = { };
-        mockDevIcons = true;
-      };
-      lspsaga = {
-        enable = true;
-        beacon = {
-          enable = true;
-        };
-        ui = {
-          border = "rounded"; # One of none, single, double, rounded, solid, shadow
-          codeAction = "💡"; # Can be any symbol you want 💡
-        };
-        hover = {
-          openCmd = "!floorp"; # Choose your browser
-          openLink = "gx";
-        };
-        diagnostic = {
-          borderFollow = true;
-          diagnosticOnlyCurrent = false;
-          showCodeAction = true;
-        };
-        symbolInWinbar = {
-          enable = true; # Breadcrumbs
-        };
-        codeAction = {
-          extendGitSigns = false;
-          showServerName = true;
-          onlyInCursor = true;
-          numShortcut = true;
-          keys = {
-            exec = "<CR>";
-            quit = [
-              "<Esc>"
-              "q"
-            ];
-          };
-        };
-        lightbulb = {
-          enable = false;
-          sign = false;
-          virtualText = true;
-        };
-        implement = {
-          enable = false;
-        };
-        rename = {
-          autoSave = false;
-          keys = {
-            exec = "<CR>";
-            quit = [
-              "<C-k>"
-              "<Esc>"
-            ];
-            select = "x";
-          };
-        };
-        outline = {
-          autoClose = true;
-          autoPreview = true;
-          closeAfterJump = true;
-          layout = "normal"; # normal or float
-          winPosition = "right"; # left or right
-          keys = {
-            jump = "e";
-            quit = "q";
-            toggleOrJump = "o";
-          };
-        };
-        scrollPreview = {
-          scrollDown = "<C-f>";
-          scrollUp = "<C-b>";
-        };
-      };
+    };
 
-      which-key.enable = true;
-      lsp = {
-        enable = true;
-        servers = {
-          nixd = {
-            enable = true;
-            settings = {
-              formatting.command = [ "nixpkgs-fmt" ];
-              nixpkgs.expr = ''
-                import <nixpkgs> { }
-              '';
-
-              options = {
-                nixos.expr = ''
-                  (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").nixosConfigurations.DANIELKNB1.options
-                '';
-                home_manager.expr = ''
-                  (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").homeConfigurations."dani@maiziedemacchiato".options
-                '';
-                nixondroid.expr = ''
-                  (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").nixOnDroidConfigurations.sams9.options
-                '';
-
-              };
-            };
-          };
-          # NOTE rather in a sep. drv:
-          ltex.enable = true;
-          texlab.enable = true;
-          lua_ls.enable = true;
+    cmdline =
+      let
+        common = {
+          mapping.__raw = /* lua */ ''
+            cmp.mapping.preset.cmdline({
+              ["<C-Space>"] = cmp.mapping.complete(), -- Open list without typing
+            })
+          '';
+          sources = [{ name = "buffer"; }];
         };
-        keymaps.lspBuf = {
-          "gd" = "definition";
-          "gD" = "references";
-          "gt" = "type_definition";
-          "gi" = "implementation";
-          "K" = "hover";
-        };
-      };
-      cmp-buffer = {
-        enable = true;
-      };
-      #cmp-emoji = {
-      #  enable = true;
-      #};
-      cmp-nvim-lsp = {
-        enable = true;
-      };
-      cmp-path = {
-        enable = true;
-      };
-      cmp_luasnip = {
-        enable = true;
-      };
-      cmp-look = {
-        enable = true;
-      };
-      # FIXME still getting pattern not found
-      #cmp-dictionary = { enable = true; };
-      cmp = {
-        enable = true;
-        settings = {
+      in
+      {
+        "/" = common;
+        "?" = common;
+        ":" = {
+          inherit (common) mapping;
           sources = [
-            { name = "nvim_lsp"; }
-            { name = "path"; }
             {
-              name = "look";
-              keyword_length = 2;
-              option.__raw = ''
-                		  {
-                                    convert_case = true,
-                                    loud = true,
-                		    dict = '${pkgs.scowl}/share/dict/words.txt'
-                		  }
-              '';
+              name = "path";
+              option.trailing_slash = true;
             }
+            { name = "cmdline"; }
           ];
-          /*
-                        		{
-                                		  name = "dictionary";
-                                		  # FIXME exactly as here https://github.com/uga-rosa/cmp-dictionary/blob/edbd263/doc/cmp-dictionary.txt#L29 and could even use aspell https://github.com/uga-rosa/cmp-dictionary/blob/edbd263/doc/cmp-dictionary.txt#L190
-                                		  paths.__raw = "{ \"${pkgs.scowl}/share/dict/words.txt\" }";
-                                		  exact_length.__raw = "2";
-                        		}
-                        		{
-                                		  name = "look";
-                                		  keyword_length = 2;
-                                		  option.__raw = ''
-                                		  {
-                    convert_case = true,
-                    loud = true,
-                              		    dict = '${pkgs.scowl}/share/dict/words.txt'
-                                		  }
-                  '';
-                        		}
-              */
+        };
+      };
+  };
 
-          formatting = {
-            fields = [
-              "abbr"
-              "kind"
-              "menu"
+  cmp-buffer = {
+    enable = true;
+  };
+
+  #cmp-emoji = {
+  #  enable = true;
+  #};
+
+  cmp-nvim-lsp = {
+    enable = true;
+  };
+
+  cmp-path = {
+    enable = true;
+  };
+
+  cmp_luasnip = {
+    enable = true;
+  };
+
+  cmp-look = {
+    enable = true;
+  };
+
+  # FIXME still getting pattern not found
+  #cmp-dictionary = { enable = true; };
+
+  mini = {
+    enable = true;
+    modules.icons = { };
+    mockDevIcons = true;
+  };
+
+  comment.enable = true;
+
+  which-key = {
+    enable = true;
+    settings = {
+      spec = [
+        {
+          __unkeyed-1 = "<leader>w";
+          proxy = "<C-w>";
+          group = "windows";
+        }
+        {
+          __unkeyed-1 = "<c-w>c";
+          desc = "Close current window";
+        }
+        {
+          __unkeyed-1 = "<c-w>H";
+          desc = "Move current window to the far left";
+        }
+        {
+          __unkeyed-1 = "<c-w>J";
+          desc = "Move current window to the very bottom";
+        }
+        {
+          __unkeyed-1 = "<c-w>K";
+          desc = "Move current window to the very top";
+        }
+        {
+          __unkeyed-1 = "<c-w>L";
+          desc = "Move current window to the far right";
+        }
+
+        {
+          __unkeyed-1 = "<leader>b";
+          group = "buffers";
+        }
+
+        {
+          __unkeyed-1 = "<leader>r";
+          group = "refactoring";
+        }
+
+        {
+          __unkeyed-1 = "<leader>f";
+          group = "files";
+        }
+      ];
+      # Using telescope for spelling
+      plugins.spelling.enabled = false;
+    };
+  };
+
+  lsp = {
+    enable = true;
+    servers = {
+      #ltex.enable = true;
+      #texlab.enable = true;
+      #lua_ls.enable = true;
+      yamlls = {
+        enable = true;
+        autostart = true;
+      };
+
+nixd = {
+        # Nix LS
+        enable = true;
+        settings =
+        let
+            flake = ''(builtins.getFlake "${inputs.self}")'';
+            system = ''''${builtins.currentSystem}'';
+        in
+        {
+          nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
+          options = rec {
+            nixos.expr = "${flake}.nixosConfigurations.DANIELKNB1.options";
+	    nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
+            home-manager.expr = "${nixos.expr}.home-manager.users.type.getSubOptions [ ]";
+            home_manager.expr = ''
+              ${flake}.homeConfigurations."dani@maiziedemacchiato".options
+            '';
+	    # Only when https://github.com/MattSturgeon/nix-config/blob/df6fc7c/nvim/flake-module.nix#L14
+            #nixvim.expr = "${flake}.packages.${system}.nvim.options";
+	    nixvim.expr = "${flake}.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.minimalPackage.options.type.type.getSubOptions [ ]";
+            nixondroid.expr = ''
+              ${flake}.nixOnDroidConfigurations.sams9.options
+            '';
+          };
+          diagnostic = {
+            # Suppress noisy warnings
+suppress = [
+              "sema-escaping-with"
+              "var-bind-to-this"
             ];
-            format =
-              # lua
-              ''
-                function(_, item)
-                  local icons = {
-                    Namespace = "󰌗",
-                    Text = "󰉿",
-                    Method = "󰆧",
-                    Function = "󰆧",
-                    Constructor = "",
-                    Field = "󰜢",
-                    Variable = "󰀫",
-                    Class = "󰠱",
-                    Interface = "",
-                    Module = "",
-                    Property = "󰜢",
-                    Unit = "󰑭",
-                    Value = "󰎠",
-                    Enum = "",
-                    Keyword = "󰌋",
-                    Snippet = "",
-                    Color = "󰏘",
-                    File = "󰈚",
-                    Reference = "󰈇",
-                    Folder = "󰉋",
-                    EnumMember = "",
-                    Constant = "󰏿",
-                    Struct = "󰙅",
-                    Event = "",
-                    Operator = "󰆕",
-                    TypeParameter = "󰊄",
-                    Table = "",
-                    Object = "󰅩",
-                    Tag = "",
-                    Array = "[]",
-                    Boolean = "",
-                    Number = "",
-                    Null = "󰟢",
-                    String = "󰉿",
-                    Calendar = "",
-                    Watch = "󰥔",
-                    Package = "",
-                    Copilot = "",
-                    Codeium = "",
-                    TabNine = "",
-                  }
-                  local icon = icons[item.kind] or ""
-                  item.kind = string.format("%s %s", icon, item.kind or "")
-                  return item
-                end
-              '';
-          };
-          snippet.expand = "function(args) require('luasnip').lsp_expand(args.body) end";
-          window = {
-            completion = {
-              winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
-              scrollbar = false;
-              side_padding = 0;
-              border = [
-                "╭"
-                "─"
-                "╮"
-                "│"
-                "╯"
-                "─"
-                "╰"
-                "│"
-              ];
-            };
-            documentation = {
-              border = [
-                "╭"
-                "─"
-                "╮"
-                "│"
-                "╯"
-                "─"
-                "╰"
-                "│"
-              ];
-              winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
-            };
-          };
-          mapping = {
-            "<C-n>" = "cmp.mapping.select_next_item()";
-            "<C-p>" = "cmp.mapping.select_prev_item()";
-            "<C-j>" = "cmp.mapping.select_next_item()";
-            "<C-k>" = "cmp.mapping.select_prev_item()";
-            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-            "<C-f>" = "cmp.mapping.scroll_docs(4)";
-            "<C-Space>" = "cmp.mapping.complete()";
-            "<C-e>" = "cmp.mapping.close()";
-            "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })";
-            # as in: https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
-            "<Tab>" = ''
-                            	    cmp.mapping(function(fallback)
-              			  if cmp.visible() then
-              			    cmp.select_next_item()
-              			  elseif require("luasnip").expand_or_jumpable() then
-              			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
-              			  else
-              			    fallback()
-              			  end
-              			end, {'i', 's'})
-                            		  '';
-            "<S-Tab>" = ''
-                            	    cmp.mapping(function(fallback)
-              			  if cmp.visible() then
-              			    cmp.select_prev_item()
-              			  elseif require("luasnip").jumpable(-1) then
-              			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
-              			  else
-              			    fallback()
-              			  end
-              			end, {'i', 's'})
-                            		  '';
           };
         };
+      };
+    };
+
+    keymaps.lspBuf = {
+      # See :h lsp-buf
+      K = {
+        action = "hover";
+        desc = "Show documentation";
+      };
+      gd = {
+        action = "definition";
+        desc = "Goto definition";
+      };
+      gD = {
+        action = "declaration";
+        desc = "Goto declaration";
+      };
+      gi = {
+        action = "implementation";
+        desc = "Goto implementation";
+      };
+      gt = {
+        # FIXME conflicts with "next tab page" :h gt
+        action = "type_definition";
+        desc = "Goto type definition";
+      };
+      ga = {
+        action = "code_action";
+        desc = "Show code actions";
+      };
+      "g*" = {
+        action = "document_symbol";
+        desc = "Show document symbols";
+      };
+      "<leader>rn" = {
+        action = "rename";
+        desc = "Rename symbol";
+      };
+    };
+  };
+
+  luasnip.enable = true;
+
+  telescope = {
+    enable = true;
+    # Keymaps defined in ./keymaps.nix
+
+    extensions = {
+      fzf-native.enable = true;
+      media-files.enable = true;
+    };
+
+    keymaps = {
+      "<leader>bb" = {
+        action = "buffers ignore_current_buffer=true sort_mru=true";
+        options.desc = "List buffers";
+      };
+      "<leader>h" = {
+        action = "help_tags";
+        options.desc = "Browse help";
+      };
+      "<leader>fg" = {
+        action = "live_grep";
+        options.desc = "Grep files";
+      };
+      "<leader>`" = {
+        action = "marks";
+        options.desc = "Browse marks";
+      };
+      "<leader>\"" = {
+        action = "registers";
+        options.desc = "Browse registers";
+      };
+      "<leader>gs" = {
+        action = "git_status";
+        options.desc = "Git status";
+      };
+      "gr" = {
+        action = "lsp_references";
+        options.desc = "Browse references";
+      };
+      "gA" = {
+        action = "diagnostics";
+        options.desc = "Browse diagnostics";
+      };
+      "gs" = {
+        action = "treesitter";
+        options.desc = "Browse symbols";
+      };
+    };
+  };
+
+  extraConfigLuaPre = /* lua */ ''
+    -- Helper for telescope (<leader>ff)
+    function telescope_project_files()
+      -- We cache the results of "git rev-parse"
+      -- Process creation is expensive in Windows, so this reduces latency
+      local is_inside_work_tree = {}
+
+      local opts = {}
+
+      return function()
+        local cwd = vim.fn.getcwd()
+        if is_inside_work_tree[cwd] == nil then
+          vim.fn.system("git rev-parse --is-inside-work-tree")
+          is_inside_work_tree[cwd] = vim.v.shell_error == 0
+        end
+
+        if is_inside_work_tree[cwd] then
+          require("telescope.builtin").git_files(opts)
+        else
+          require("telescope.builtin").find_files(opts)
+        end
+      end
+    end
+  '';
+
+  # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
+  fzf-lua = {
+    enable = true;
+    profile = "telescope";
+    keymaps = {
+      "<Leader>ff" = {
+        action = "files";
+        settings = {
+          cwd = "~";
+          winopts = {
+            height = 0.1;
+            width = 0.5;
+          };
+        };
+        options.silent = true;
+      };
+      "<Leader>fg" = "live_grep";
+      "<C-x><C-f>" = {
+        mode = "i";
+        action = "complete_file";
+        settings = {
+          cmd = "rg --files";
+          winopts.preview.hidden = "nohidden";
+        };
+        options = {
+          silent = true;
+          desc = "Fuzzy complete file";
+        };
+      };
+    };
+    settings = {
+      grep = {
+        prompt = "Grep  ";
+      };
+      winopts = {
+        height = 0.4;
+        width = 0.93;
+        row = 0.99;
+        col = 0.3;
+      };
+      files = {
+        find_opts.__raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
+        prompt = "Files❯ ";
+        multiprocess = true;
+        file_icons = true;
+        color_icons = true;
       };
     };
   };
 in
 {
+
+  imports = [ inputs.nixvim.homeManagerModules.nixvim ];
 
   ###### interface
 
@@ -602,239 +640,99 @@ in
 
   ###### implementation
 
+  # FIXME add nvim-lsp as in https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
   config = mkIf cfg.enable (mkMerge [
     {
-      # FIXME add nvim-lsp as in https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
-      custom.programs.neovim.minimalPackage = makeNixvim {
-        enableMan = false;
-        colorschemes.gruvbox.enable = true;
-        extraPlugins =
-          builtins.attrValues
-            {
-              inherit (pkgs.vimPlugins)
-                neoterm
-                ;
-            }
-          ++ [
-            (pluggo "faster-nvim")
-          ];
-        extraConfigLua = ''
-          	  -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
-          -- only for cmp-dictionary not for cmp-look	  
-          vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
+      # minimal nvim
+      custom.programs.neovim.minimalPackage =       makeNixvimWithModule {
+        #inherit pkgs;
+        module = { helpers, ... }: # import ./config; # import the module directly
+          {
+            enableMan = false;
 
-                    	vim.g.clipboard = {
-                          name = 'OSC 52',                                           copy = {                                                     ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-                            ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-                          },
-                          paste = {                                                    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),                                                                 ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                               },                                                       }
-                    	'';
-        extraPackages = builtins.attrValues {
-          inherit (pkgs)
-            nixfmt-rfc-style
+            colorschemes.catppuccin.enable = true;
+
+            inherit extraConfigLuaPre;
+
+            # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
+            extraConfigLua = ''
+              	    require('faster').setup()
+
+              	    -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
+              	    -- only for cmp-dictionary not for cmp-look	  
+              	    vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
+
+              	    vim.g.clipboard = {
+              	      name = 'OSC 52',
+              	      copy = {                                                     
+              	        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+                              ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+              	      },
+                            paste = {
+              	        ['+'] = require('vim.ui.clipboard.osc52').paste('+'), 
+              		['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                  
+              	      },                                                       
+              	    }
+              	    '';
+
+            extraPlugins =
+              builtins.attrValues {
+                inherit (unstable.vimPlugins)
+                  neoterm
+                  nnn-vim
+                  faster-nvim
+                  ;
+              }
             ;
-        };
-        plugins = {
-          fzf-lua = {
-            enable = true;
-            profile = "telescope";
-            keymaps = {
-              "<Leader>n" = {
-                action = "files";
-                settings = {
-                  #cwd = "~";
-                  winopts = {
-                    height = 0.1;
-                    width = 0.5;
-                  };
-                };
-                options.silent = true;
-              };
-              # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
-              "<Leader>ff" = {
-                action = "files";
-                settings = {
-                  cwd = "~";
-                  winopts = {
-                    height = 0.1;
-                    width = 0.5;
-                  };
-                };
-                options.silent = true;
-              };
-              "<Leader>fg" = "live_grep";
-              "<C-x><C-f>" = {
-                mode = "i";
-                action = "complete_file";
-                settings = {
-                  cmd = "rg --files";
-                  winopts.preview.hidden = "nohidden";
-                };
-                options = {
-                  silent = true;
-                  desc = "Fuzzy complete file";
-                };
-              };
-            };
-            settings = {
-              grep = {
-                prompt = "Grep  ";
-              };
-              winopts = {
-                height = 0.4;
-                width = 0.93;
-                row = 0.99;
-                col = 0.3;
-              };
-              files = {
-                find_opts.__raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
-                prompt = "Files❯ ";
-                multiprocess = true;
-                file_icons = true;
-                color_icons = true;
-              };
-            };
-          };
-          mini = {
-            enable = true;
-            modules.icons = { };
-            mockDevIcons = true;
-          };
-          comment.enable = true;
-          which-key.enable = true;
-          lsp = {
-            enable = true;
-            servers = {
-              nixd = {
-                enable = true;
-                settings = {
-                  formatting.command = [ "nixpkgs-fmt" ];
-                  nixpkgs.expr = ''
-                    import <nixpkgs> { }
-                  '';
 
-                  options = {
-                    nixos.expr = ''
-                      (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").nixosConfigurations.DANIELKNB1.options
-                    '';
-                    home_manager.expr = ''
-                      (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").homeConfigurations."dani@maiziedemacchiato".options
-                    '';
-                    nixondroid.expr = ''
-                      (builtins.getFlake "/data/data/com.termux.nix/files/home/.nix-config").nixOnDroidConfigurations.sams9.options
-                    '';
+            inherit keymaps;
 
-                  };
-                };
-              };
-            };
-            keymaps.lspBuf = {
-              "gd" = "definition";
-              "gD" = "references";
-              "gt" = "type_definition";
-              "gi" = "implementation";
-              "K" = "hover";
-            };
-          };
-          cmp-buffer = {
-            enable = true;
-          };
-          #cmp-nvim-lsp = {
-          #  enable = true;
-          #};
-          cmp-path = {
-            enable = true;
-          };
-          cmp-look = {
-            enable = true;
-          };
-          cmp = {
-            enable = true;
-            settings = {
-              sources = [
-                { name = "buffer"; }
-                #{ name = "nvim_lsp"; }
-                { name = "path"; }
-                {
-                  name = "look";
-                  keyword_length = 2;
-                  option.__raw = ''
-                    		  {
-                                        convert_case = true,
-                                        loud = true,
-                    		    dict = '${pkgs.scowl}/share/dict/words.txt'
-                    		  }
-                  '';
+            nixpkgs.pkgs = unstable;
+
+            # Override neovim-unwrapped with one from a flake input
+            # Using `stdenv.hostPlatform` to access `system`
+            nixpkgs.overlays = [
+              (
+                final: prev: {
+                  neovim-unwrapped =
+                    inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+
+                  vimPlugins =
+                    prev.vimPlugins
+                    // {
+                      faster-nvim = final.vimUtils.buildVimPlugin {
+                        name = "faster-nvim";
+                        src = inputs.name;
+                      };
+                    };
                 }
-              ];
+              )
+            ];
 
-              window = {
-                completion = {
-                  winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
-                  scrollbar = false;
-                  side_padding = 0;
-                  border = [
-                    "╭"
-                    "─"
-                    "╮"
-                    "│"
-                    "╯"
-                    "─"
-                    "╰"
-                    "│"
-                  ];
-                };
-                documentation = {
-                  border = [
-                    "╭"
-                    "─"
-                    "╮"
-                    "│"
-                    "╯"
-                    "─"
-                    "╰"
-                    "│"
-                  ];
-                  winhighlight = "FloatBorder:CmpBorder,Normal:CmpPmenu,CursorLine:CmpSel,Search:PmenuSel";
-                };
-              };
-              mapping = {
-                "<C-n>" = "cmp.mapping.select_next_item()";
-                "<C-p>" = "cmp.mapping.select_prev_item()";
-                "<C-j>" = "cmp.mapping.select_next_item()";
-                "<C-k>" = "cmp.mapping.select_prev_item()";
-                "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-                "<C-f>" = "cmp.mapping.scroll_docs(4)";
-                "<C-Space>" = "cmp.mapping.complete()";
-                "<C-e>" = "cmp.mapping.close()";
-                "<CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })";
-                # as in: https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
-                "<Tab>" = ''
-                                	    cmp.mapping(function(fallback)
-                  			  if cmp.visible() then
-                  			    cmp.select_next_item()
-                  			  elseif require("luasnip").expand_or_jumpable() then
-                  			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
-                  			  else
-                  			    fallback()
-                  			  end
-                  			end, {'i', 's'})
-                                		  '';
-                "<S-Tab>" = ''
-                                	    cmp.mapping(function(fallback)
-                  			  if cmp.visible() then
-                  			    cmp.select_prev_item()
-                  			  elseif require("luasnip").jumpable(-1) then
-                  			    vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
-                  			  else
-                  			    fallback()
-                  			  end
-                  			end, {'i', 's'})
-                                		  '';
-              };
+            plugins = {
+              inherit
+	        fzf-lua
+                mini
+                which-key
+                comment
+                lsp
+                cmp
+                cmp-buffer# m
+                trouble
+		cmp_luasnip
+                cmp-path# m
+                cmp-look# m
+		luasnip
+		gitsigns
+		telescope
+                ;
             };
           };
+        # You can use `extraSpecialArgs` to pass additional arguments to your module files
+        extraSpecialArgs = {
+          # inherit (inputs) foo;
         };
+
       };
 
       home.packages =
@@ -847,20 +745,63 @@ in
             makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
           '')
         ];
-
-      #home.sessionVariables.EDITOR = "vi";
     }
 
     (mkIf (!cfg.lightWeight) {
-      custom.programs.neovim.finalPackage = makeNixvim configuration;
+      # full nvim
+      custom.programs.neovim.finalPackage = config.programs.nixvim.build.package;
 
-      home.packages =
-        let
-          inherit (config.custom.programs.neovim) finalPackage;
-        in
-        [
-          finalPackage
+      programs.nixvim = lib.mkForce {
+        enable = true;
+
+        enableMan = false;
+
+        colorschemes.gruvbox.enable = true;
+
+        extraPlugins =
+          builtins.attrValues
+            {
+              inherit (unstable.vimPlugins)
+                nnn-vim
+                neoterm
+                ;
+            }
+          ++ [
+            (pluggo "faster-nvim")
+          ];
+
+        inherit keymaps;
+
+        nixpkgs.pkgs = unstable;
+
+        # Override neovim-unwrapped with one from a flake input
+        # Using `stdenv.hostPlatform` to access `system`
+        nixpkgs.overlays = [
+          (
+            final: prev: {
+              neovim-unwrapped =
+                inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+            }
+          )
         ];
+
+        plugins = {
+          inherit
+            fzf-lua
+            mini
+            which-key
+            comment
+            lsp
+            cmp
+            cmp-buffer# m
+            #cmp-emoji
+            cmp-nvim-lsp
+            cmp-path# m
+            cmp_luasnip
+            cmp-look# m
+            ;
+        };
+      };
     })
   ]);
 }

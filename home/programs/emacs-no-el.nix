@@ -16,6 +16,7 @@ let
     mkIf
     mkOption
     optionalAttrs
+    optionalString
     types
     ;
   inherit (pkgs.stdenv) isLinux isAarch64;
@@ -174,51 +175,56 @@ in
     let
       fun =
         epkgs:
+	# mostly from here https://rossabaker.com/configs/emacs/, https://git.rossabaker.com/ross/cromulent/src/branch/main/src/org/config/emacs/index.org#headline-51, https://git.rossabaker.com/ross/cromulent/src/branch/main/gen/flake/emacs
+	# ISSUES only chance to get rid of involuntary cursor (point - as the 2nd cursor is called) jumps on nix-on-droid and
+	# NixOS-WSL (both seem to lack useful term implementations) is by running emacs in a screeen session or at least run one 
+	# immediately ahead of emacs (screen -ls screen -D)
+	# zellij is an option as well, but i need to find out how to enable C-g, see https://github.com/zellij-org/zellij/issues/1399#issuecomment-1409862120 and the complete issue thread
         builtins.attrValues {
           inherit (epkgs)
             moe-theme
             #better-defaults
-            bind-key # FIXME not redundant ? Is in https://github.com/jwiegley/use-package
-            use-package
-            #writeroom-mode
-            which-key
+            bind-key # u
+            use-package # u
+            #writeroom-mode # https://stable.melpa.org/#/writeroom-mode
+            which-key # https://elpa.gnu.org/packages/which-key.html
             # https://cestlaz.github.io/posts/using-emacs-16-undo-tree/
-            undo-tree
-            #smooth-scrolling
+            #undo-tree # https://elpa.gnu.org/packages/undo-tree.html
+            #smooth-scrolling # https://stable.melpa.org/#/smooth-scrolling
             #sensible-defaults
             #sane-defaults
             #jinx
-            titlecase
-            suggest
-            persist-state
-            ibuffer-vc
-            emacs
-            #corfu-terminal
-            diminish
-            no-littering
-            gcmh
-            olivetti
-            zoom
-            orderless
+            #titlecase # https://stable.melpa.org/#/titlecase
+            #suggest # https://melpa.org/#/suggest
+            #persist-state # https://stable.melpa.org/#/persist-state
+            #ibuffer-vc # https://melpa.org/#/ibuffer-vc
+            emacs # u
+            #corfu-terminal # https://codeberg.org/akib/emacs-corfu-terminal/
+            #diminish # https://elpa.gnu.org/packages/diminish.html
+            #no-littering # https://melpa.org/#/no-littering
+            gcmh # https://elpa.gnu.org/packages/gcmh.html
+            olivetti # https://melpa.org/#/olivetti
+	    org # https://elpa.gnu.org/packages/org.html
+            #zoom # https://melpa.org/#/zoom
+            #orderless # https://elpa.gnu.org/packages/orderless.html
             # https://blog.mads-hartmann.com/emacs/2014/03/03/complete-word-based-on-dictionary.html
             ;
 
           inherit (epkgs.melpaPackages)
-            ac-ispell
-            el-fly-indent-mode
+            #ac-ispell # https://elpa.gnu.org/packages/orderless.html, use case: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
+            el-fly-indent-mode # u
             ;
           inherit (epkgs.elpaPackages)
-            jinx
-            cape
-            corfu
+            jinx # u
+            cape # u
+            corfu # u
             ;
         }
         ++ [
-          org-novelist
-          #my-default-el
-          org-extra-emphasis # FIXME https://emacsnotes.wordpress.com/2022/06/29/use-org-extra-emphasis-when-you-need-more-emphasis-markers-in-emacs-org-mode/, also install pdflatex etc.
-          ox-odt
-          ox-html-markdown-style-footnotes
+          org-novelist # u
+          #org-extra-emphasis # FIXME https://emacsnotes.wordpress.com/2022/06/29/use-org-extra-emphasis-when-you-need-more-emphasis-markers-in-emacs-org-mode/, also install pdflatex etc.
+          #ox-odt
+          #ox-html-markdown-style-footnotes
         ];
     in
     mkIf cfg.enable {
@@ -256,10 +262,21 @@ in
       );
 
       custom.programs.emacs-no-el.homePackage = (
-        pkgs.runCommand "emacs-no-el" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-          mkdir -p $out/bin	
-          makeWrapper ${config.custom.programs.emacs-no-el.finalPackage.outPath}/bin/emacs $out/bin/emacs-no-el --argv0 emacs    
+        pkgs.runCommand "emacs-no-el" {
+	# in a one-time test this fixed the text garbling in emacs in nix-on-droid
+	#TERM="xterm-256color"; https://github.com/search?q=repo%3ANixOS%2Fnixpkgs+wrapprogram&type=code (https://stackoverflow.com/a/39713383)
+	# nice try but emacs uses "dumb" here anyways: https://emacs.stackexchange.com/a/26834
+	# Only "magic fix" I found so far, that even seems to fix the garbling when M-: (geteTAB to have completed (getenv and
+	# to continue i. e. (getenv "TERM") is running (ignoring for good that it says [screen is terminating]) 
+	# nix run nixpkgs#screen.out before calling emacs 
+	# Tested on nix-on-droid but without --set XTERM ... as below
+	# https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
+	nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+          mkdir -p $out/bin
+          makeWrapper ${config.custom.programs.emacs-no-el.finalPackage.outPath}/bin/emacs $out/bin/emacs-no-el \
+	    --argv0 emacs ${optionalString (isLinux && isAarch64) "--run ${pkgs.screen}/bin/screen"} --set TERM xterm-256color
         ''
+	# https://discourse.nixos.org/t/home-manager-spacemacs/8033/5
       );
 
       custom.programs.shell.shellAliases =

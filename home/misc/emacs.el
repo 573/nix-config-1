@@ -12,6 +12,18 @@
  (use-package bind-key
    :demand t)
 
+(use-package gcmh
+  :ensure t
+  :diminish
+  :init (setq gc-cons-threshold most-positive-fixnum)
+  :hook (emacs-startup . gcmh-mode)
+  :custom
+  (gcmh-idle-delay 'auto)
+  (gcmh-auto-idle-delay-factor 10)
+  (gcmh-high-cons-threshold (* 16 1024 1024)))
+
+(which-key-mode)
+
 ;; stolen from here:
 ;; https://github.com/minad/corfu?tab=readme-ov-file#configuration (example configuration)
 (use-package corfu
@@ -127,42 +139,61 @@
   :init
   (add-hook 'emacs-lisp-mode-hook #'el-fly-indent-mode))
 
-;; stolen here: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
-;; Technical details
-;;
-;;    based on ac-ispell
-;;    lazy load of ispell-mode to speed Emacs startup
-;;    add a fallback dictionary "english-words.txt" so autocompletion never fails
-;;    `ispell-lookup-words` or `lookup-words` simply does grep thing, so english-words.txt is just a plain text file.
-;;(global-set-key (kbd "M-/") 'hippie-expand)
+(use-package  org-novelist
+  :ensure nil
+  ;;  :load-path "~/Downloads/"  ; The directory containing 'org-novelist.el'
+  :custom
+  ;; Setting de-DE leads to subtle errors (no localised files)
+  (org-novelist-language-tag "en-GB")  ; The interface language for Org Novelist to use. It defaults to 'en-GB' when not set
+  (org-novelist-author "Daniel Kahlenberg")  ; The default author name to use when exporting a story. Each story can also override this setting
+  (org-novelist-author-email "573@users.noreply.github.com")  ; The default author contact email to use when exporting a story. Each story can also override this setting
+  (org-novelist-automatic-referencing-p nil))
 
-;; The actual expansion function
-(defun try-expand-by-dict (old)
-  ;; old is true if we have already attempted an expansion
-  (unless (bound-and-true-p ispell-minor-mode)
-    (ispell-minor-mode 1))
 
-  ;; @scowl@/share/dict/words.txt is the fallback dicitonary
-  (if (not ispell-alternate-dictionary)
-      (setq ispell-alternate-dictionary (file-truename "@scowl@/share/dict/words.txt")))
-  (let ((lookup-func (if (fboundp 'ispell-lookup-words)
-                       'ispell-lookup-words
-                       'lookup-words)))
-    (unless old
-      (he-init-string (he-lisp-symbol-beg) (point))
-      (if (not (he-string-member he-search-string he-tried-table))
-        (setq he-tried-table (cons he-search-string he-tried-table)))
-      (setq he-expand-list
-            (and (not (equal he-search-string ""))
-                 (funcall lookup-func (concat (buffer-substring-no-properties (he-lisp-symbol-beg) (point)) "*")))))
-    (if (null he-expand-list)
-      (if old (he-reset-string))
-      (he-substitute-string (car he-expand-list))
-      (setq he-expand-list (cdr he-expand-list))
-      t)
-    ))
+(use-package moe-theme
+  :init
+  ;; Show highlighted buffer-id as decoration. (Default: nil)
+  (setq moe-theme-highlight-buffer-id t)
 
-;;(setq hippie-expand-try-functions-list
-;;      '(;; try-expand-dabbrev
-;;        ;; try-expand-dabbrev-all-buffers
-;;        try-expand-by-dict))
+  ;; Resize titles (optional).
+  (setq moe-theme-resize-markdown-title '(1.5 1.4 1.3 1.2 1.0 1.0))
+  (setq moe-theme-resize-org-title '(1.5 1.4 1.3 1.2 1.1 1.0 1.0 1.0 1.0))
+  (setq moe-theme-resize-rst-title '(1.5 1.4 1.3 1.2 1.1 1.0))
+
+  ;; Highlight Buffer-id on Mode-line
+  (setq moe-theme-highlight-buffer-id nil)
+
+  ;; Choose a color for mode-line.(Default: blue)
+  (setq moe-theme-set-color 'cyan)
+
+  (load-theme 'moe-dark t))
+
+
+;; https://stackoverflow.com/questions/36416030/how-to-enable-org-indent-mode-by-default
+(setq org-startup-indented t)
+
+;; https://stackoverflow.com/a/14370689
+(show-paren-mode 1)
+(setq blink-matching-delay 0.3)
+
+;; https://www.emacswiki.org/emacs/AnsiTermHints
+;; Terminal buffer configuration.
+ (add-hook 'term-mode-hook 'my-term-mode-hook)
+ (defun my-term-mode-hook ()
+   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=20611
+   (setq bidi-paragraph-direction 'left-to-right))
+
+;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
+(defun my/initial-layout ()
+  "Create my initial screen layout."
+  (interactive)
+  ;; 2. having org-mode launch in scratch buffer from the beginning, and
+  (switch-to-buffer "*scratch*")
+  (org-mode)
+  ;; (org-indent-mode)
+  ;; 3. to have olivetti mode enabled too.
+  (olivetti-mode)
+  (delete-other-windows)
+  )
+
+(my/initial-layout)

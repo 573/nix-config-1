@@ -39,7 +39,7 @@ in
       builders = mkOption {
         type = types.listOf types.str;
         default = [
-          "ssh://eu.nixbuild.net aarch64-linux - 100 1 benchmark big-parallel"
+	  "ssh://eu.nixbuild.net aarch64-linux,armv7l-linux - 100 1 benchmark,big-parallel - -"
         ];
         description = "Nix remote builders.";
       };

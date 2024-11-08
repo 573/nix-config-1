@@ -2,6 +2,7 @@ _:
 
 {
   lib,
+  config,
   pkgs,
   homeModules ? [ ],
   inputs,
@@ -26,7 +27,7 @@ in
       */
       extraSpecialArgs = {
         inherit inputs rootPath;
-        inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim;
+        inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim makeNixvimWithModule;
         inherit (inputs.yazi.packages.${pkgs.system}) yazi;
         unstable = inputs.unstable.legacyPackages.${pkgs.system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc965;
@@ -42,6 +43,14 @@ in
             inputs.emacs-overlay-cached.lib.${pkgs.system}.emacsWithPackagesFromUsePackage
           else
             inputs.emacs-overlay.lib.${pkgs.system}.emacsWithPackagesFromUsePackage;
+    homeDir =
+      if isLinux && isAarch64 then
+        # TODO figure out :p homeConfigurations."dani@maiziedemacchiato".config.home.homeDirectory
+	# :p nixOnDroidConfigurations.sams9.config.user.home => cfg.user.home
+        config.user.home
+      else # TODO for now only user nixos anyway on nixos-wsl
+           # :p nixosConfigurations.DANIELKNB1.config.wsl.defaultUser
+        "/home/${config.wsl.defaultUser}";
       };
       sharedModules = homeModules;
       useGlobalPkgs = true; # disables options nixpkgs.*

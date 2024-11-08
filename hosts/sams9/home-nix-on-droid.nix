@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  unstable,
   ...
 }:
 let
@@ -90,6 +91,10 @@ in
       inherit (pkgs)
         nix-inspect
         ;
+
+      inherit (unstable)
+        zellij
+	;
     };
 
 #    activation =
