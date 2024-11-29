@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  unstable,
+  nixos-2405,
   ...
 }:
 let
@@ -92,7 +92,7 @@ in
         nix-inspect
         ;
 
-      inherit (unstable)
+      inherit (nixos-2405)
         zellij
 	;
     };

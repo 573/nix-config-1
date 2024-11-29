@@ -10,7 +10,8 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05"; # TODO 24.11 here asap
+    nixos-2405.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
@@ -550,6 +551,7 @@
         nixpkgs = inputs.nixpkgs.legacyPackages.${system};
         latest = inputs.latest.legacyPackages.${system};
         unstable = inputs.unstable.legacyPackages.${system};
+        nixos-2405 = inputs.nixos-2405.legacyPackages.${system};
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};

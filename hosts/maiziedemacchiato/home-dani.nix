@@ -52,6 +52,8 @@ in
       audio.enable = true;
 
       arbtt.enable = true;
+
+      zellij.enable = true;
     };
   };
 

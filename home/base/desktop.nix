@@ -224,8 +224,8 @@ in
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         } // { "layout.css.devPixelsPerPx" = "-1.0"; };
 
-        userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
-        userContent = lib.readFile "${inputs.penguin-fox}/files/chrome/userContent.css";
+        #userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
+        #userContent = lib.readFile "${inputs.penguin-fox}/files/chrome/userContent.css";
       };
       package = pkgs.wrapFirefox pkgs.firefox-unwrapped {
         # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
