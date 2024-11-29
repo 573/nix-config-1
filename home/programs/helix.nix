@@ -1,5 +1,6 @@
 { config
 , lib
+, inputs
 , pkgs
 , unstable
 , ...
@@ -78,29 +79,29 @@ in
   ".build/"
   "!.gitignore"
 ];
- 
-      languages = {
-        language = [
-          {
+
+    languages = {
+  # the language-server option currently requires helix from the master branch at https://github.com/helix-editor/helix/
+	      language-server.nixd = {
+        command = "nixd";
+		args = ["--inlay-hints" "--semantic-tokens"];
+          config.nixd =
+        let
+            flake = ''(builtins.getFlake "${inputs.self}")'';
+       #     system = ''''${builtins.currentSystem}'';
+        in
+	  {
+	    nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
+            options.home-manager.expr = "${flake}.nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]";
+	  };
+	};
+
+  language = [{
             name = "nix";
             formatter.command = "nixfmt";
-	    language-servers = [
-#	      language-server.nixd = with pkgs.nixd; [
-#	        command = "${nixd}/bin/nixd";
-#		args = ["--inlay-hints" "--semantic-tokens"];
-#		config.nixd.options.home-manager.expr = '(builtins.getFlake "${rootDir}").homeConfigurations.nix-on-droid.options';
-	    ];
-          }
-          {
-            name = "css";
-            language-servers = [ ];
-          }
-          {
-            name = "scss";
-            language-servers = [ ];
-          }
-        ];
-      };
+	language-servers = [ "nixd" ];
+  }];
+};
       settings = {
         keys.normal = {
           X = "extend_line_above";

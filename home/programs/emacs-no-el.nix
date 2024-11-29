@@ -271,10 +271,15 @@ in
 	# nix run nixpkgs#screen.out before calling emacs 
 	# Tested on nix-on-droid but without --set XTERM ... as below
 	# https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/setup-hooks/make-wrapper.sh
-	nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+	/*nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
           mkdir -p $out/bin
           makeWrapper ${config.custom.programs.emacs-no-el.finalPackage.outPath}/bin/emacs $out/bin/emacs-no-el \
 	    --argv0 emacs ${optionalString (isLinux && isAarch64) "--run ${pkgs.screen}/bin/screen"} --set TERM xterm-256color
+        ''*/
+	nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+          mkdir -p $out/bin
+          makeWrapper ${config.custom.programs.emacs-no-el.finalPackage.outPath}/bin/emacs $out/bin/emacs-no-el \
+	    --argv0 emacs --set TERM xterm-256color
         ''
 	# https://discourse.nixos.org/t/home-manager-spacemacs/8033/5
       );
