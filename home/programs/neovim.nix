@@ -403,7 +403,7 @@ let
 
 nixd = {
         # Nix LS
-        enable = true;
+        enable = false; # FIXME re-enable when crashes on termux are fixed
         settings =
         let
             flake = ''(builtins.getFlake "${inputs.self}")'';

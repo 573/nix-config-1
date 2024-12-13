@@ -221,7 +221,7 @@ in
       programs.fzf.enable = true;
 
       # FIXME: set to sd-switch once it works for krypton, https://home-manager-options.extranix.com/?query=systemd.user.startServices&release=release-24.05
-      systemd.user.startServices = "legacy";
+      systemd.user.startServices = true;
     }
 
     (mkIf (!cfg.minimal) {

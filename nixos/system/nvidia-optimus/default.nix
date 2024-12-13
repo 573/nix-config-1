@@ -57,10 +57,13 @@ in
       (config.lib.custom.mkScript "nvidia-offload" ./nvidia-offload.sh [ ] { _doNotClearPath = true; })
     ];
 
-    hardware.nvidia.prime = {
-      inherit (cfg) amdgpuBusId nvidiaBusId;
+    hardware.nvidia = {
+      open = false;
 
-      offload.enable = true;
+      prime = {
+        inherit (cfg) amdgpuBusId nvidiaBusId;
+        offload.enable = true;
+      };
     };
 
     services.xserver.videoDrivers = [ "nvidia" ];

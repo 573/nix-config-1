@@ -10,7 +10,7 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05"; # TODO 24.11 here asap
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixos-2405.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
@@ -75,7 +75,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -276,7 +276,7 @@
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
       #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixos-2405"; # FIXME set to "nixpkgs" when https://github.com/nix-community/NixOS-WSL/tree/renovate/nixpkgs-24.x is merged
       inputs.flake-compat.follows = "flake-compat";
       #inputs.flake-utils.follows = "flake-utils";
     };

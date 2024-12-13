@@ -53,8 +53,9 @@ in
 	  nativeBuildInputs = [ makeWrapper zellij ];
 	} ''
         mkdir -p $out/bin
-        makeWrapper ${zellij}/bin/zellij $out/bin/zellij \
-	--add-flags "-l compact options --no-pane-frames"
+        makeWrapper ${zellij}/bin/zellij $out/bin/zellij --argv0 zellij
+        makeWrapper ${zellij}/bin/zellij $out/bin/zellij-mini \
+	--argv0 zellij --add-flags "-l compact options --no-pane-frames"
 	'';
       in zellij-zen;
   };
