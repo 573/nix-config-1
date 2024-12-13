@@ -160,7 +160,6 @@ in
         #mpvScripts.chapterskip
         #mpvScripts.quality-menu
         source-code-pro
-        ubuntu_font_family
         #spotify-player
         #gtt
         notepad-next

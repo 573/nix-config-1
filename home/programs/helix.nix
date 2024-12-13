@@ -66,9 +66,6 @@ in
       shellcheck
       vscode-langservers-extracted
       marksman
-    ;
-    inherit
-      (pkgs.nodePackages)
       bash-language-server
       ;
     };
