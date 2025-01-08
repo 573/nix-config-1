@@ -16,7 +16,7 @@ let
   cfg = config.custom.wsl;
 in
 {
-  imports = [ inputs.nix-ld-rs.nixosModules.nix-ld ];
+  #imports = [ inputs.nix-ld-rs.nixosModules.nix-ld ];
 
   options.custom.wsl = {
     enable =
@@ -43,7 +43,8 @@ in
     # to run: NIX_LD_LIBRARY_PATH=/usr/lib/wsl/lib/ /usr/lib/wsl/lib/nvidia-smi
     #programs.nix-ld.enable = true;
     # see  https://github.com/nix-community/NixOS-WSL/discussions/92
-    programs.nix-ld.dev = {
+    # disabled nix-ld-rs with 24.11
+    programs.nix-ld = {
       enable = true;
       # TODO https://github.com/Mic92/dotfiles/blob/1b76848e2b5951bc9041af95a834a08b68e146fd/nixos/modules/nix-ld.nix
       libraries = with pkgs; [

@@ -63,7 +63,7 @@ in
     users.users.nixos.extraGroups = [ "docker" ];
 
     # https://discourse.nixos.org/t/gpu-enabled-docker-containers-in-nixos/23870/2
-    systemd.enableUnifiedCgroupHierarchy = false;
+    #systemd.enableUnifiedCgroupHierarchy = false;
 
   };
 
