@@ -31,6 +31,12 @@ in
         inherit inputs rootPath;
         inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim makeNixvimWithModule;
         inherit (inputs.yazi.packages.${pkgs.system}) yazi;
+    zellij =
+      if isLinux && isAarch64
+        then
+        inputs.nixos-2405.legacyPackages.${pkgs.system}.zellij
+      else
+        inputs.unstable.legacyPackages.${pkgs.system}.zellij; 
         nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.system};
         unstable = inputs.unstable.legacyPackages.${pkgs.system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc965;

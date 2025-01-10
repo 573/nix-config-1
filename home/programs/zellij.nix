@@ -44,18 +44,21 @@ in
   config = mkIf cfg.enable {
 
     # TODO zellij gh/discussions/3077
-    custom.programs.zellij.finalPackage = config.custom.programs.zellij.package; 
+    custom.programs.zellij.finalPackage = config.programs.zellij.package;
+
     programs.zellij = {
       enable = true;
  # https://nixos.wiki/wiki/Nix_Cookbook#Wrapping_packages
+ # ${config.custom.programs.zellij.finalPackage.outPath}
       package = let
         zellij-zen = runCommand "zellij-zen" {
-	  nativeBuildInputs = [ makeWrapper zellij ];
+	  nativeBuildInputs = [ makeWrapper ];
 	} ''
         mkdir -p $out/bin
-        makeWrapper ${zellij}/bin/zellij $out/bin/zellij --argv0 zellij
+        makeWrapper ${zellij}/bin/zellij $out/bin/zellij \
+	  --argv0 zellij
         makeWrapper ${zellij}/bin/zellij $out/bin/zellij-mini \
-	--argv0 zellij --add-flags "-l compact options --no-pane-frames"
+	  --argv0 zellij --add-flags "-l compact options --no-pane-frames"
 	'';
       in zellij-zen;
   };

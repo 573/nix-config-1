@@ -28,6 +28,7 @@ in
     programs = {
       hledger.enable = true;
       tex.enable = true;
+      zellij.enable = true;
     };
 
     development = {
@@ -120,11 +121,6 @@ in
       nix-prefetch
       hadolint
       hurl
-      ;
-
-      inherit
-      (unstable)
-      zellij
       ;
 
     inherit (pkgs.python310Packages)

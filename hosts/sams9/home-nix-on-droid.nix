@@ -35,6 +35,7 @@ in
       #yazi.enable = lib.mkForce false;
       #tex.enable = true;
       #hledger.enable = true;
+      zellij.enable = true;
 
 
 
@@ -91,10 +92,6 @@ in
       inherit (pkgs)
         nix-inspect
         ;
-
-      inherit (nixos-2405)
-        zellij
-	;
     };
 
 #    activation =
