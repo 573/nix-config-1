@@ -83,8 +83,25 @@ in
               for = "unix";
             }
           ];
+	  # FIXME preview not working, run="pdff"; wants .config/yazi/plugins/pdf.lua https://github.com/sxyazi/yazi/issues/110
+	  pdff = [
+            { run = ''zathura "$@"''; block = true; desc = "Open"; for = "unix"; }
+          ];
         };
+	open = {
+	  prepend_rules = [
+            { mime = "application/pdf"; use = [ "pdf" "reveal" ]; }
+          ];
+	};
         plugin = {
+	  preloaders = [
+	# PDF
+	{ mime = "application/pdf"; run = "pdf"; }
+          ];
+	  previewers = [
+	    # PDF
+	{ mime = "application/pdf"; run = "pdf"; }
+	  ];
           prepend_previewers = [
             # Archive previewer
             {
@@ -111,6 +128,11 @@ in
               mime = "application/x-xz";
               run = "ouch";
             }
+	    # pdf previewer
+	    {
+	      mime = "application/pdf";
+	      run = "pdf";
+	    }
           ];
         };
       };
@@ -119,10 +141,13 @@ in
     xdg.enable = true;
 
     xdg.configFile."yazi/plugins/ouch.yazi".source = inputs.ouch-yazi;
+    xdg.configFile."yazi/plugins/pdf.yazi/main.lua".source = "${inputs.yazi}/yazi-plugin/preset/plugins/pdf.lua";
 
     # https://github.com/GianniBYoung/rsync.yazi https://github.com/KKV9/compress.yazi https://github.com/ndtoan96/ouch.yazi
     home.packages = [
       unstable._7zz
+      unstable.zathura
+      unstable.poppler
     #  unstable.ouch
      # unstable.chafa
     ];

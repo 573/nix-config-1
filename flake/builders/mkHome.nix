@@ -43,7 +43,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.unstable.legacyPackages.${system}.zellij; 
     yazi =
       if isLinux && isAarch64 then
-        inputs.nixpkgs.legacyPackages.${system}.yazi
+        inputs.unstable.legacyPackages.${system}.yazi
       else
         inputs.unstable.legacyPackages.${system}.yazi;
     emacs =

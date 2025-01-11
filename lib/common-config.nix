@@ -30,7 +30,7 @@ in
       extraSpecialArgs = {
         inherit inputs rootPath;
         inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim makeNixvimWithModule;
-        inherit (inputs.yazi.packages.${pkgs.system}) yazi;
+        inherit (inputs.unstable.legacyPackages.${pkgs.system}) yazi;
     zellij =
       if isLinux && isAarch64
         then

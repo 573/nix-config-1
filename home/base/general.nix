@@ -69,7 +69,7 @@ in
         htop.enable = true;
         nix-index.enable = true;
 	helix.enable = true;
-	#yazi.enable = true;
+	yazi.enable = true;
         #xplr.enable = true;
         neovim = {
           enable = true;
