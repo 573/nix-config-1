@@ -54,6 +54,8 @@ in
       arbtt.enable = true;
 
       zellij.enable = true;
+
+      mpv.enable = true;
     };
   };
 
