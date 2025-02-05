@@ -183,6 +183,18 @@
    ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=20611
    (setq bidi-paragraph-direction 'left-to-right))
 
+;; https://emacs.stackexchange.com/a/17674
+;; https://github.com/AntonHakansson/org-nix-shell/blob/f359d9e1053fadee86dd668f4789ae2e700d8e8a/demo.org?plain=1#L5
+;; https://discourse.nixos.org/t/nix-shells-in-emacs-org-mode-source-blocks/12673/73878
+;; https://orgmode.org/worg/org-contrib/babel/languages/index.html
+(org-babel-do-load-languages
+ 'org-babel-load-languages '((C . t) (python . t) (shell . t)))
+
+;; Invalid read syntax "#" 1,2 when eval-buffer their demo.org and no nix-shell effective when using C-c C-c on 
+;; blocks - if it worked added (nix . t) above to 'org-babel-load-languages
+;;(use-package org-nix-shell
+;;  :hook (org-mode . org-nix-shell-mode))
+
 ;; https://emacs.stackexchange.com/questions/73878/how-to-start-scratch-buffer-with-olivetti-org-mode-and-exotica-theme-altogether?rq=1
 (defun my/initial-layout ()
   "Create my initial screen layout."

@@ -34,7 +34,7 @@ in
       };
 
       bindings = {
-        "Ctrl+p" = "sort-playlist";
+        "Ctrl+p" = "script-binding playlistmanager/sortplaylist";
       };
       
     };
