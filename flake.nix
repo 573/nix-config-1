@@ -177,12 +177,12 @@
 
     "hledger-completion.bash" = {
       flake = false;
-      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.32.3&dir=hledger/shell-completion";
+      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.41&dir=hledger/shell-completion";
     };
 
     hledger-bin = {
       flake = false;
-      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.32.3&dir=bin";
+      url = "github:simonmichael/hledger?ref=refs/tags/hledger-1.41&dir=bin";
     };
 
     fsread-nvim = {
@@ -282,11 +282,16 @@
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/ebd77d296e02754318aae98802440aea456bdfdc";
+      url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
     };
 
     emacs-overlay-cached = {
-      url = "github:nix-community/emacs-overlay/ebd77d296e02754318aae98802440aea456bdfdc";
+    # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
+      # n-o-d 24.11 not yet released, stateVersion also still on 24.05
+      # this commit (pr) breaks my aarch64 emacs somehow: a20a230b4051096340ee5415d1a8d66648566810
+      # with the one before it works f148a612dbb4c29162fd61558ca10bc1b6fdc669
+      # see https://github.com/nix-community/emacs-overlay/commits/master?since=2024-08-07&until=2024-08-07
+      url = "github:nix-community/emacs-overlay/f148a612dbb4c29162fd61558ca10bc1b6fdc669";
       #url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
       #url = "github:nix-community/emacs-overlay/2308be4351ab8a152248a48baebf22649c83a487";
     };
@@ -554,7 +559,7 @@
         unstable = inputs.unstable.legacyPackages.${system};
         nixos-2405 = inputs.nixos-2405.legacyPackages.${system};
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
-        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc9121;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
         fenix = inputs.fenix.packages.${system};
         nixpkgs-ruby-overlay = inputs.nixpkgs-ruby.overlays.default;
@@ -601,7 +606,6 @@
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
         (mkNixos "aarch64-linux" "twopi")
-        (mkNixos "armv7l-linux" "rasnixpi")
       ];
 
       # Expose the necessary information in your flake so agenix-rekey

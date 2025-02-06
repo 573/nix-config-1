@@ -145,7 +145,7 @@ in
           '';
     };
 
-  # FIXME: update when released
+  # FIXME: update only when released
   system.stateVersion = "24.05";
 
   terminal.font =

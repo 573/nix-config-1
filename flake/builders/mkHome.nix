@@ -32,7 +32,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
     libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
 
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim makeNixvimWithModule;
-    haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc965;
+    haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc9121;
     ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
     unstable = inputs.unstable.legacyPackages.${system};
     zellij =

@@ -43,7 +43,8 @@ let
     pname = "ox-odt";
     # nix-style unstable version 0-unstable-20240427 can be used after
     # https://github.com/NixOS/nixpkgs/pull/316726 reaches you
-    version = "20240427.0";
+    #version = "20240427.0";
+    version = "0-unstable-20240427";
     src = pkgs.fetchFromGitHub {
       owner = "kjambunathan";
       repo = "org-mode-ox-odt";
@@ -51,7 +52,7 @@ let
       hash = "sha256-/AXechWnUYiGYw/zkVRhUFwhcfknTzrC4oSWoa80wRw=";
     };
     # not needed after https://github.com/NixOS/nixpkgs/pull/316107 reaches you
-    commit = "foo";
+    #commit = "foo";
 
     # use :files to include only related files
     # https://github.com/melpa/melpa?tab=readme-ov-file#recipe-format

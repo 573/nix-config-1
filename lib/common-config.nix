@@ -39,7 +39,7 @@ in
         inputs.unstable.legacyPackages.${pkgs.system}.zellij; 
         nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.system};
         unstable = inputs.unstable.legacyPackages.${pkgs.system};
-        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc965;
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc9121;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system};
         emacs =
           if isLinux && isAarch64 then
