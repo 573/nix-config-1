@@ -91,6 +91,8 @@ packages missing being noticed at runtime which often is related to so first che
 flake input `emacs-overlay`, might refer to a dated version. Also when updating emacs
 the aarch64-linux variant needs to be remote-built or binfmt-built and pushed to a
 cache as its build causes an OOM killer on certain devices.
+ More info here: https://gist.github.com/573/d39c29400044c8e6f22a8b1d17c0a56c
+
 
 ###### nix-on-droid
 

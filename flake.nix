@@ -53,8 +53,8 @@
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
-    # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.32.3&fullName=hledger-1.32.3&keyName=haskellPackages.hledger&revision=05bbf675397d5366259409139039af8077d695ce&channel=nixpkgs-unstable#instructions
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
+    # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.41&fullName=hledger-1.41&keyName=haskellPackages.hledger_1_41&revision=21808d22b1cda1898b71cf1a1beb524a97add2c4&channel=nixpkgs-unstable#instructions
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/21808d22b1cda1898b71cf1a1beb524a97add2c4";  # 05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -282,11 +282,12 @@
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/c051c42e3325ac62e9bf83e72e3868db1e5f2e64";
+      url = "github:nix-community/emacs-overlay/ebd77d296e02754318aae98802440aea456bdfdc";
     };
 
     emacs-overlay-cached = {
-      url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
+      url = "github:nix-community/emacs-overlay/ebd77d296e02754318aae98802440aea456bdfdc";
+      #url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
       #url = "github:nix-community/emacs-overlay/2308be4351ab8a152248a48baebf22649c83a487";
     };
 

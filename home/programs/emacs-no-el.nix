@@ -215,7 +215,7 @@ in
             #ac-ispell # https://elpa.gnu.org/packages/orderless.html, use case: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
             el-fly-indent-mode # u
 	    #org-nix-shell # https://melpa.org/#/org-nix-shell
-	    #ob-nix # https://melpa.org/#/ob-nix
+	    ob-nix # https://melpa.org/#/ob-nix
             ;
           inherit (epkgs.elpaPackages)
             jinx # u
