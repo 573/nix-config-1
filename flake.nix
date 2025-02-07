@@ -54,7 +54,7 @@
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
     # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.41&fullName=hledger-1.41&keyName=haskellPackages.hledger_1_41&revision=21808d22b1cda1898b71cf1a1beb524a97add2c4&channel=nixpkgs-unstable#instructions
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/21808d22b1cda1898b71cf1a1beb524a97add2c4";  # 05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/c792c60b8a97daa7efe41a6e4954497ae410e0c1";  # 05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -217,6 +217,11 @@
 
     yazi-compress = {
       url = "github:KKV9/compress.yazi";
+      flake = false;
+    };
+
+    yazi-plugin-bat = {
+      url = "github:mgumz/yazi-plugin-bat";
       flake = false;
     };
 
@@ -559,7 +564,7 @@
         unstable = inputs.unstable.legacyPackages.${system};
         nixos-2405 = inputs.nixos-2405.legacyPackages.${system};
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
-        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskell.packages.ghc9121;
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskellPackages;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
         fenix = inputs.fenix.packages.${system};
         nixpkgs-ruby-overlay = inputs.nixpkgs-ruby.overlays.default;

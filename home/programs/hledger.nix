@@ -8,7 +8,7 @@
   lib,
   pkgs,
   inputs,
-  ghc-nixpkgs-unstable,
+  haskellPackages,
   ...
 }:
 
@@ -23,12 +23,15 @@ let
 
   inherit (pkgs.stdenv) isLinux isx86_64;
 
-  inherit (ghc-nixpkgs-unstable)
-    hledger
-    hledger-utils
+  inherit (haskellPackages)
+    hledger_1_40
+    hledger-web_1_40
+    hledger-ui_1_40
     hledger-interest
-    hledger-web
-    hledger-ui
+    ;
+
+  inherit (pkgs)
+    hledger-utils
     ;
 
   /**
@@ -73,7 +76,7 @@ in
         [
           (config.lib.custom.wrapProgram {
             name = "hledger";
-            source = hledger;
+            source = hledger_1_40;
             path = "/bin/hledger";
             editor = pkgs.micro; # TODO replace by nvim when faster
           })
@@ -83,8 +86,8 @@ in
         ]
         ++ optionals (isLinux && isx86_64) [
           # pkgs.hledger-iadd # DONT on demand can retrieve via nix profile install nixpkgs/d1c3fea7ecbed758168787fe4e4a3157e52bc808#haskellPackages.hledger-iadd, see https://gist.github.com/573/6b02765d71c27edb10c481e4746e7264
-          hledger-ui
-          hledger-web
+          hledger-ui_1_40
+          hledger-web_1_40
           # pkgs.hledger-flow # DONT same as hledger-flow above
         ];
       sessionPath = [ "${inputs.hledger-bin.outPath}/bin" ];

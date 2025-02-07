@@ -39,7 +39,7 @@ in
         inputs.unstable.legacyPackages.${pkgs.system}.zellij; 
         nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.system};
         unstable = inputs.unstable.legacyPackages.${pkgs.system};
-        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskell.packages.ghc9121;
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskellPackages;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system};
         emacs =
           if isLinux && isAarch64 then
@@ -139,7 +139,8 @@ in
         path = inputs.nixpkgs-unfree;
       };
       unstable.flake = inputs.unstable;
+      nixos-2405.flake = inputs.nixos-2405;
     };
-    nixPath = [ "nixpkgs=flake:nixpkgs" "unstable=flake:unstable" "nixpkgs-unfree=flake:nixpkgs-unfree" ];
+    nixPath = [ "nixpkgs=flake:nixpkgs" "unstable=flake:unstable" "nixos-2405=flake:nixos-2405" "nixpkgs-unfree=flake:nixpkgs-unfree" ];
   };
 }

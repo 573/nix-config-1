@@ -66,6 +66,7 @@ in
         ];
       };
       # https://yazi-rs.github.io/docs/resources
+      # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1
       settings = {
         log = {
           enabled = false;
@@ -84,24 +85,31 @@ in
             }
           ];
 	  # FIXME preview not working, run="pdff"; wants .config/yazi/plugins/pdf.lua https://github.com/sxyazi/yazi/issues/110
-	  pdff = [
-            { run = ''zathura "$@"''; block = true; desc = "Open"; for = "unix"; }
+	  pdf = [
+            { run = ''zathura "$@"''; block = true; desc = "Open with zathura"; for = "unix"; }
           ];
         };
 	open = {
-	  prepend_rules = [
+	  rules = [
             { mime = "application/pdf"; use = [ "pdf" "reveal" ]; }
           ];
 	};
         plugin = {
 	  preloaders = [
 	# PDF
-	{ mime = "application/pdf"; run = "pdf"; }
+	{ mime = "application/pdf"; run = "pdf"; } #?
           ];
 	  previewers = [
 	    # PDF
-	{ mime = "application/pdf"; run = "pdf"; }
+	{ mime = "application/pdf"; run = "pdf"; } #?
+	{ name = "*/"; run = "folder"; sync = true; }
+	{ mime = "text/*";                 run = "bat"; }
+	{ mime = "*/xml";                  run = "bat"; }
+	{ mime = "*/cs";                   run = "bat"; }
+	{ mime = "*/javascript";           run = "bat"; }
+	{ mime = "*/x-wine-extension-ini"; run = "bat"; }
 	  ];
+
           prepend_previewers = [
             # Archive previewer
             {
@@ -133,6 +141,14 @@ in
 	      mime = "application/pdf";
 	      run = "pdf";
 	    }
+	    { 
+	      name = "*.csv"; 
+	      run = "bat";
+	    }
+	    { 
+	      name = "*.md";
+	      run = "bat";
+	    }
           ];
         };
       };
@@ -141,15 +157,17 @@ in
     xdg.enable = true;
 
     xdg.configFile."yazi/plugins/ouch.yazi".source = inputs.ouch-yazi;
+    xdg.configFile."yazi/plugins/bat.yazi".source = inputs.yazi-plugin-bat;
     xdg.configFile."yazi/plugins/pdf.yazi/main.lua".source = "${inputs.yazi}/yazi-plugin/preset/plugins/pdf.lua";
 
     # https://github.com/GianniBYoung/rsync.yazi https://github.com/KKV9/compress.yazi https://github.com/ndtoan96/ouch.yazi
-    home.packages = [
-      unstable._7zz
-      unstable.zathura
-      unstable.poppler
-    #  unstable.ouch
-     # unstable.chafa
-    ];
+    home.packages = builtins.attrValues {
+      inherit (unstable)
+        _7zz
+        zathura
+        poppler
+#        ouch
+	;
+    };
   };
 }

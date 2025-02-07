@@ -1408,17 +1408,17 @@
     },
     "ghc-nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1737545071,
-        "narHash": "sha256-j4HeaLw1LZxkCvuOxdO1xTnPYLSOQuzOjGEuCK80X2w=",
+        "lastModified": 1735160951,
+        "narHash": "sha256-9h91U6BBNnzShwzlC+r/aXB+WyN3S140lYQbHH95bc0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "21808d22b1cda1898b71cf1a1beb524a97add2c4",
+        "rev": "c792c60b8a97daa7efe41a6e4954497ae410e0c1",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "21808d22b1cda1898b71cf1a1beb524a97add2c4",
+        "rev": "c792c60b8a97daa7efe41a6e4954497ae410e0c1",
         "type": "github"
       }
     },
@@ -3205,11 +3205,11 @@
     },
     "nixpkgs_18": {
       "locked": {
-        "lastModified": 1736200483,
-        "narHash": "sha256-JO+lFN2HsCwSLMUWXHeOad6QUxOuwe9UOAF/iSl1J4I=",
+        "lastModified": 1738843498,
+        "narHash": "sha256-7x+Q4xgFj9UxZZO9aUDCR8h4vyYut4zPUvfj3i+jBHE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3f0a8ac25fb674611b98089ca3a5dd6480175751",
+        "rev": "f5a32fa27df91dfc4b762671a0e0a859a8a0058f",
         "type": "github"
       },
       "original": {
@@ -4315,6 +4315,7 @@
         "wsl-vpnkit": "wsl-vpnkit",
         "yazi": "yazi",
         "yazi-compress": "yazi-compress",
+        "yazi-plugin-bat": "yazi-plugin-bat",
         "yt-dlp": "yt-dlp",
         "zen-browser": "zen-browser",
         "zig2nix": "zig2nix"
@@ -5135,11 +5136,11 @@
     },
     "unstable": {
       "locked": {
-        "lastModified": 1736241350,
-        "narHash": "sha256-CHd7yhaDigUuJyDeX0SADbTM9FXfiWaeNyY34FL1wQU=",
+        "lastModified": 1738797219,
+        "narHash": "sha256-KRwX9Z1XavpgeSDVM/THdFd6uH8rNm/6R+7kIbGa+2s=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "8c9fd3e564728e90829ee7dbac6edc972971cd0f",
+        "rev": "1da52dd49a127ad74486b135898da2cef8c62665",
         "type": "github"
       },
       "original": {
@@ -5245,6 +5246,22 @@
       "original": {
         "owner": "KKV9",
         "repo": "compress.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-plugin-bat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1734770030,
+        "narHash": "sha256-tvBN0K0W+sh6vcH6w+oE8aK4MGInVukwQA45r5U96aw=",
+        "owner": "mgumz",
+        "repo": "yazi-plugin-bat",
+        "rev": "cce74d67b9ccdd226ed35baaea1c7660efa78356",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mgumz",
+        "repo": "yazi-plugin-bat",
         "type": "github"
       }
     },
