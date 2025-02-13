@@ -9,6 +9,7 @@
   pkgs,
   libreoffice-postscript,
   rootPath,
+  unstable,
   ...
 }:
 let
@@ -166,6 +167,11 @@ in
         #gtt
         notepad-next
         ;
+
+      inherit (unstable)
+        tesseract
+	ocrmypdf
+	;
 
       inherit (pkgs.usbutils)
         out

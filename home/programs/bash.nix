@@ -50,7 +50,7 @@ in
         	# set +H
 
 		# inspo: https://discourse.nixos.org/t/how-do-folks-keep-a-cheat-sheet-of-terminal-konsole-commands/58565/6 https://unix.stackexchange.com/a/147787
-		set -O vi
+		set -o vi
 		bind Space:magic-space
       '';
     };
