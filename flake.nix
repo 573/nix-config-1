@@ -281,7 +281,7 @@
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
       #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
-      inputs.nixpkgs.follows = "nixos-2405"; # FIXME set to "nixpkgs" when https://github.com/nix-community/NixOS-WSL/tree/renovate/nixpkgs-24.x is merged
+      inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
       #inputs.flake-utils.follows = "flake-utils";
     };

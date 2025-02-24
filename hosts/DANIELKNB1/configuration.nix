@@ -20,6 +20,8 @@
     # TODO get used to handling first, see example at https://github.com/oddlama/agenix-rekey/pull/28#issue-2331901837
     #agenix-rekey.enable = true;
       programs.nixbuild.enable = true;
+
+    services.tailscale.enable = true;
   };
 
   systemd.tmpfiles.rules = [
