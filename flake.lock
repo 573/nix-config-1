@@ -2861,7 +2861,7 @@
           "flake-compat"
         ],
         "nixpkgs": [
-          "nixos-2405"
+          "nixpkgs"
         ]
       },
       "locked": {

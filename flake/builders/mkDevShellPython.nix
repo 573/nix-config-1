@@ -23,6 +23,9 @@ let
         ocrmypdf
         pandas
         numpy
+	# FIXME i. e. https://discourse.nixos.org/t/anyone-has-a-working-jupyterhub-jupyter-lab-setup/7659/2 or https://github.com/stuzenz/nix-sample-jupyterlab-nix-shell or https://discourse.nixos.org/t/how-to-work-with-broken-jupyterhub-package-service/29663/4 https://www.reddit.com/r/NixOS/comments/1b95pv4/comment/ktvwruz/
+jupyterlab
+jupyterlab-git
         ;
     }
   );
