@@ -537,6 +537,7 @@
         mkDevenvHaskell
         mkDevenvRustWasm32
         mkDevShellJdk
+	mkDevShellPostgreSQL
         mkDevenvRubyNix
         mkDevenvRubyVar3
         mkDevShellOcaml
@@ -796,6 +797,7 @@
           #{ name = "template";  value = nixpkgs.mkShell {}; }
           # AFAIU the pkgs used herein (mkDevenv*) are with the overlays as in flake/nixpkgs.nix etc. applied, also means any derivation defined therein can be used here then, but is a different derivation than i. e. some binary-cached elsewhere, which can lead to subtle differences i. e. (un)expected rebuilds. To use a binary-cached flake define here directly in flake.nix and add overlays when needed only.
           (mkDevShellJdk system "jdk21" { jdk = pkgs: pkgs.jdk21; })
+          (mkDevShellPostgreSQL system "postgresql" { inherit haskellPackages unstable; })
           # TODO wait for https://github.com/tweag/jupyenv/pull/524
           # until then as in https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/editors/jupyter-kernels/coq/default.nix (https://github.com/NixOS/nixpkgs/issues/255923, https://github.com/NixOS/nixpkgs/pull/268078 and https://gist.github.com/teto/4d12998d734f982e27f48d8bb001c8ae)
           # https://discourse.nixos.org/t/install-custom-kernels-into-jupyter-lab/37502

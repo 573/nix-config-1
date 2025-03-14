@@ -148,6 +148,7 @@ in
 
   mkApp = wrapper ./builders/mkApp.nix;
   mkDevShellJdk = wrapper ./builders/mkDevShellJdk.nix;
+  mkDevShellPostgreSQL = wrapper ./builders/mkDevShellPostgreSQL.nix;
   mkDevenvJvmLang = wrapper ./builders/mkDevenvJvmLang.nix;
   mkDevenvDeno = wrapper ./builders/mkDevenvDeno.nix;
   mkDevenvFlutter = wrapper ./builders/mkDevenvFlutter.nix;

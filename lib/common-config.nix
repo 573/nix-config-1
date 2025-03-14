@@ -14,7 +14,7 @@ let
   #inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions)
   #  nix_2_24
   inherit (pkgs.nixVersions)
-   stable
+   stable nix_2_22
     ;
 in
 {
@@ -121,7 +121,7 @@ in
       flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
-    package = stable;
+    package = nix_2_22; #stable;
     # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
 
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
