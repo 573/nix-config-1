@@ -6,6 +6,11 @@
 (message "configuration is %S" "templated from home/misc/emacs.el: @out@ see C-x b *Messages* for the real path of emacs.el")
 (message "works")
 
+
+(custom-set-variables
+ '(ispell-alternate-dictionary "/sdcard/wordlist-german.txt")
+ )
+
 ;; A simple way to manage personal keybindings.
 ;; needed by use-package
 ;; M-x describe-personal-keybindings
@@ -28,9 +33,10 @@
 ;; https://github.com/minad/corfu?tab=readme-ov-file#configuration (example configuration)
 (use-package corfu
   ;; Optional customizations
-  :custom
+  ;;  :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-   (corfu-auto t)                 ;; Enable auto completion
+  ;;  (corfu-auto t)                    ;; Enable auto completion
+  ;;(corfu-auto-prefix 2)             ;; https://www.reddit.com/r/emacs/comments/xnsq3i/comment/ipvocds/
   ;; (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -39,30 +45,32 @@
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+;; :hook ((prog-mode . corfu-mode)
+;;        (shell-mode . corfu-mode)
+;;        (eshell-mode . corfu-mode))
 
-  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
-  ;; be used globally (M-/).  See also the customization variable
-  ;; `global-corfu-modes' to exclude certain modes.
-  :init
-  (global-corfu-mode))
+;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+;; be used globally (M-/).  See also the customization variable
+;; `global-corfu-modes' to exclude certain modes.
+:init
+(global-corfu-mode)
+;;(corfu-popupinfo-mode)
+)
 
 ;; A few more useful configurations...
 (use-package emacs
   :custom
   ;; TAB cycle if there are only few candidates
-  ;; (completion-cycle-threshold 3)
-
+  ;;(completion-cycle-threshold 3)
+  
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (tab-always-indent 'complete)
 
   ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
   ;; try `cape-dict'.
-  ;;(text-mode-ispell-word-completion nil)
+  (text-mode-ispell-word-completion nil)
 
   ;; Hide commands in M-x which do not apply to the current mode.  Corfu
   ;; commands are hidden, since they are not used via M-x. This setting is
@@ -109,14 +117,17 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-dict) ;; Dictionary completion
   ;; ...
   :config ;; start emacs ; C-x b *scratch* ; start typing ; C-c p w should suggest from dictionary now
-  (setq cape-dict-file "@scowl@/share/dict/words.txt")
+  ;;(setq cape-dict-file "@scowl@/share/dict/words.txt")
+  (setq cape-dict-file "/sdcard/wordlist-german.txt")
+  ;;  (setq cape-dict-grep nil)
+  ;;(setq cape-dict-limit 10)
   ;; https://github.com/minad/cape/blob/ae98ec2/README.org#capf-transformers
   ;; Example 3: Create a Capf with debugging messages
   ;;(setq-local completion-at-point-functions (list (cape-capf-debug #'cape-dict)))
   ;; https://github.com/minad/cape?tab=readme-ov-file#super-capf---merging-multiple-capfs
-;; Merge the dabbrev, dict and keyword capfs, display candidates together.
-;;(setq-local completion-at-point-functions
-;;            (list (cape-capf-super #'cape-dabbrev #'cape-dict #'cape-keyword)))
+  ;; Merge the dabbrev, dict and keyword capfs, display candidates together.
+  ;;(setq-local completion-at-point-functions
+  ;;            (list (cape-capf-super #'cape-dabbrev #'cape-dict #'cape-keyword)))
 
 ;; Alternative: Define named Capf instead of using the anonymous Capf directly
 (defun cape-dabbrev-dict-keyword ()
@@ -128,11 +139,11 @@
 ;;M-? triggers correction for the misspelled word before point.
 ;;C-u M-? triggers correction for the entire buffer.
 ;;C-u C-u M-? forces correction of the word at point, even if it is not misspelled.
-(use-package jinx
-  :bind (("M-?" . jinx-correct)
-	 ("M-C-k" . jinx-languages))
-  :init
-  (add-hook 'emacs-startup-hook #'global-jinx-mode))
+;; (use-package jinx
+;;   :bind (("M-?" . jinx-correct)
+;; 	 ("M-C-k" . jinx-languages))
+;;   :init
+;;   (add-hook 'emacs-startup-hook #'global-jinx-mode))
 
 ;; TODO https://github.com/jiahaoli95/el-fly-indent-mode.el
 (use-package el-fly-indent-mode
@@ -199,12 +210,14 @@
 (defun my/initial-layout ()
   "Create my initial screen layout."
   (interactive)
+  (find-file "/sdcard/wordlist-german.txt")
   ;; 2. having org-mode launch in scratch buffer from the beginning, and
   (switch-to-buffer "*scratch*")
+  (set-buffer-file-coding-system utf-8)
   (org-mode)
   ;; (org-indent-mode)
   ;; 3. to have olivetti mode enabled too.
-  (olivetti-mode)
+  ;;(olivetti-mode)
   (delete-other-windows)
   )
 
