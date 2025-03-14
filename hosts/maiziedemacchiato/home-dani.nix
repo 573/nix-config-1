@@ -171,6 +171,7 @@ in
       inherit (unstable)
         tesseract
 	ocrmypdf
+	teams-for-linux
 	;
 
       inherit (pkgs.usbutils)
@@ -184,6 +185,7 @@ in
 
       inherit (pkgs.nixgl)
         nixGLIntel
+	#nixGLNvidiaBumblebee
         ;
 
       inherit (libreoffice-postscript)
