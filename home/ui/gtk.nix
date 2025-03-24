@@ -52,6 +52,7 @@ in
 
     # https://hoverbear.org/blog/declarative-gnome-configuration-in-nixos/
     # https://github.com/Hoverbear-Consulting/flake/blob/89cbf802a0be072108a57421e329f6f013e335a6/users/ana/home.nix
+    # TODO https://discourse.nixos.org/t/different-cursor-theme-hovering-background-and-windows/62983
     gtk = {
       enable = true;
       iconTheme = {
