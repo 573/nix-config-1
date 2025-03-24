@@ -1,4 +1,4 @@
-{ nixpkgs, rootPath }:
+{ nixpkgs, rootPath, nixos-hardware }:
 
 let
   configuration =
@@ -7,6 +7,7 @@ let
     {
       imports = [
         (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
+	nixos-hardware.nixosModules.raspberry-pi-4
       ];
 
       networking = {

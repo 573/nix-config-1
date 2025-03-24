@@ -10,6 +10,7 @@
   libreoffice-postscript,
   rootPath,
   unstable,
+  homeDir,
   ...
 }:
 let
@@ -48,15 +49,17 @@ in
         #. ${config.home.homeDirectory}/.aliases.sh
       '';
 
-      hledger.enable = true;
+      #hledger.enable = true;
 
       audio.enable = true;
 
-      arbtt.enable = true;
+      #arbtt.enable = true;
 
-      zellij.enable = true;
+      #zellij.enable = true;
 
       mpv.enable = true;
+
+      nixbuild.enable = true;
     };
   };
 
@@ -100,7 +103,7 @@ in
 
   home = {
     enableDebugInfo = false; # Enabled that for https://github.com/NixOS/nixpkgs/issues/271991
-    homeDirectory = "/home/dani";
+    homeDirectory = homeDir;
     username = "dani";
 
     packages = attrValues {
@@ -132,17 +135,17 @@ in
         xdotool
         xclip
         keepassxc
-        swappy
+        #swappy
         arandr
         xterm
-        signal-desktop
+        #signal-desktop
         #tailscale # and openssh to custom package, i. e. home/programs/ssh
         #my-emacs
         #openssh
-        dstask
+        #dstask
         # TODO https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/ https://wiki.hyprland.org/Nix/Hyprland-on-other-distros/ https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8 https://wiki.archlinux.org/title/Display_manager
         pcmanfm
-        chafa
+        #chafa
         #simple-scan # memory error, potential workaround: https://github.com/NixOS/nixpkgs/issues/149812
         #tint2 # rather use at service definition themselves
         #simple-scan # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations of home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work, rather using host's simple-scan until https://github.com/NixOS/nixpkgs/issues/271989 gets recognition
@@ -171,7 +174,7 @@ in
       inherit (unstable)
         tesseract
 	ocrmypdf
-	teams-for-linux
+	#teams-for-linux
 	;
 
       inherit (pkgs.usbutils)
@@ -188,27 +191,12 @@ in
 	#nixGLNvidiaBumblebee
         ;
 
-      inherit (libreoffice-postscript)
-        libreoffice
-        ;
+      #inherit (libreoffice-postscript)
+      #  libreoffice
+      #  ;
 
-      nerdfonts = pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
+      nerdfonts = pkgs.nerd-fonts.ubuntu-mono; # TODO nerd-fonts.monaspace
 
-      keyboard-de = (
-        writeScriptBin "keyboard-de" ''
-          #!${runtimeShell}
-
-          setxkbmap -model pc104 -layout de
-        ''
-      );
-
-      keyboard-en = (
-        writeScriptBin "keyboard-en" ''
-                  #!${runtimeShell}
-
-          	setxkbmap -model pc104 -layout us -variant altgr-intl
-        ''
-      );
     };
 
     sessionPath = [

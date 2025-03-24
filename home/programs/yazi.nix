@@ -4,7 +4,6 @@
   lib,
   inputs,
   unstable,
-  yazi,
   ...
 }:
 
@@ -51,13 +50,15 @@ in
       # https://github.com/sxyazi/yazi/issues/1046
       # FIXME https://github.com/sxyazi/yazi/issues/1726 (in upstream main only, use https://yazi-rs.github.io/docs/installation#cache)
         # also tried as in: https://discourse.nixos.org/t/patching-src-fails-and-limiting-hunks-doesnt-work-either/54406
-      package = yazi;
+      package = (unstable.yazi.override {
+	  optionalDeps = with pkgs; [ jq _7zz fd ripgrep fzf zoxide ];
+	});
 
       enableBashIntegration = true;
 
       keymap = {
         # F1 or ~ for help
-        manager.prepend_keymap = [
+        mgr.prepend_keymap = [
           {
             run = "plugin ouch --args=zip";
             on = [ "C" ];
@@ -65,6 +66,9 @@ in
           }
         ];
       };
+
+      theme = builtins.fromTOML (builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml");
+
       # https://yazi-rs.github.io/docs/resources
       # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1
       settings = {
@@ -88,9 +92,15 @@ in
 	  pdf = [
             { run = ''zathura "$@"''; block = true; desc = "Open with zathura"; for = "unix"; }
           ];
+	  edit = [
+	    { run = ''$EDITOR "$@"''; block = true; for = "unix"; }
+          ];
         };
 	open = {
 	  rules = [
+	    # https://yazi-rs.github.io/docs/configuration/yazi#open
+	    # You can spot on a file to check it's mime-type with the default Tab key.
+	    { mime = "text/*";          use = "edit"; }
             { mime = "application/pdf"; use = [ "pdf" "reveal" ]; }
           ];
 	};
@@ -166,8 +176,10 @@ in
         _7zz
         zathura
         poppler
-#        ouch
+	bat
 	;
-    };
+    } ++ [
+      (lib.hiPrio unstable.ouch)
+    ];
   };
 }
