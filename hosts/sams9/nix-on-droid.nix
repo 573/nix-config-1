@@ -19,8 +19,9 @@ let
     UsePAM=no\nHostKey ${sshdDirectory}/ssh_host_ed25519_key\nPort 8022\nPermitUserEnvironment yes\n
   '';
 
+  # config.home.username not existing, use either nixOnDroidConfigurations.sams9.config.home-manager.config.home.username ou nixOnDroidConfigurations.sams9.config.user.userName
   sshEnvironment = ''
-  PATH=/data/data/com.termux.nix/files/usr/etc/profiles/per-user/nix-on-droid/bin:"$PATH"
+  PATH=/data/data/com.termux.nix/files/usr/etc/profiles/per-user/${config.home-manager.config.home.username}/bin:"$PATH"
   '';
 
   commonConfig = config.lib.custom.commonConfig configArgs;
