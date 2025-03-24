@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  homeDir,
   nixos-2405,
   ...
 }:
@@ -35,13 +36,13 @@ in
       #yazi.enable = lib.mkForce false;
       #tex.enable = true;
       #hledger.enable = true;
-      zellij.enable = true;
+      #zellij.enable = true;
 
 
 
       shell = {
       envExtra = lib.mkBefore ''
-        . "/etc/profiles/per-user/nix-on-droid/etc/profile.d/nix-on-droid-session-init.sh"
+        . "/etc/profiles/per-user/${config.home.username}/etc/profile.d/nix-on-droid-session-init.sh"
       '';
 
         logoutExtra = ''
@@ -65,10 +66,16 @@ in
       # FIXME: tmux does not start
       tmux.enable = lib.mkForce false;
 
+      nixbuild.enable = true;
     };
+ 
+    # FIXME still needs the android app
+    services.tailscale.enable = true;
   };
 
   home = {
+    # for compat with ../../home/programs/nixbuild.nix
+    homeDirectory = homeDir; #config.home-manager.config.home.
     packages = attrValues {
       # with pkgs; [
       /*
