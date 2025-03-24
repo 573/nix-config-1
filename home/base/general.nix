@@ -58,7 +58,7 @@ in
     {
       custom.programs = {
         #emacs-novelist.enable = true;
-        emacs-no-el.enable = true;
+        #emacs-no-el.enable = true;
         #emacs-nano.enable = true;
         bash.enable = true;
         #shell = {
@@ -68,18 +68,15 @@ in
         #};
         htop.enable = true;
         nix-index.enable = true;
-	helix.enable = true;
-	yazi.enable = true;
+	#helix.enable = true;
+	#yazi.enable = true;
         #xplr.enable = true;
         neovim = {
           enable = true;
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };
-	shell.shellAliases = {
-	  nixbuild-shell = "nix run nixpkgs#rlwrap ssh eu.nixbuild.net shell";
-	};
-      };
+	      };
 
 	programs = {
 	zoxide = {
@@ -172,7 +169,7 @@ in
 
             nix-inspect
             #            zellij
-            viddy
+            #viddy
             #zoxide # rather home module
             ;
 
@@ -231,7 +228,7 @@ in
         # see ./home/programs
         programs = {
           git.enable = true;
-          nnn.enable = true;
+          #nnn.enable = true;
           rsync.enable = true;
           ssh = {
             enable = true;
@@ -255,7 +252,9 @@ in
     (mkIf (!cfg.lightWeight) {
       custom.programs = {
         tmux.enable = true;
-        #emacs.enable = true;
+        emacs-no-el.enable = true;
+	helix.enable = true;
+	yazi.enable = true;
       };
 
       home.packages = attrValues {

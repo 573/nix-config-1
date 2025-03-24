@@ -65,8 +65,8 @@ in
       lua-language-server
       shellcheck
       vscode-langservers-extracted
-      marksman
-      bash-language-server
+marksman
+     bash-language-server
       ;
     };
 
