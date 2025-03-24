@@ -28,7 +28,6 @@ in
     wsl = {
       enable = true;
       interop.register = true;
-      wslConf.user.default = "nixos";
       nativeSystemd = true;
     };
 
@@ -54,7 +53,6 @@ in
 
 services.locate = {
   enable = true;
-  localuser = null; # silence warning
   package = pkgs.plocate; # use faster locate implementation
   prunePaths = [
     "/media"

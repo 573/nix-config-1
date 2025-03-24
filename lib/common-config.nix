@@ -14,7 +14,7 @@ let
   #inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions)
   #  nix_2_24
   inherit (pkgs.nixVersions)
-   stable nix_2_22
+   stable nix_2_22 nix_2_28
     ;
 in
 {
@@ -76,6 +76,7 @@ in
     settings = {
       # TODO https://discourse.nixos.org/t/merged-list-contains-duplicates/38004
       substituters = [
+        "https://laut.cachix.org/"
         "https://anmonteiro.nix-cache.workers.dev"
         "https://573-bc.cachix.org/"
         "https://cache.nixos.org/"
@@ -93,6 +94,7 @@ in
         "https://cuda-maintainers.cachix.org/"
       ];
       trusted-public-keys = lib.mkForce [
+        "laut.cachix.org-1:0VdPZQIzKf4dbk8eHrZPjZc53y6DzdNsUt/VB6ju66g="
         "ocaml.nix-cache.com-1:/xI2h2+56rwFfKyyFVbkJSeGqSIYMC/Je+7XXqGKDIY="
         "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -121,7 +123,7 @@ in
       flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
-    package = nix_2_22; #stable;
+    package = nix_2_28; #stable;
     # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
 
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613
@@ -131,13 +133,15 @@ in
     # https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538
     channel.enable = false;
 
+    # See https://discourse.nixos.org/t/nix-copying-a-store-path-into-the-store/60409/11 for discussion
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       nix-config.flake = inputs.self;
-      "nixpkgs-unfree".to = {
-        type = "path";
-        path = inputs.nixpkgs-unfree;
-      };
+      #"nixpkgs-unfree".to = {
+      #  type = "path";
+      #  path = inputs.nixpkgs-unfree;
+      #};
+      nixpkgs-unfree.flake = inputs.nixpkgs-unfree;
       unstable.flake = inputs.unstable;
       nixos-2405.flake = inputs.nixos-2405;
     };

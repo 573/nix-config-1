@@ -4,6 +4,7 @@
   pkgs,
   homeDir,
   nixos-2405,
+  inputs,
   ...
 }:
 let
@@ -67,6 +68,11 @@ in
       tmux.enable = lib.mkForce false;
 
       nixbuild.enable = true;
+
+      neovim = {
+        enable = true;
+	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixOnDroidConfigurations.sams.options.home-manager.config.type.getSubOptions [ ]'';
+      };
     };
  
     # FIXME still needs the android app

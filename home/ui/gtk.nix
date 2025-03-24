@@ -52,6 +52,8 @@ in
 
     # https://hoverbear.org/blog/declarative-gnome-configuration-in-nixos/
     # https://github.com/Hoverbear-Consulting/flake/blob/89cbf802a0be072108a57421e329f6f013e335a6/users/ana/home.nix
+    # TODO https://discourse.nixos.org/t/different-cursor-theme-hovering-background-and-windows/62983
+    # https://discourse.nixos.org/t/different-cursor-theme-hovering-background-and-windows/62983
     gtk = {
       enable = true;
       iconTheme = {
@@ -63,8 +65,10 @@ in
         package = pkgs.palenight-theme;
       };
       cursorTheme = {
-        name = "Numix-Cursor";
-        package = pkgs.numix-cursor-theme;
+        #name = "Numix-Cursor";
+        #package = pkgs.numix-cursor-theme;
+        name = "phinger-cursors-dark";
+        package = pkgs.phinger-cursors;
       };
       gtk3.extraConfig = {
         Settings = ''
@@ -146,11 +150,17 @@ in
     home.sessionVariables.GTK_THEME = "palenight";
 
     home.pointerCursor = {
+      #gtk.enable = true;
+      #x11.enable = true;
+      #name = "Numix-Cursor";
+      #package = pkgs.numix-cursor-theme;
+      #size = 20;
+
+      name = "phinger-cursors-dark";
+      package = pkgs.phinger-cursors;
+      size = 24;
       gtk.enable = true;
       x11.enable = true;
-      name = "Numix-Cursor";
-      package = pkgs.numix-cursor-theme;
-      size = 20;
     };
 
   };

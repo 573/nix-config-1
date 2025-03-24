@@ -14,9 +14,6 @@ _check_requirements() {
   elif [[ -d "${HOME}/projects/${CONF_NAME}" ]]; then
     ROOT="${HOME}/projects/${CONF_NAME}"
     PRESET="git-single"
-  elif [[ -n "@workDirectory@" && -d "${HOME}/projects/@workDirectory@/${CONF_NAME}" ]]; then
-    ROOT="${HOME}/projects/@workDirectory@/${CONF_NAME}"
-    PRESET="git-single"
   else
     echo "neither ${CONF} nor projects named ${CONF_NAME} do not exist"
     exit 2

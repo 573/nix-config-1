@@ -28,7 +28,7 @@ let
 
   pluggo =
     pname:
-    unstable.vimUtils.buildVimPlugin {
+    pkgs.vimUtils.buildVimPlugin {
       inherit pname;
       src = inputs."${pname}";
       version = "0.1";
@@ -347,7 +347,7 @@ let
   #cmp-dictionary = { enable = true; };
 
   yazi = {
-      enable = true;
+      enable = false;
 
       settings = {
         log_level = "off";
@@ -475,36 +475,42 @@ let
         autostart = true;
       };
 
-nixd = {
+      nixd = {
         # Nix LS
-        enable = false; # FIXME re-enable when crashes on termux are fixed
+        enable = true; # FIXME re-enable when crashes on termux are fixed
         settings =
         let
             flake = ''(builtins.getFlake "${inputs.self}")'';
-            system = ''''${builtins.currentSystem}'';
         in
         {
           nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
-          options = rec {
-            nixos.expr = "${flake}.nixosConfigurations.DANIELKNB1.options";
-	    nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
-            home-manager.expr = "${nixos.expr}.home-manager.users.type.getSubOptions [ ]";
-            home_manager.expr = ''
-              ${flake}.homeConfigurations."dani@maiziedemacchiato".options
-            '';
-	    # Only when https://github.com/MattSturgeon/nix-config/blob/df6fc7c/nvim/flake-module.nix#L14
-            #nixvim.expr = "${flake}.packages.${system}.nvim.options";
-	    nixvim.expr = "${flake}.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.minimalPackage.options.type.type.getSubOptions [ ]";
-            nixondroid.expr = ''
-              ${flake}.nixOnDroidConfigurations.sams9.options
-            '';
-          };
-          diagnostic = {
-            # Suppress noisy warnings
-suppress = [
+	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/formatting.html
+	  formatting.command = [ "nixfmt" ];
+	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/diagnostic.html
+          diagnostic.suppress = [
               "sema-escaping-with"
               "var-bind-to-this"
             ];
+	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/index.html#pluginslspserversnixdsettingsoptions
+          options = rec {
+            nixos.expr = "${flake}.nixosConfigurations.DANIELKNB1.options";
+	    # as in https://github.com/nix-community/NixOS-WSL/blob/d34d9412556d3a896e294534ccd25f53b6822e80/modules/wsl-conf.nix#L21
+	    nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
+	    # as in https://github.com/nix-community/home-manager/blob/e8c19a3cec2814c754f031ab3ae7316b64da085b/nixos/common.nix#L112
+            home-manager.expr = config.custom.programs.neovim.nixd.expr.home-manager;
+	    # TODO split up by making *.expr configurable by host in that neovim.nix module here
+            #home_manager.expr = ''
+            #  ${flake}.homeConfigurations."dani@maiziedemacchiato".options
+            #'';
+	    /* TODO https://github.com/nix-community/nixvim/blob/1fb1bf8a73ccf207dbe967cdb7f2f4e0122c8bd5/flake/default.nix#L10, is another approach i. e. with that config https://github.com/khaneliman/khanelivim/blob/a33e6ab/flake.nix
+	    nix-repl> :lf github:khaneliman/khanelivim
+	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options 
+	    same as
+	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
+	    */
+            nixondroid.expr = ''
+              ${flake}.nixOnDroidConfigurations.sams9.options
+            '';
           };
         };
       };
@@ -685,6 +691,18 @@ in
 
       enable = mkEnableOption "neovim config";
 
+      nixd = {
+        expr = {
+	  home-manager = mkOption {
+	    type = types.str;
+	    default = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+	    description = let flake = ''(builtins.getFlake "${inputs.self}")''; in ''
+	    Either like ${flake}.homeConfigurations.nonnixos.options or like ${flake}.nixosConfigurations.nixosmachine.options.home-manager.users.type.getSubOptions [ ]
+	    '';
+	    };
+	};
+      };
+
       lightWeight = mkEnableOption "light weight neovim (vi) config for low performance hosts" // {
         default = true;
       };
@@ -730,6 +748,9 @@ in
 
             # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
             extraConfigLua = ''
+	            -- FIXME alacritty (+ tmux + neovim) workaround
+		    vim.opt.paste = true
+
               	    require('faster').setup()
 
               	    -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
@@ -740,9 +761,9 @@ in
               	      name = 'OSC 52',
               	      copy = {                                                     
               	        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-                              ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+                        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
               	      },
-                            paste = {
+                      paste = {
               	        ['+'] = require('vim.ui.clipboard.osc52').paste('+'), 
               		['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                  
               	      },                                                       
@@ -751,9 +772,9 @@ in
 
             extraPlugins =
               builtins.attrValues {
-                inherit (unstable.vimPlugins)
+                inherit (pkgs.vimPlugins)
                   neoterm
-                  nnn-vim
+                  #nnn-vim
                   faster-nvim
                   ;
               }
@@ -761,22 +782,22 @@ in
 
             inherit keymaps;
 
-            nixpkgs.pkgs = unstable;
+            nixpkgs.pkgs = pkgs;
 
             # Override neovim-unwrapped with one from a flake input
             # Using `stdenv.hostPlatform` to access `system`
             nixpkgs.overlays = [
               (
                 final: prev: {
-                  neovim-unwrapped =
-                    inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+                  #neovim-unwrapped =
+                  #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
 
                   vimPlugins =
                     prev.vimPlugins
                     // {
                       faster-nvim = final.vimUtils.buildVimPlugin {
                         name = "faster-nvim";
-                        src = inputs.name;
+                        src = inputs.faster-nvim;
                       };
                     };
                 }
@@ -799,7 +820,7 @@ in
 		luasnip
 		gitsigns
 		telescope
-		yazi
+		#yazi
                 ;
             };
           };
@@ -820,9 +841,16 @@ in
             makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
           '')
         ];
+
+      home.sessionVariables = { EDITOR = lib.mkDefault "vi"; };
+
+
+      custom.programs.shell.shellAliases = {
+        f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
+      };
     }
 
-    (mkIf (!cfg.lightWeight) {
+    /*(mkIf (!cfg.lightWeight) {
       # full nvim
       custom.programs.neovim.finalPackage = config.programs.nixvim.build.package;
 
@@ -836,8 +864,8 @@ in
         extraPlugins =
           builtins.attrValues
             {
-              inherit (unstable.vimPlugins)
-                nnn-vim
+              inherit (pkgs.vimPlugins)
+                #nnn-vim
                 neoterm
                 ;
             }
@@ -847,15 +875,15 @@ in
 
         inherit keymaps;
 
-        nixpkgs.pkgs = unstable;
+        nixpkgs.pkgs = pkgs;
 
         # Override neovim-unwrapped with one from a flake input
         # Using `stdenv.hostPlatform` to access `system`
         nixpkgs.overlays = [
           (
             final: prev: {
-              neovim-unwrapped =
-                inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+              #neovim-unwrapped =
+              #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
             }
           )
         ];
@@ -874,10 +902,10 @@ in
             cmp-path# m
             cmp_luasnip
             cmp-look# m
-	    yazi
+	    #yazi
             ;
         };
       };
-    })
+    })*/
   ]);
 }

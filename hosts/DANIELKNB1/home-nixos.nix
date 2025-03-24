@@ -6,6 +6,7 @@
 {
   lib,
   pkgs, # latest,
+  inputs,
   unstable,
   ...
 }:
@@ -29,6 +30,12 @@ in
       hledger.enable = true;
       tex.enable = true;
       zellij.enable = true;
+      nixbuild.enable = true;
+      alacritty.enable = true;
+      neovim = {
+        enable = true;
+	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+      };
     };
 
     development = {
@@ -123,7 +130,7 @@ in
       hurl
       ;
 
-    inherit (pkgs.python310Packages)
+    inherit (pkgs.python3Packages)
       pudb
       ;
 

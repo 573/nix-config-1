@@ -10,7 +10,7 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixos-2405.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
@@ -26,6 +26,8 @@
     nixos-2211.url = "github:NixOS/nixpkgs/nixos-22.11";
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     deploy-rs = {
       url = "github:serokell/deploy-rs";
@@ -46,10 +48,10 @@
     };
 
     # Firefox style
-    penguin-fox = {
-      url = "github:p3nguin-kun/pengufox";
-      flake = false;
-    };
+    #penguin-fox = {
+    #  url = "github:p3nguin-kun/pengufox";
+    #  flake = false;
+    #};
 
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
@@ -75,7 +77,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -225,6 +227,11 @@
       flake = false;
     };
 
+    yamb-yazi = {
+      url = "github:h-hg/yamb.yazi";
+      flake = false;
+    };
+
     ouch-yazi = {
       url = "github:ndtoan96/ouch.yazi";
       flake = false;
@@ -237,8 +244,15 @@
 
     # https://github.com/sxyazi/yazi/issues/1726
     yazi = {
-      url = "github:sxyazi/yazi";
+      # tag shipped for stable yazi
+      # tag nightly for unstable yazi
+      url = "github:sxyazi/yazi?ref=refs/tags/shipped";
       #inputs.nixpkgs.follows = "unstable";
+    };
+
+    command-yazi = {
+      url = "github:KKV9/command.yazi";
+      flake = false;
     };
 
     ml_env = {
@@ -287,7 +301,8 @@
     };
 
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
+      url = "github:nix-community/emacs-overlay";
+      #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
     };
 
     emacs-overlay-cached = {
@@ -312,6 +327,11 @@
       flake = false;
     };
 
+    frank-yazi = {
+      url = "github:lpnh/frank.yazi";
+      flake = false;
+    };
+
     sensible-defaults = {
       url = "https://raw.githubusercontent.com/hrs/sensible-defaults.el/main/sensible-defaults.el";
       flake = false;
@@ -326,7 +346,7 @@
 
     talon = {
       url = "github:nix-community/talon-nix";
-      inputs.nixpkgs.follows = "unstable";
+      #inputs.nixpkgs.follows = "unstable";
     };
 
     flake-parts = {
@@ -407,11 +427,15 @@
     zig2nix.url = "github:Cloudef/zig2nix";
 
     nix-ld-rs.url = "github:Mic92/nix-ld";
-    nixvim-config.url = "github:MikaelFangel/nixvim-config";
+
+    bookmarks-yazi = {
+      url = "github:dedukun/bookmarks.yazi";
+      flake = false;
+    };
 
     nixvim = {
-      url = "github:nix-community/nixvim";
-      #  inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/nixvim/nixos-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ghciwatch = {
@@ -443,6 +467,11 @@
     nixpkgs-unfree = {
       url = "github:numtide/nixpkgs-unfree";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    catppuccin-yazi = {
+      url = "github:catppuccin/yazi";
+      flake = false;
     };
   };
 
@@ -527,6 +556,7 @@
         mkHome
         mkNixOnDroid
         mkNixos
+	mkRaspiNixos
         mkDeploy
         mkDevenvJvmLang
         mkDevenvDeno
@@ -594,9 +624,20 @@
         nodes = listToAttrs [
           (mkDeploy "aarch64-linux" "sams9__aarch64-linux")
           (mkDeploy "aarch64-linux" "sams9__x86_64-linux")
+          (mkDeploy "aarch64-linux" "sams__aarch64-linux")
+          (mkDeploy "aarch64-linux" "sams__x86_64-linux")
         ];
       };
 
+
+      /**
+        Sample queries:
+       nix-repl> :p nixOnDroidConfigurations.sams9.config.home-manager.config.home.username
+       nix-repl> :p homeConfigurations."dani@maiziedemacchiato".config.home.username
+       nix-repl> :p nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.home.username
+       nix eval --json .#raspberries.twopi.config.system.build.sdImage --show-trace
+       nix eval --json .#raspberries.twopi.config.system.build.toplevel --show-trace
+      */
       homeConfigurations = listToAttrs [
         /**
                	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
@@ -607,11 +648,14 @@
 
       nixOnDroidConfigurations = listToAttrs [
         (mkNixOnDroid "aarch64-linux" "sams9")
+        (mkNixOnDroid "aarch64-linux" "sams")
       ];
 
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
-        (mkNixos "aarch64-linux" "twopi")
+        (mkNixos "x86_64-linux" "guitar")
+	(mkRaspiNixos "aarch64-linux" "twopi")
+	(mkRaspiNixos "x86_64-linux" "twopivm")
       ];
 
       # Expose the necessary information in your flake so agenix-rekey
@@ -882,7 +926,7 @@
           {
             aarch64-linux = {
               rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
-              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; };
+              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; inherit (inputs) nixos-hardware; };
             };
             armv7l-linux = {
               # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix
@@ -892,7 +936,54 @@
               run-in-vm = import ./files/nix/run-in-vm.nix { inherit nixpkgs rootPath; };
             };
 
-            x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+            x86_64-linux = {
+	      installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+	      # https://discourse.nixos.org/t/get-qemu-guest-integration-when-running-nixos-rebuild-build-vm/22621
+	      # https://mattwidmann.net/notes/running-nixos-in-a-vm/
+	      # https://blog.yaymukund.com/posts/nixos-raspberry-pi-nixbuild-headless/
+	      # nix build --max-jobs 1 .#packages.x86_64-linux.demo-with-automatic-vm-integration
+	      # TODO https://wiki.nixos.org/wiki/NixOS_on_ARM/QEMU 
+	      #  nix-build flake:nixpkgs -A pkgsCross.aarch64-multiplatform.ubootQemuAarch64
+	      #  qemu-system-aarch64 -nographic -machine virt -cpu cortex-a57 -bios result/u-boot.bin ./nixos-image-sd-card-***-aarch64-linux.img -m 4G 
+	      demo-with-automatic-vm-integration = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+          name = "run-nixos-vm";
+          runtimeInputs = [ nixpkgs.legacyPackages.x86_64-linux.pkgs.virt-viewer ];
+          text = ''
+	    echo hi
+            ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm & PID_QEMU="$!"
+            sleep 1 # I think some tools have an option to wait like -w
+            remote-viewer spice://127.0.0.1:5930
+            kill $PID_QEMU
+          '';
+	  };
+	  demo-nox = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+            name = "run-nixos-vm";
+	    text = ''
+	    QEMU_KERNEL_PARAMS=console=ttyS0 ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm -nographic
+	    '';
+	  };
+
+          # TODO try what is suggested on discourse here https://discourse.nixos.org/t/looking-for-help-around-tightening-the-feedback-loop/67109/3
+	  raspi2qemu = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+            name = "run-nixos-vm";
+	    text = #''
+	      #img=./raspi-in-qemu.img
+	      #cp ${inputs.self.nixosConfigurations.twopi.config.system.build.sdImage}/sd-image/${inputs.self.nixosConfigurations.twopi.options.sdImage.imageName.value} "$img"
+	      #chmod 0640 "$img"
+	      #echo $out
+              #cp "$img" $out
+
+	      # First make this work
+	      # FIXME this makes now - I think I just need to take twopi instead of twopivm now:
+	      # $ file /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm
+	      # /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm: symbolic link to qemu-system-x86_64
+	      # in run-twopi-vm
+	      ''
+	      echo ${self.nixosConfigurations.twopi.config.system.build.sdImage}
+	      ${self.nixosConfigurations.twopi.config.system.build.vm}/bin/run-twopi-vm
+	    '';
+	  };
+	    };
           }
           (
             nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations

@@ -83,6 +83,7 @@ let
   #  };
 
 in
+# see also: https://github.com/Gerschtli/nix-config/commit/6ddf3aac08b1d21cda997542b0aef0ad41b4f723#diff-b49215b74a3855b7a44e508b5459197be8c4a1636f55d7bb593d3890fc295dd8R29
 #xsecurelock = pkgs.xsecurelock.overrideAttrs (oldAttrs: rec {
 #  # FIXME --with-pam-service-name=authproto_pam belongs added after removing --with-pam-service-name=??
 #  configureFlags = (remove "--with-pam-service-name=login" (flatten oldAttrs.configureFlags ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ])); # ++ [ "--with-pam-service-name=lxdm" "--with-xscreensaver=${pkgs.xscreensaver}/libexec/xscreensaver" ];
@@ -142,6 +143,33 @@ in
 
     programs.firefox = {
       enable = true;
+
+      # https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/17
+      policies = {
+      ExtensionSettings = with builtins;
+        let extension = shortId: uuid: {
+          name = uuid;
+          value = {
+            install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
+            installation_mode = "normal_installed";
+          };
+        };
+        in listToAttrs [
+          (extension "tree-style-tab" "treestyletab@piro.sakura.ne.jp")
+          (extension "ublock-origin" "uBlock0@raymondhill.net")
+          (extension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}")
+          (extension "tabliss" "extension@tabliss.io")
+          (extension "umatrix" "uMatrix@raymondhill.net")
+          #(extension "libredirect" "7esoorv3@alefvanoon.anonaddy.me")
+          (extension "clearurls" "{74145f27-f039-47ce-a470-a662b129930a}")
+          (extension "privacy-badger17" "jid1-MnnxcxisBPnSXQ@jetpack")
+	  (extension "qwantcom-for-firefox" "qwantcomforfirefox@jetpack")
+	  (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
+          (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
+	];
+        # To add additional extensions, https://github.com/tupakkatapa/mozid
+    };
+
       profiles.dani = {
         #bookmarks = { };
         extensions = with inputs.firefox-addons.packages.${system}; [
@@ -227,6 +255,8 @@ in
         #userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
         #userContent = lib.readFile "${inputs.penguin-fox}/files/chrome/userContent.css";
       };
+      # https://home-manager-options.extranix.com/?query=firefox 
+      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/firefox/wrapper.nix 
       package = pkgs.wrapFirefox pkgs.firefox-unwrapped {
         # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
         extraPolicies = {
@@ -252,21 +282,6 @@ in
               "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
               "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
             };
-
-          ExtensionSettings = {
-            "uBlock0@raymondhill.net" = {
-              install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-              installation_mode = "force_installed";
-            };
-            "jid1-MnnxcxisBPnSXQ@jetpack" = {
-              install_url = "https://addons.mozilla.org/firefox/downloads/latest/privacy-badger17/latest.xpi";
-              installation_mode = "force_installed";
-            };
-            "extension@tabliss.io" = {
-              install_url = "https://addons.mozilla.org/firefox/downloads/file/3940751/tabliss-2.6.0.xpi";
-              installation_mode = "force_installed";
-            };
-          };
         };
       };
     };
@@ -280,11 +295,11 @@ in
       [
         chrome
         ausweisapp
+	vlc
       ]
       ++ (attrValues {
 
         inherit (pkgs)
-          zen-browser
           pavucontrol
           pdftk
           qpdfview
@@ -296,7 +311,6 @@ in
           #xsecurelock # lxdm not shown
           xscreensaver
           droidcam # host-install v4l2loopback
-          vlc
           mediathekview
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
@@ -309,6 +323,32 @@ in
         inherit (pkgs.lxde)
           lxsession
           ;
+
+      keyboard-de =
+        pkgs.writeShellApplication { 
+	  name = "keyboard-de";
+	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
+
+	  text = ''
+          #!${pkgs.runtimeShell}
+
+          setxkbmap -model pc104 -layout de
+        '';
+	}
+      ;
+
+      keyboard-en =
+        pkgs.writeShellApplication { 
+	  name = "keyboard-en";
+	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
+
+	  text = ''
+          #!${pkgs.runtimeShell}
+
+          setxkbmap -model pc104 -layout us -variant altgr-intl
+        '';
+	}
+	;
       });
 
     # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb

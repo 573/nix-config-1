@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -23,48 +28,34 @@ in
 
   config = mkIf cfg.enable {
 
+    fonts = {
+      fontconfig = {
+        enable = true;
+        defaultFonts = {
+          monospace = [ "UbuntuMono Nerd Font" ];
+        };
+      };
+    };
+
+    home.packages = [ pkgs.nerd-fonts.ubuntu-mono ];
+
     programs.alacritty = {
       enable = true;
 
+      package = config.lib.custom.wrapProgram {
+        name = "alacritty";
+        source = pkgs.alacritty;
+        path = "/bin/alacritty";
+        fixGL = true;
+      };
+      
       settings = {
-        env.TERM = "screen-256color";
-
-        font = {
-          normal.family = "UbuntuMono Nerd Font";
-          bold.family = "UbuntuMono Nerd Font";
-          italic.family = "UbuntuMono Nerd Font";
-          bold_italic.family = "UbuntuMono Nerd Font";
-          size = 9;
-        };
-
-        colors = {
-          primary = {
-            background = "#000000";
-            foreground = "#ffffff";
-          };
-
-          normal = {
-            black = "#000000";
-            red = "#cd0000";
-            green = "#00cd00";
-            yellow = "#cdcd00";
-            blue = "#6d68ff";
-            magenta = "#cd00cd";
-            cyan = "#00cdcd";
-            white = "#e5e5e5";
-          };
-
-          bright = {
-            black = "#7f7f7f";
-            red = "#ff0000";
-            green = "#00ff00";
-            yellow = "#ffff00";
-            blue = "#8d88ff";
-            magenta = "#ff00ff";
-            cyan = "#00ffff";
-            white = "#ffffff";
-          };
-        };
+        terminal.shell = {
+	  # See man tmux
+	  # See https://superuser.com/questions/209437/how-do-i-scroll-in-tmux
+          args = [ "new-session" "-A" "-D" "-s" "main" ];
+	  program = "${lib.getExe' config.custom.programs.tmux.finalPackage "tmux"}";
+	};
       };
     };
 

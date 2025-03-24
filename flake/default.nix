@@ -1,7 +1,7 @@
 {
   inputs,
   rootPath,
-  forEachSystem
+  forEachSystem,
 }:
 
 let
@@ -145,6 +145,7 @@ in
   mkNixOnDroid = simpleWrapper ./builders/mkNixOnDroid.nix;
   mkNixos = simpleWrapper ./builders/mkNixos.nix;
   mkDeploy = simpleWrapper ./builders/mkDeploy.nix;
+  mkRaspiNixos = simpleWrapper ./builders/mkRaspiNixos.nix;
 
   mkApp = wrapper ./builders/mkApp.nix;
   mkDevShellJdk = wrapper ./builders/mkDevShellJdk.nix;

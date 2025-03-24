@@ -37,6 +37,7 @@
             desktopEntryPath = "/share/applications/${desktopFileName}.desktop";
             out = placeholder "out";
 
+            # TODO test https://github.com/soupglasses/nix-system-graphics
             content = readFile "${pkgs.nixgl.nixGLIntel}/bin/nixGLIntel";
             lines = splitString "\n" content;
 

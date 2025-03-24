@@ -1,9 +1,10 @@
-{ config
-, lib
-, inputs
-, pkgs
-, unstable
-, ...
+{
+  config,
+  lib,
+  inputs,
+  pkgs,
+  unstable,
+  ...
 }:
 
 let
@@ -56,49 +57,78 @@ in
       enable = true;
       defaultEditor = true;
       extraPackages = builtins.attrValues {
-          inherit (pkgs)
-      # language servers / formatters
-      nil
-      nixd
-      nixfmt-rfc-style
-      taplo
-      lua-language-server
-      shellcheck
-      vscode-langservers-extracted
-      marksman
-      bash-language-server
-      ;
-    };
+        inherit (pkgs)
+          # language servers / formatters
+          nil
+          nixd
+          nixfmt-rfc-style
+          taplo
+          lua-language-server
+          shellcheck
+          vscode-langservers-extracted
+          marksman
+          bash-language-server
+          ;
+      };
 
-    package = unstable.helix;
+      package = unstable.helix;
 
-    ignores = [
-  ".build/"
-  "!.gitignore"
-];
+      ignores = [
+        ".build/"
+        "!.gitignore"
+      ];
 
-    languages = {
-  # the language-server option currently requires helix from the master branch at https://github.com/helix-editor/helix/
-	      language-server.nixd = {
-        command = "nixd";
-		args = ["--inlay-hints" "--semantic-tokens"];
+      languages = {
+        # the language-server option currently requires helix from the master branch at https://github.com/helix-editor/helix/
+        language-server.nixd = {
+          command = "nixd";
+          args = [
+            "--inlay-hints=true"
+            "--semantic-tokens=true"
+	    "--nixpkgs-worker-stderr=~/.cache/helix/nixpkgs-worker.log"
+            "--option-worker-stderr=~/.cache/helix"
+          ];
+          formatting.command = [ "nixfmt" ];
           config.nixd =
-        let
-            flake = ''(builtins.getFlake "${inputs.self}")'';
-       #     system = ''''${builtins.currentSystem}'';
-        in
-	  {
-	    nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
-            options.home-manager.expr = "${flake}.nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]";
-	  };
-	};
+            let
+              flake = ''(builtins.getFlake "${inputs.self}")'';
+              nixosOptions = "${flake}.nixosConfigurations.DANIELKNB1.options";
+            in
+            {
+              nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
+              options = {
+                nixos.expr = nixosOptions;
+                # as in https://github.com/nix-community/NixOS-WSL/blob/d34d9412556d3a896e294534ccd25f53b6822e80/modules/wsl-conf.nix#L21
+                nixos-wsl.expr = "${nixosOptions}.wsl.wslConf.type.getSubOptions [ ]";
+                # as in https://github.com/nix-community/home-manager/blob/e8c19a3cec2814c754f031ab3ae7316b64da085b/nixos/common.nix#L112
+                home-manager.expr = "${nixosOptions}.home-manager.users.type.getSubOptions [ ]";
+                # TODO split up by making *.expr configurable by host in that neovim.nix module here
+                #home_manager.expr = ''
+                #  ${flake}.homeConfigurations."dani@maiziedemacchiato".options
+                #'';
+                /*
+                  TODO https://github.com/nix-community/nixvim/blob/1fb1bf8a73ccf207dbe967cdb7f2f4e0122c8bd5/flake/default.nix#L10, is another approach i. e. with that config https://github.com/khaneliman/khanelivim/blob/a33e6ab/flake.nix
+                  	    nix-repl> :lf github:khaneliman/khanelivim
+                  	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
+                  	    same as
+                  	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
+                */
+                nixondroid.expr = ''
+                  ${flake}.nixOnDroidConfigurations.sams9.options
+                '';
+              };
+            };
+        };
 
-  language = [{
+        language = [
+          {
             name = "nix";
             formatter.command = "nixfmt";
-	language-servers = [ "nixd" ];
-  }];
-};
+            auto-format = true;
+            language-servers = [ "nixd" ];
+          }
+        ];
+      };
       settings = {
         keys.normal = {
           X = "extend_line_above";
@@ -152,5 +182,5 @@ in
         };
       };
     };
-    };
+  };
 }

@@ -57,46 +57,6 @@ in
               id = "xbvei-t7pxz";
               label = "Musicupload";
             };
-            "v9gme-7b6ou" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = "~/lebenslauf-cv.git";
-              id = "v9gme-7b6ou";
-              label = "Lebenslauf Git-Dir";
-            };
-            "ph2s3-y0cec" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = "~/lebenslauf-cv";
-              id = "ph2s3-y0cec";
-              label = "Lebenslauf";
-            };
-            "n9duo-eqmww" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = "~/stories";
-              id = "n9duo-eqmww";
-              label = "Stories";
-            };
-            "7zqso-s3dap" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = "~/stories";
-              id = "7zqso-s3dap";
-              label = "Stories Git-Dir";
-            };
           };
         };
       };

@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, pkgs, lib, rootPath, ... }:
 
 {
   # FIXME currently disabled due to Windows-Update 21.11.23

@@ -58,7 +58,7 @@ in
     {
       custom.programs = {
         #emacs-novelist.enable = true;
-        emacs-no-el.enable = true;
+        #emacs-no-el.enable = true;
         #emacs-nano.enable = true;
         bash.enable = true;
         #shell = {
@@ -76,10 +76,7 @@ in
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };
-	shell.shellAliases = {
-	  nixbuild-shell = "nix run nixpkgs#rlwrap ssh eu.nixbuild.net shell";
-	};
-      };
+	      };
 
 	programs = {
 	zoxide = {
@@ -172,8 +169,10 @@ in
 
             nix-inspect
             #            zellij
-            viddy
+            #viddy
             #zoxide # rather home module
+	    qrencode
+	    nixfmt-rfc-style
             ;
 
           #inherit (unstable)
@@ -197,7 +196,11 @@ in
             "--quit-if-one-screen"
             "--tabs=4"
           ];
-          PAGER = "${pkgs.less}/bin/less";
+	  MY_BM_HMSESSIONVARS = "/etc/profiles/per-user/nixos/etc/profile.d/hm-session-vars.sh";
+	  # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix
+	  # See here as well https://github.com/nix-community/home-manager/blob/fce051eaf881220843401df545a1444ab676520c/modules/misc/vte.nix#L40
+	  PROMPT_COMMAND = ''history -n; history -w; history -c; history -r; $PROMPT_COMMAND'';
+          PAGER = lib.getExe pkgs.less;
           SHELL = "bash";
           # TODO how does that interfere with same attr in neovim.nix
           #EDITOR = "vi";
@@ -231,7 +234,7 @@ in
         # see ./home/programs
         programs = {
           git.enable = true;
-          nnn.enable = true;
+          #nnn.enable = true;
           rsync.enable = true;
           ssh = {
             enable = true;
@@ -255,7 +258,9 @@ in
     (mkIf (!cfg.lightWeight) {
       custom.programs = {
         tmux.enable = true;
-        #emacs.enable = true;
+        emacs-configured.enable = true;
+	#helix.enable = true;
+	#yazi.enable = true;
       };
 
       home.packages = attrValues {
@@ -264,17 +269,10 @@ in
           ouch
           strace
           lineselect
-          git-annex
           cyme
 
           # poc
           age
-
-          #git-annex-remote-googledrive
-          #haskellPackages.feedback
-          #haskellPackages.pushme # broken
-          #datalad
-          #git-annex-utils
           ;
       };
     })

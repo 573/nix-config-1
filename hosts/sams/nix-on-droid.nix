@@ -44,7 +44,7 @@ in
 
     if [[ ! -f "${sshdDirectory}/ssh_host_ed25519_key" ]]; then
       $VERBOSE_ECHO "Generating host keys..."
-      $DRY_RUN_CMD ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f "${sshdTmpDirectory}/ssh_host_ed25519_key" -N ""
+      $DRY_RUN_CMD ${lib.getExe' pkgs.openssh "ssh-keygen"} -t ed25519 -f "${sshdTmpDirectory}/ssh_host_ed25519_key" -N ""
       $VERBOSE_ECHO "Writing sshd_config..."
       $DRY_RUN_CMD echo -e "HostKey ${sshdDirectory}/ssh_host_ed25519_key\nPermitUserEnvironment yes\n" > "${sshdTmpDirectory}/sshd_config"
 
@@ -59,8 +59,8 @@ in
   '';
 
   # for deployment, see https://github.com/nix-community/nix-on-droid/issues/94#issuecomment-2380612109
-  user.uid = 10289;
-  user.gid = 10289;
+  user.uid = 10332;
+  user.gid = 10332;
 
   environment = {
     etcBackupExtension = ".nod-bak";
@@ -101,7 +101,7 @@ in
             #!${runtimeShell}
 
             echo "Starting sshd in non-daemonized way on port 8022"
-            ${pkgs.openssh}/bin/sshd -p 8022 -f "${sshdDirectory}/sshd_config" -D
+            ${lib.getExe' pkgs.openssh "sshd"} -p 8022 -f "${sshdDirectory}/sshd_config" -D
           '')
         ]
       );
@@ -116,7 +116,7 @@ in
       useUserPackages
       ;
 
-    config = commonConfig.homeManager.userConfig "sams9" "nix-on-droid";
+    config = commonConfig.homeManager.userConfig "sams" "nix-on-droid";
   };
 
   nix =

@@ -1,4 +1,4 @@
-Regarding garbage collection - redling list
+Regarding garbage collection - reading list
 
 * https://ianthehenry.com/posts/how-to-learn-nix/saving-your-shell/ - the hands-on part that is very enlightening starts basically with the `$ ln -s /nix/store/4n40rm31n58ga0xl62nanq13a34axwwx-nix-shell.drv /nix/var/nix/gcroots/per-user/ian/nix-shell-test` statements
 * https://www.reddit.com/r/NixOS/comments/1as7dp3/protect_flake_shell_used_with_nix_develop_from/ (https://www.reddit.com/r/NixOS/comments/1as7dp3/comment/kqoukxp/) - `nix-add-root-devshell` function explains the case of flakes here

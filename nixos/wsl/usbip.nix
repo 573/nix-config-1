@@ -54,6 +54,14 @@ in
         ;
     };
 
+    # https://github.com/nix-community/NixOS-WSL/issues/662#issuecomment-3114880659
+    # TODO possibly redundant, update nixos-wsl flake first 
+    /*extraBin = [
+    { src = "${lib.getExe' pkgs.coreutils-full "ls"}"; }
+    { src = "${lib.getExe pkgs.bash}"; }
+    { src = "${lib.getExe' pkgs.linuxPackages.usbip "usbip"}"; }
+  ];*/
+
     services.udev.enable = true;
 
     systemd = {

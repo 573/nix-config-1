@@ -56,6 +56,15 @@ in
             ;
         }
       ) { _doNotClearPath = true; })
+
+      (config.lib.custom.mkScript "migrate_to_new_kvmswitch.sh" ./migrate_to_new_kvmswitch.sh (
+        builtins.attrValues
+        {
+          inherit (pkgs.xorg)
+            xrandr
+            ;
+        }
+      ) { _doNotClearPath = true; })
     ];
 
   };
