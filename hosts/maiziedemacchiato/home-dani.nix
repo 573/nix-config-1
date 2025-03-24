@@ -10,6 +10,7 @@
   libreoffice-postscript,
   rootPath,
   unstable,
+  homeDir,
   ...
 }:
 let
@@ -57,6 +58,8 @@ in
       zellij.enable = true;
 
       mpv.enable = true;
+
+      nixbuild.enable = true;
     };
   };
 
@@ -100,7 +103,7 @@ in
 
   home = {
     enableDebugInfo = false; # Enabled that for https://github.com/NixOS/nixpkgs/issues/271991
-    homeDirectory = "/home/dani";
+    homeDirectory = homeDir;
     username = "dani";
 
     packages = attrValues {

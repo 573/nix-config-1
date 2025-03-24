@@ -27,6 +27,8 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs = {
@@ -444,6 +446,11 @@
       url = "github:numtide/nixpkgs-unfree";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    catppuccin-yazi = {
+      url = "github:catppuccin/yazi";
+      flake = false;
+    };
   };
 
   outputs =
@@ -527,6 +534,7 @@
         mkHome
         mkNixOnDroid
         mkNixos
+	mkRaspiNixos
         mkDeploy
         mkDevenvJvmLang
         mkDevenvDeno
@@ -597,6 +605,15 @@
         ];
       };
 
+
+      /**
+        Sample queries:
+       nix-repl> :p nixOnDroidConfigurations.sams9.config.home-manager.config.home.username
+       nix-repl> :p homeConfigurations."dani@maiziedemacchiato".config.home.username
+       nix-repl> :p nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.home.username
+       nix eval --json .#raspberries.twopi.config.system.build.sdImage --show-trace
+       nix eval --json .#raspberries.twopi.config.system.build.toplevel --show-trace
+      */
       homeConfigurations = listToAttrs [
         /**
                	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
@@ -611,9 +628,11 @@
 
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
-        (mkNixos "aarch64-linux" "twopi")
       ];
 
+      raspberries = listToAttrs [
+	(mkRaspiNixos "aarch64-linux" "twopi")
+      ];
       # Expose the necessary information in your flake so agenix-rekey
       # knows where it has too look for secrets and paths.
       #
@@ -882,7 +901,7 @@
           {
             aarch64-linux = {
               rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
-              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; };
+              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; inherit (inputs) nixos-hardware; };
             };
             armv7l-linux = {
               # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix

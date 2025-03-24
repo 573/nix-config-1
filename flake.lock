@@ -220,6 +220,22 @@
         "url": "https://flakehub.com/f/catppuccin/nix/1.2.%2A.tar.gz"
       }
     },
+    "catppuccin-yazi": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1741231685,
+        "narHash": "sha256-nEF3gs8JAipZK8Ut67EVHw6zW1zCeFse4b2LxOwRIlc=",
+        "owner": "catppuccin",
+        "repo": "yazi",
+        "rev": "0c274adb1e128bbc3355363703759a0842be620c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "yazi",
+        "type": "github"
+      }
+    },
     "clojure-dev-template": {
       "inputs": {
         "nixpkgs": "nixpkgs_2"
@@ -2839,6 +2855,21 @@
         "type": "github"
       }
     },
+    "nixos-hardware": {
+      "locked": {
+        "lastModified": 1742806253,
+        "narHash": "sha256-zvQ4GsCJT6MTOzPKLmlFyM+lxo0JGQ0cSFaZSACmWfY=",
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "rev": "ecaa2d911e77c265c2a5bac8b583c40b0f151726",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "type": "github"
+      }
+    },
     "nixos-unstable": {
       "locked": {
         "lastModified": 1736012469,
@@ -4234,6 +4265,7 @@
         "agenix-rekey": "agenix-rekey",
         "bundix": "bundix",
         "catppuccin": "catppuccin",
+        "catppuccin-yazi": "catppuccin-yazi",
         "clojure-dev-template": "clojure-dev-template",
         "deadcolumn-nvim": "deadcolumn-nvim",
         "deferred-clipboard.nvim": "deferred-clipboard.nvim",
@@ -4284,6 +4316,7 @@
         "nixos-2305": "nixos-2305",
         "nixos-2311": "nixos-2311",
         "nixos-2405": "nixos-2405",
+        "nixos-hardware": "nixos-hardware",
         "nixos-unstable": "nixos-unstable",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_18",
