@@ -347,7 +347,7 @@ let
   #cmp-dictionary = { enable = true; };
 
   yazi = {
-      enable = true;
+      enable = false;
 
       settings = {
         log_level = "off";
@@ -475,9 +475,9 @@ let
         autostart = true;
       };
 
-nixd = {
+      nixd = {
         # Nix LS
-        enable = false; # FIXME re-enable when crashes on termux are fixed
+        enable = true; # FIXME re-enable when crashes on termux are fixed
         settings =
         let
             flake = ''(builtins.getFlake "${inputs.self}")'';
@@ -753,7 +753,7 @@ in
               builtins.attrValues {
                 inherit (unstable.vimPlugins)
                   neoterm
-                  nnn-vim
+                  #nnn-vim
                   faster-nvim
                   ;
               }
@@ -776,7 +776,7 @@ in
                     // {
                       faster-nvim = final.vimUtils.buildVimPlugin {
                         name = "faster-nvim";
-                        src = inputs.name;
+                        src = inputs.faster-nvim;
                       };
                     };
                 }
@@ -799,7 +799,7 @@ in
 		luasnip
 		gitsigns
 		telescope
-		yazi
+		#yazi
                 ;
             };
           };
@@ -820,6 +820,13 @@ in
             makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
           '')
         ];
+
+      home.sessionVariables = { EDITOR = lib.mkDefault "vi"; };
+
+
+      custom.programs.shell.shellAliases = {
+        f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
+      };
     }
 
     (mkIf (!cfg.lightWeight) {
@@ -837,7 +844,7 @@ in
           builtins.attrValues
             {
               inherit (unstable.vimPlugins)
-                nnn-vim
+                #nnn-vim
                 neoterm
                 ;
             }
@@ -874,7 +881,7 @@ in
             cmp-path# m
             cmp_luasnip
             cmp-look# m
-	    yazi
+	    #yazi
             ;
         };
       };

@@ -47,11 +47,13 @@ in
       root.openssh.authorizedKeys.keyFiles = mkIf cfg.rootLogin [
         "${rootPath}/files/keys/id_ed25519.daniel.pub"
         "${rootPath}/files/keys/id_ed25519.danielwdws.pub"
+        "${rootPath}/files/keys/id_ed25519.daniel.nixondroid.pub"
       ];
 
       dani.openssh.authorizedKeys.keyFiles = [
         "${rootPath}/files/keys/id_ed25519.daniel.pub"
         "${rootPath}/files/keys/id_ed25519.danielwdws.pub"
+        "${rootPath}/files/keys/id_ed25519.daniel.nixondroid.pub"
       ];
     };
 
