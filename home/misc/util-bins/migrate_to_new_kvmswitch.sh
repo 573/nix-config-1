@@ -1,15 +1,15 @@
 source @bashLib@
-# the legacy script I used when the VGA cable
-# still was attached to my old Linky switch
-# to provide monitor for my laptop and the
-# HDMI cable attached to provide monitor
-# for work's laptop
+# the new script I use since HDMI cables
+# are attached to my new KVM switch
+# to provide one monitor via DVI shared by
+# all laptops.
 #
 # generated as follows: arandr to have
 # a nice graphical view of monitors, also 
 # there I applied changed config and
 # when fitting saved to this exact shell
-# script, the export arandr does, which is
+# script - just in ~/.screenlayout/, 
+# the export arandr does, which is
 # for testing on demand also but could be 
 # called on certain system startup phases
 # directly - I'll do slightly different.
@@ -29,4 +29,4 @@ source @bashLib@
 # loaded temporary in autorandr and saved
 # to a profile named mobile that I load
 # when laptop is off dock.
-xrandr --output eDP-1 --mode 2880x1620_59.96 --pos 1920x0 --rotate normal --output VGA-1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP-1 --off --output HDMI-1 --off --output DP-2 --off --output HDMI-2 --off
+xrandr --output eDP-1 --off --output VGA-1 --off --output DP-1 --off --output HDMI-1 --off --output DP-2 --off --output HDMI-2 --off --output DP-2-1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-2-2 --off --output DP-2-3 --off

@@ -11,6 +11,8 @@ let
     mkEnableOption
     mkIf
     optionals
+    mkOption
+    types
     ;
 
   cfg = config.custom.programs.tmux;
@@ -174,6 +176,15 @@ in
       enable = mkEnableOption "tmux config";
 
       urlview = mkEnableOption "urlview plugin";
+
+      finalPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of final tmux.
+        '';
+      };
     };
 
   };
@@ -181,6 +192,8 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
+
+    custom.programs.tmux.finalPackage = lib.findFirst (item: builtins.match ".+?tmux.+?" item.name != null) (abort "no matches") config.home.packages;
 
     custom.programs.shell.shellAliases.tmux = "tmux -2";
 
@@ -194,18 +207,21 @@ in
       packages = [
         (config.lib.custom.mkScript "tprofile" ./tprofile.sh [ pkgs.tmux ] {
           inherit tmuxProfiles;
-          workDirectory = config.custom.misc.work.directory;
-        })
-
-        (config.lib.custom.mkZshCompletion "tprofile" ./tprofile-completion.zsh {
-          inherit tmuxProfiles;
-          workDirectory = config.custom.misc.work.directory;
         })
       ];
     };
 
     programs.tmux = {
-      inherit extraConfig;
+      # candidate for https://discourse.nixos.org/t/adding-custom-options-to-nixpkgs-modules-with-arbitrary-attrsets/61039/2
+      #inherit extraConfig;
+
+      extraConfig = ''
+      # See https://www.raymondcamden.com/2017/10/19/copying-to-clipboard-with-windows-subsystem-for-linux
+      #bind-key P run "powershell.exe -Command 'Get-Clipboard'  | sed -e 's/\r\n$//g' | tmux load-buffer -; tmux paste-buffer"
+      # See https://disjoint.ca/til/2016/12/14/using-xsel-to-copy-and-paste-text-between-the-cli-and-gui/
+      # and https://www.reddit.com/r/tmux/comments/prtuba/tmux_copy_to_system_clipboard_key_binding_strange/
+      bind C-v run -b "tmux set-buffer \"$(xsel --clipboard | tr -d '\r')\"; tmux paste-buffer"
+      '';
 
       enable = true;
 
@@ -217,21 +233,49 @@ in
       clock24 = true;
       secureSocket = false;
       escapeTime = 100;
+      sensibleOnTop = true;
+      mouse = true;
 
       plugins =
         with pkgs.tmuxPlugins;
         (
           [
-            {
+            /*{
               plugin = fingers;
               extraConfig = ''
                 set -g @fingers-compact-hints 0
                 set -g @fingers-ctrl-action '${pkgs.findutils}/bin/xargs ${pkgs.xdg-utils}/bin/xdg-open > /dev/null 2>&1'
               '';
-            }
+            }*/
+	    /*{
+	    plugin = tmux-which-key;
+	    }*/
+	    {
+	    plugin = tmux-thumbs;
+	    }
+	    {
+	    plugin = tmux-fzf;
+	    }
+	    /*{
+	    plugin = mode-indicator;
+	    }*/
+	    {
+	    plugin = ctrlw;
+	    }
+	    {
+	    plugin = extrakto;
+	    }
+	    /*{
+	    plugin = fpp;
+	    }*/
           ]
           ++ optionals cfg.urlview [ urlview ]
         );
+    };
+
+    programs.fzf = {
+      enable = true;
+      tmux.enableShellIntegration = true;
     };
 
   };

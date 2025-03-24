@@ -43,7 +43,7 @@ fi
 # installation
 # TODO putting --accept-flake-config in nixos-rebuild here let's the command silently fail, track this in an issue
 if _is_nixos; then
-  hostname=DANIELKNB1 #$(_read_enum "Enter hostname" DANIELKNB1)
+  hostname=$(_read_enum "Enter hostname" DANIELKNB1 guitar)
 
   _log "Run sudo nixos-rebuild ..."
   sudo nixos-rebuild \
@@ -52,8 +52,13 @@ if _is_nixos; then
     --flake "git+file:///${nix_config}#${hostname}" || :
 
   _log "Don't forget to set passwd for ${USER} and root!"
+  _log "We did run nixos-rebuild boot, not switch, so you might want to run <result>/activate now to have the changes in effect or reboot!"
+  _log " <result> is basically the path after init= in the concering grub menu entry thus to see the actual value use a variation of:"
+  _log "\`sudo sed -n 66p /boot/grub/grub.cfg\` $(sudo sed -n 66p /boot/grub/grub.cfg)"
   _log "In case you need to userdel the nixos user, '\$ wsl -d NixOS -u root' and see https://gist.github.com/573/131629a55c0ef91305532c6f977934e6."
 elif [[ ${USER} == "nix-on-droid" ]]; then
+  [[ "$(id -u)" == "10332" ]] && declare -g confname=sams
+  [[ "$(id -u)" == "10289" ]] && declare -g confname=sams9
   _log "Run nix-on-droid ..."
   #    nix-on-droid build \
   #        --option print-build-logs true \
@@ -73,7 +78,8 @@ elif [[ ${USER} == "nix-on-droid" ]]; then
     --option extra-trusted-public-keys "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA=" \
     --option extra-substituters "https://yazi.cachix.org" \
     --option extra-trusted-public-keys "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" \
-    "git+file:///${nix_config}#nixOnDroidConfigurations.sams9.activationPackage" -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
+    "git+file:///${nix_config}#nixOnDroidConfigurations.${confname}.activationPackage" \
+    -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
 else
   _log "Build home-manager activationPackage..."
   nix build \
