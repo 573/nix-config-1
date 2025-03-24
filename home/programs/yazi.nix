@@ -65,6 +65,9 @@ in
           }
         ];
       };
+
+      theme = builtins.fromTOML (builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml");
+
       # https://yazi-rs.github.io/docs/resources
       # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1
       settings = {
@@ -88,9 +91,15 @@ in
 	  pdf = [
             { run = ''zathura "$@"''; block = true; desc = "Open with zathura"; for = "unix"; }
           ];
+	  edit = [
+	    { run = ''vi "$@"''; block = true; for = "unix"; }
+          ];
         };
 	open = {
 	  rules = [
+	    # https://yazi-rs.github.io/docs/configuration/yazi#open
+	    # You can spot on a file to check it's mime-type with the default Tab key.
+	    { mime = "text/*";          use = "edit"; }
             { mime = "application/pdf"; use = [ "pdf" "reveal" ]; }
           ];
 	};

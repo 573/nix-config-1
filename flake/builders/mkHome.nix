@@ -59,6 +59,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
 
     homeDir =
+      # should not break with raspberry as it concerns only non-nixos
       if isLinux && isAarch64 then
         "/data/data/com.termux.nix/files/home"
       else
