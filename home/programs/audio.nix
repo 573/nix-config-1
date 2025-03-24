@@ -37,7 +37,7 @@ in
       # with pkgs; [
       inherit (pkgs)
         qpwgraph
-        helio-workstation
+#        helio-workstation
         ;
 
       inherit (pkgs)

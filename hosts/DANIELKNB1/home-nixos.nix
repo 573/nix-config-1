@@ -29,6 +29,8 @@ in
       hledger.enable = true;
       tex.enable = true;
       zellij.enable = true;
+      nixbuild.enable = true;
+      alacritty.enable = true;
     };
 
     development = {
@@ -123,7 +125,7 @@ in
       hurl
       ;
 
-    inherit (pkgs.python310Packages)
+    inherit (pkgs.python3Packages)
       pudb
       ;
 

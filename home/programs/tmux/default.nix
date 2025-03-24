@@ -11,6 +11,8 @@ let
     mkEnableOption
     mkIf
     optionals
+    mkOption
+    types
     ;
 
   cfg = config.custom.programs.tmux;
@@ -174,6 +176,15 @@ in
       enable = mkEnableOption "tmux config";
 
       urlview = mkEnableOption "urlview plugin";
+
+      finalPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of final tmux.
+        '';
+      };
     };
 
   };
@@ -181,6 +192,8 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
+
+    custom.programs.tmux.finalPackage = lib.findFirst (item: builtins.match ".+?tmux.+?" item.name != null) (abort "no matches") config.home.packages;
 
     custom.programs.shell.shellAliases.tmux = "tmux -2";
 
@@ -194,18 +207,13 @@ in
       packages = [
         (config.lib.custom.mkScript "tprofile" ./tprofile.sh [ pkgs.tmux ] {
           inherit tmuxProfiles;
-          workDirectory = config.custom.misc.work.directory;
-        })
-
-        (config.lib.custom.mkZshCompletion "tprofile" ./tprofile-completion.zsh {
-          inherit tmuxProfiles;
-          workDirectory = config.custom.misc.work.directory;
         })
       ];
     };
 
     programs.tmux = {
-      inherit extraConfig;
+      # candidate for https://discourse.nixos.org/t/adding-custom-options-to-nixpkgs-modules-with-arbitrary-attrsets/61039/2
+      #inherit extraConfig;
 
       enable = true;
 
@@ -217,21 +225,48 @@ in
       clock24 = true;
       secureSocket = false;
       escapeTime = 100;
+      sensibleOnTop = true;
 
       plugins =
         with pkgs.tmuxPlugins;
         (
           [
-            {
+            /*{
               plugin = fingers;
               extraConfig = ''
                 set -g @fingers-compact-hints 0
                 set -g @fingers-ctrl-action '${pkgs.findutils}/bin/xargs ${pkgs.xdg-utils}/bin/xdg-open > /dev/null 2>&1'
               '';
-            }
+            }*/
+	    /*{
+	    plugin = tmux-which-key;
+	    }*/
+	    {
+	    plugin = tmux-thumbs;
+	    }
+	    {
+	    plugin = tmux-fzf;
+	    }
+	    /*{
+	    plugin = mode-indicator;
+	    }*/
+	    {
+	    plugin = ctrlw;
+	    }
+	    {
+	    plugin = extrakto;
+	    }
+	    /*{
+	    plugin = fpp;
+	    }*/
           ]
           ++ optionals cfg.urlview [ urlview ]
         );
+    };
+
+    programs.fzf = {
+      enable = true;
+      tmux.enableShellIntegration = true;
     };
 
   };
