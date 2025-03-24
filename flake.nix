@@ -27,6 +27,8 @@
     nixos-2211-small.url = "github:NixOS/nixpkgs/nixos-22.11-small";
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs = {
@@ -444,6 +446,11 @@
       url = "github:numtide/nixpkgs-unfree";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    catppuccin-yazi = {
+      url = "github:catppuccin/yazi";
+      flake = false;
+    };
   };
 
   outputs =
@@ -527,6 +534,7 @@
         mkHome
         mkNixOnDroid
         mkNixos
+	mkRaspiNixos
         mkDeploy
         mkDevenvJvmLang
         mkDevenvDeno
@@ -594,9 +602,20 @@
         nodes = listToAttrs [
           (mkDeploy "aarch64-linux" "sams9__aarch64-linux")
           (mkDeploy "aarch64-linux" "sams9__x86_64-linux")
+          (mkDeploy "aarch64-linux" "sams__aarch64-linux")
+          (mkDeploy "aarch64-linux" "sams__x86_64-linux")
         ];
       };
 
+
+      /**
+        Sample queries:
+       nix-repl> :p nixOnDroidConfigurations.sams9.config.home-manager.config.home.username
+       nix-repl> :p homeConfigurations."dani@maiziedemacchiato".config.home.username
+       nix-repl> :p nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.home.username
+       nix eval --json .#raspberries.twopi.config.system.build.sdImage --show-trace
+       nix eval --json .#raspberries.twopi.config.system.build.toplevel --show-trace
+      */
       homeConfigurations = listToAttrs [
         /**
                	calls `mkHome` as defined in ./flake/default.nix (`[system]` and `[name]` parameters) and ./flake/builders/mkHome.nix, latter the place where `extraSpecialArgs` would also go
@@ -607,11 +626,14 @@
 
       nixOnDroidConfigurations = listToAttrs [
         (mkNixOnDroid "aarch64-linux" "sams9")
+        (mkNixOnDroid "aarch64-linux" "sams")
       ];
 
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
-        (mkNixos "aarch64-linux" "twopi")
+        (mkNixos "x86_64-linux" "guitar")
+	(mkRaspiNixos "aarch64-linux" "twopi")
+	(mkRaspiNixos "x86_64-linux" "twopivm")
       ];
 
       # Expose the necessary information in your flake so agenix-rekey
@@ -882,7 +904,7 @@
           {
             aarch64-linux = {
               rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
-              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; };
+              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; inherit (inputs) nixos-hardware; };
             };
             armv7l-linux = {
               # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix
@@ -892,7 +914,53 @@
               run-in-vm = import ./files/nix/run-in-vm.nix { inherit nixpkgs rootPath; };
             };
 
-            x86_64-linux.installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+            x86_64-linux = {
+	      installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+	      # https://discourse.nixos.org/t/get-qemu-guest-integration-when-running-nixos-rebuild-build-vm/22621
+	      # https://mattwidmann.net/notes/running-nixos-in-a-vm/
+	      # https://blog.yaymukund.com/posts/nixos-raspberry-pi-nixbuild-headless/
+	      # nix build --max-jobs 1 .#packages.x86_64-linux.demo-with-automatic-vm-integration
+	      # TODO https://wiki.nixos.org/wiki/NixOS_on_ARM/QEMU 
+	      #  nix-build flake:nixpkgs -A pkgsCross.aarch64-multiplatform.ubootQemuAarch64
+	      #  qemu-system-aarch64 -nographic -machine virt -cpu cortex-a57 -bios result/u-boot.bin ./nixos-image-sd-card-***-aarch64-linux.img -m 4G 
+	      demo-with-automatic-vm-integration = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+          name = "run-nixos-vm";
+          runtimeInputs = [ nixpkgs.legacyPackages.x86_64-linux.pkgs.virt-viewer ];
+          text = ''
+	    echo hi
+            ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm & PID_QEMU="$!"
+            sleep 1 # I think some tools have an option to wait like -w
+            remote-viewer spice://127.0.0.1:5930
+            kill $PID_QEMU
+          '';
+	  };
+	  demo-nox = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+            name = "run-nixos-vm";
+	    text = ''
+	    QEMU_KERNEL_PARAMS=console=ttyS0 ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm -nographic
+	    '';
+	  };
+
+	  raspi2qemu = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+            name = "run-nixos-vm";
+	    text = #''
+	      #img=./raspi-in-qemu.img
+	      #cp ${inputs.self.nixosConfigurations.twopi.config.system.build.sdImage}/sd-image/${inputs.self.nixosConfigurations.twopi.options.sdImage.imageName.value} "$img"
+	      #chmod 0640 "$img"
+	      #echo $out
+              #cp "$img" $out
+
+	      # First make this work
+	      # FIXME this makes now - I think I just need to take twopi instead of twopivm now:
+	      # $ file /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm
+	      # /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm: symbolic link to qemu-system-x86_64
+	      # in run-twopi-vm
+	      ''
+	      echo ${self.nixosConfigurations.twopi.config.system.build.sdImage}
+	      ${self.nixosConfigurations.twopi.config.system.build.vm}/bin/run-twopi-vm
+	    '';
+	  };
+	    };
           }
           (
             nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations

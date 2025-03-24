@@ -39,6 +39,7 @@ in
         "ls"
         "cd"
         "exit"
+	"pwd"
       ];
 
       # mkBefore is needed because hashing needs to be enabled early in the config
