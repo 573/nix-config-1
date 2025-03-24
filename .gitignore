@@ -3,3 +3,4 @@ nixos.qcow2
 result
 result-*
 *.elc
+*.pem
