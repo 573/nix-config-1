@@ -320,7 +320,12 @@ in
 
         pretty.graph = "format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset";
 
-        pull.ff = "only";
+        pull = {
+	  ff = "only";
+	  rebase = true;
+	};
+
+        push.autoSetupRemote = true;
 
         rebase = {
           autoSquash = true;

@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   inherit (lib)
@@ -21,25 +21,37 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.enable {
+  config = let
+      nixosUser = pkgs.coqPackages.lib.switch-if [
+        {cond = config.custom.base.general.wsl; out = "nixos"; }
+      ] "dani";  
+      homedir = config.home-manager.users."${nixosUser}".home.homeDirectory;
+  in mkIf cfg.enable {
     # use root's .ssh here as nix-daemon runs with root permissions
     programs.ssh.extraConfig = ''
-      Host eu.nixbuild.net
-        PubkeyAcceptedKeyTypes ssh-ed25519
+    Host nixbuild
+        HostName eu.nixbuild.net
+        User root
+        PubKeyAcceptedKeyTypes ssh-ed25519
         ServerAliveInterval 60
         IPQoS throughput
-        IdentityFile /root/.ssh/my-nixbuild-key
+        IdentitiesOnly yes
+        IdentityFile ${homedir}/.ssh/my-nixbuild-key
     '';
 
-    programs.ssh.knownHosts = {
-      nixbuild = {
-        hostNames = [ "eu.nixbuild.net" ];
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
-      };
-    };
+#    programs.ssh.knownHosts = {
+#      nixbuild = {
+#        hostNames = [ "eu.nixbuild.net" ];
+#        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
+#      };
+#    };
 
     nix = {
       distributedBuilds = true;
+      settings = {
+	      trusted-users = ["${nixosUser}"];
+	      builders-use-substitutes = true;
+      };
       buildMachines = [
         {
           hostName = "eu.nixbuild.net";
@@ -49,7 +61,11 @@ in
             "benchmark"
             "big-parallel"
           ];
-        }
+	  sshUser = "root";
+	  sshKey = "${homedir}/.ssh/my-nixbuild-key";
+	  publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
+	  speedFactor = 2;
+	}
       ];
     };
   };

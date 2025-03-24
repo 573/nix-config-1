@@ -29,6 +29,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
   */
   extraSpecialArgs = {
     inherit inputs rootPath;
+    system = "${system}";
     libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
 
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim makeNixvimWithModule;
@@ -41,11 +42,6 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.nixos-2405.legacyPackages.${system}.zellij
       else
         inputs.unstable.legacyPackages.${system}.zellij; 
-    yazi =
-      if isLinux && isAarch64 then
-        inputs.unstable.legacyPackages.${system}.yazi
-      else
-        inputs.unstable.legacyPackages.${system}.yazi;
     emacs =
       if isLinux && isAarch64 then
         inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
@@ -59,10 +55,12 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
 
     homeDir =
+      # should not break with raspberry as it concerns only non-nixos
       if isLinux && isAarch64 then
         "/data/data/com.termux.nix/files/home"
       else
         "/home/${username}";
+    inherit username;
   };
 
   modules = [

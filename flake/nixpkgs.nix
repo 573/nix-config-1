@@ -4,6 +4,7 @@
   system,
   pkgsSet ? inputs.nixpkgs,
   nixOnDroid ? false,
+  # raspberry ? false,
   config ? {
     # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
     allowAliases = false;
@@ -107,7 +108,7 @@ import pkgsSet {
         }
         // genAttrs [
           "bundix"
-          "talon"
+#          "talon"
           "devenv"
           "zen-browser"
         ] (name: inputs.${name}.packages.${system}.default)
@@ -136,5 +137,10 @@ import pkgsSet {
       inputs.nix-on-droid.overlays.default
       # prevent uploads to remote builder, https://ryantm.github.io/nixpkgs/functions/prefer-remote-fetch
       (final: prev: prev.prefer-remote-fetch final prev)
-    ];
+    ] ++ # https://github.com/nix-community/nixos-generators/issues/266 TODO parameter raspberry analog nixOnDroid
+    [ (final: prev: {
+	makeModulesClosure = x:
+	prev.makeModulesClosure (x // { allowMissing = true; });
+        }) ]
+    ;
 }
