@@ -45,8 +45,8 @@ in
       hostname = mkOption {
         type = types.enum [
           "DANIELKNB1"
+	  "guitar"
           "twopi"
-	  "raspinix"
         ];
         description = "Host name.";
       };
@@ -61,7 +61,7 @@ in
 
       boot.tmp.cleanOnBoot = true;
 
-      console.keyMap = "de";
+      console.keyMap = lib.mkDefault "us-acentos";
 
       custom = {
         system.firewall.enable = true;

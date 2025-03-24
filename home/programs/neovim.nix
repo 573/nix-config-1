@@ -347,7 +347,7 @@ let
   #cmp-dictionary = { enable = true; };
 
   yazi = {
-      enable = true;
+      enable = false;
 
       settings = {
         log_level = "off";
@@ -475,9 +475,9 @@ let
         autostart = true;
       };
 
-nixd = {
+      nixd = {
         # Nix LS
-        enable = false; # FIXME re-enable when crashes on termux are fixed
+        enable = true; # FIXME re-enable when crashes on termux are fixed
         settings =
         let
             flake = ''(builtins.getFlake "${inputs.self}")'';
@@ -820,6 +820,13 @@ in
             makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
           '')
         ];
+
+      home.sessionVariables = { EDITOR = lib.mkDefault "nvim"; };
+
+
+      custom.programs.shell.shellAliases = {
+        f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
+      };
     }
 
     (mkIf (!cfg.lightWeight) {
