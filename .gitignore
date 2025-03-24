@@ -3,3 +3,5 @@ nixos.qcow2
 result
 result-*
 *.elc
+*.pem
+prevent-gc-for-path-to-debug

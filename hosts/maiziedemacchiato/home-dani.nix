@@ -10,6 +10,7 @@
   libreoffice-postscript,
   rootPath,
   unstable,
+  homeDir,
   ...
 }:
 let
@@ -57,6 +58,8 @@ in
       zellij.enable = true;
 
       mpv.enable = true;
+
+      nixbuild.enable = true;
     };
   };
 
@@ -100,7 +103,7 @@ in
 
   home = {
     enableDebugInfo = false; # Enabled that for https://github.com/NixOS/nixpkgs/issues/271991
-    homeDirectory = "/home/dani";
+    homeDirectory = homeDir;
     username = "dani";
 
     packages = attrValues {
@@ -194,21 +197,31 @@ in
 
       nerdfonts = pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
 
-      keyboard-de = (
-        writeScriptBin "keyboard-de" ''
-          #!${runtimeShell}
+      keyboard-de =
+        pkgs.writeShellApplication { 
+	  name = "keyboard-de";
+	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
+
+	  text = ''
+          #!${pkgs.runtimeShell}
 
           setxkbmap -model pc104 -layout de
-        ''
-      );
+        '';
+	}
+      ;
 
-      keyboard-en = (
-        writeScriptBin "keyboard-en" ''
-                  #!${runtimeShell}
+      keyboard-en =
+        pkgs.writeShellApplication { 
+	  name = "keyboard-en";
+	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
 
-          	setxkbmap -model pc104 -layout us -variant altgr-intl
-        ''
-      );
+	  text = ''
+          #!${pkgs.runtimeShell}
+
+          setxkbmap -model pc104 -layout us -variant altgr-intl
+        '';
+	}
+	;
     };
 
     sessionPath = [
