@@ -29,6 +29,7 @@ in
       hledger.enable = true;
       tex.enable = true;
       zellij.enable = true;
+      nixbuild.enable = true;
     };
 
     development = {

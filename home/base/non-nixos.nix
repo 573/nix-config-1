@@ -13,9 +13,12 @@ let
     concatStringsSep
     mkEnableOption
     mkIf
+    mkMerge
     mkOption
+    optional
     optionals
     types
+    unique
     ;
 
   cfg = config.custom.base.non-nixos;
@@ -38,9 +41,8 @@ in
 
       builders = mkOption {
         type = types.listOf types.str;
-        default = [
-	  "ssh://eu.nixbuild.net aarch64-linux,armv7l-linux - 100 1 benchmark,big-parallel - -"
-        ];
+	# DONE Make configurable the other way around in nixbuild dependent on this builders here, explainer https://gist.github.com/573/1ff0527f8b42b0123dc3a13bc523f487
+        default = [];# ++ optional config.custom.programs.nixbuild.enable "ssh://root@eu.nixbuild.net aarch64-linux,armv7l-linux /home/${config.home.username}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
         description = "Nix remote builders.";
       };
     };
