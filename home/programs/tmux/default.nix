@@ -215,13 +215,24 @@ in
       # candidate for https://discourse.nixos.org/t/adding-custom-options-to-nixpkgs-modules-with-arbitrary-attrsets/61039/2
       #inherit extraConfig;
 
+
+
       extraConfig = ''
+      # See https://superuser.com/a/1440887
+      # set -g set-clipboard off
       # See https://www.raymondcamden.com/2017/10/19/copying-to-clipboard-with-windows-subsystem-for-linux
       #bind-key P run "powershell.exe -Command 'Get-Clipboard'  | sed -e 's/\r\n$//g' | tmux load-buffer -; tmux paste-buffer"
       # See https://disjoint.ca/til/2016/12/14/using-xsel-to-copy-and-paste-text-between-the-cli-and-gui/
       # and https://www.reddit.com/r/tmux/comments/prtuba/tmux_copy_to_system_clipboard_key_binding_strange/
-      bind C-v run -b "tmux set-buffer \"$(xsel --clipboard | tr -d '\r')\"; tmux paste-buffer"
-      '';
+      # Works only when set -g set-clipboard on
+      #bind C-v run -b "tmux set-buffer \"$(xsel --clipboard | tr -d '\r')\"; tmux paste-buffer"
+      # * https://www.reddit.com/r/tmux/comments/v8q56m/comment/idzzywm/
+      # * https://unix.stackexchange.com/questions/15715/getting-tmux-to-copy-a-buffer-to-the-clipboard#comment43977_16405
+      # * https://superuser.com/a/582069
+      # so this is prefix+shift+p in tmux, means when vi runs in tmux toggle nopaste (go insert mode) and hit prefix+shift+p here
+      bind P run -b "xsel --clipboard | tr -d '\r' | tmux load-buffer -; tmux paste-buffer"
+''; 
+
 
       enable = true;
 

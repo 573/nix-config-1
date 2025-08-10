@@ -28,7 +28,6 @@ in
     wsl = {
       enable = true;
       interop.register = true;
-      nativeSystemd = true;
     };
 
     environment.defaultPackages = [ pkgs.wslu ];

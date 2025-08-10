@@ -748,8 +748,22 @@ in
 
             # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
             extraConfigLua = ''
-	            -- FIXME alacritty (+ tmux + neovim) workaround
-		    vim.opt.paste = true
+	            -- alacritty (+ tmux + neovim) workaround
+                    -- DONT vim.opt.paste = true -- as it breaks many other things i.e. fzf
+		    -- DONT [also] rather see https://jdhao.github.io/2021/02/01/bracketed_paste_mode/
+		    --      is nice but does not work even with only alacritty and no tmux inbetween  
+                    -- DONE like follows (hitting F2 to toggle paste on demand before C-S-v)
+		    -- see * https://stackoverflow.com/a/78629377
+		    --     * https://www.reddit.com/r/neovim/comments/uuh8xw/noob_vimkeymapset_vs_vimapinvim_set_keymap_key/
+                    --     * https://www.reddit.com/r/neovim/comments/xilic1/comment/ip3saw1/
+                    --     * or just using <BAR> as see https://www.reddit.com/r/neovim/comments/yd6ne9/comment/itq9ocx/
+		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
+		    -- TODO vim.notify("paste toggled")
+		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
+		    --      :set paste?<cr> https://stackoverflow.com/a/12060528
+                    -- not working see https://superuser.com/questions/468640/f2-in-paste-mode
+		    --             also https://vimhelp.org/options.txt.html#%27paste%27
+		    --vim.keymap.set('i', "<f2>", '<c-\><c-o>:set paste!<cr>', { noremap = true })
 
               	    require('faster').setup()
 
@@ -769,6 +783,8 @@ in
               	      },                                                       
               	    }
               	    '';
+
+
 
             extraPlugins =
               builtins.attrValues {
