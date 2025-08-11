@@ -9,6 +9,7 @@
   lib,
   pkgs,
   unstable,
+  hostname,
   ...
 }:
 let
@@ -68,33 +69,51 @@ in
         #};
         htop.enable = true;
         nix-index.enable = true;
-	helix.enable = true;
-	yazi.enable = true;
+        helix.enable = true;
+        yazi.enable = true;
         #xplr.enable = true;
         neovim = {
           enable = true;
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };
-	      };
+      };
 
-	programs = {
-	zoxide = {
-	  enable = true;
-	  package = unstable.zoxide;
-	  enableBashIntegration = true;
-	};
-	bat = {
-	  enable = true;
-	  package = unstable.bat;
-	  extraPackages = with unstable.bat-extras; [ batpipe batman ];
-	};
-	eza = {
-	  enable = true;
-	  enableBashIntegration = true;
-	  package = unstable.eza;
+      programs = {
+        bash = {
+	  sessionVariables =
+          # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix
+          # On NixOS systems I can see the immediate effect in /home/nixos/.local/state/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh
+          # See here as well https://github.com/nix-community/home-manager/blob/fce051eaf881220843401df545a1444ab676520c/modules/misc/vte.nix#L40
+          # and https://www.reddit.com/r/NixOS/comments/1e2quog/help_escaping_triple_single_quotes/
+	  # TODO problem on non-NixOS (generic-linux, see https://github.com/nix-community/home-manager/blob/11cc5449c50e0e5b785be3dfcb88245232633eb8/modules/targets/generic-linux.nix#L4) with duplicate sourcing of nix.sh (both in hm-session-vars.sh and in .bashrc) and hm-session-vars.sh (both in .profile and in .bashrc) comes from https://github.com/nix-community/home-manager/blob/98d030f723e0a4a446e56b276573efb8bef422f5/modules/targets/generic-linux.nix#L41 (via https://github.com/nix-community/home-manager/issues/1782#issue-802788592). This comment described the prior on-demand workaround https://github.com/nix-community/home-manager/pull/797#issuecomment-544783247. The duplication basically happening here https://github.com/nix-community/home-manager/blob/11cc5449c50e0e5b785be3dfcb88245232633eb8/modules/programs/bash.nix#L268 (via ignoredly https://github.com/nix-community/home-manager/commit/d06bcf4c970e45fa260e992d96160b48712504e6#r40204451).
+	  # another example https://github.com/ajeetdsouza/zoxide/blob/2299f2834bcc6e1c07a0118460a638577a890d89/templates/bash.txt#L57
+	  # FIXME having it in programs.bash.sessionVariables leads to it being ignored for PROMPT_COMMAND on NixOS
+          #PROMPT_COMMAND = ''history -n; history -w; history -c; history -r'' + lib.optionalString (!config.custom.base.non-nixos.enable) "; $PROMPT_COMMAND";
+	  lib.optionalAttrs (config.custom.base.non-nixos.enable) {
+          PROMPT_COMMAND = ''history -n; history -w; history -c; history -r'';
 	};
 	};
+
+        zoxide = {
+          enable = true;
+          package = unstable.zoxide;
+          enableBashIntegration = true;
+        };
+        bat = {
+          enable = true;
+          package = unstable.bat;
+          extraPackages = with unstable.bat-extras; [
+            batpipe
+            batman
+          ];
+        };
+        eza = {
+          enable = true;
+          enableBashIntegration = true;
+          package = unstable.eza;
+        };
+      };
 
       home = {
         language = {
@@ -171,15 +190,14 @@ in
             #            zellij
             #viddy
             #zoxide # rather home module
-	    qrencode
-	    nixfmt-rfc-style
+            qrencode
+            nixfmt-rfc-style
             ;
 
           #inherit (unstable)
-           # eza
-            #            yazi
-            #;
-
+          # eza
+          #            yazi
+          #;
 
           #	  batman = (unstable.bat-extras.batman.overrideAttrs (oldAttrs: {
           #    propagatedBuildInputs = [
@@ -196,10 +214,7 @@ in
             "--quit-if-one-screen"
             "--tabs=4"
           ];
-	  MY_BM_HMSESSIONVARS = "/etc/profiles/per-user/nixos/etc/profile.d/hm-session-vars.sh";
-	  # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix
-	  # See here as well https://github.com/nix-community/home-manager/blob/fce051eaf881220843401df545a1444ab676520c/modules/misc/vte.nix#L40
-	  PROMPT_COMMAND = ''history -n; history -w; history -c; history -r; $PROMPT_COMMAND'';
+          MY_BM_HMSESSIONVARS = "/etc/profiles/per-user/nixos/etc/profile.d/hm-session-vars.sh";
           PAGER = lib.getExe pkgs.less;
           SHELL = "bash";
           # TODO how does that interfere with same attr in neovim.nix
@@ -212,7 +227,18 @@ in
           # MANPAGER="nvim -u NONE -i NONE \"+runtime plugin/man.lua\" -c \"Man"'!'"\" -o -"
           # export MANPAGER='nvim -u NONE -i NONE "+runtime plugin/man.lua" -c "Man"''!'' -o -'
           #working#MANPAGER = "${config.custom.programs.neovim.finalPackage}/bin/nvim -u NONE -i NONE '+runtime plugin/man.lua' -c Man! -o -";
-        };
+        
+          # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix
+          # On NixOS systems I can see the immediate effect in /home/nixos/.local/state/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh
+          # See here as well https://github.com/nix-community/home-manager/blob/fce051eaf881220843401df545a1444ab676520c/modules/misc/vte.nix#L40
+          # and https://www.reddit.com/r/NixOS/comments/1e2quog/help_escaping_triple_single_quotes/
+	  # TODO problem on non-NixOS (generic-linux, see https://github.com/nix-community/home-manager/blob/11cc5449c50e0e5b785be3dfcb88245232633eb8/modules/targets/generic-linux.nix#L4) with duplicate sourcing of nix.sh (both in hm-session-vars.sh and in .bashrc) and hm-session-vars.sh (both in .profile and in .bashrc) comes from https://github.com/nix-community/home-manager/blob/98d030f723e0a4a446e56b276573efb8bef422f5/modules/targets/generic-linux.nix#L41 (via https://github.com/nix-community/home-manager/issues/1782#issue-802788592). This comment described the prior on-demand workaround https://github.com/nix-community/home-manager/pull/797#issuecomment-544783247. The duplication basically happening here https://github.com/nix-community/home-manager/blob/11cc5449c50e0e5b785be3dfcb88245232633eb8/modules/programs/bash.nix#L268 (via ignoredly https://github.com/nix-community/home-manager/commit/d06bcf4c970e45fa260e992d96160b48712504e6#r40204451).
+	  # another example https://github.com/ajeetdsouza/zoxide/blob/2299f2834bcc6e1c07a0118460a638577a890d89/templates/bash.txt#L57
+	  # FIXME having it in programs.bash.sessionVariables leads to it being ignored for PROMPT_COMMAND on NixOS
+          #PROMPT_COMMAND = ''history -n; history -w; history -c; history -r'' + lib.optionalString (!hostname == "maiziedemacchiato") "; $PROMPT_COMMAND";
+	} // lib.optionalAttrs (!config.custom.base.non-nixos.enable) {
+          PROMPT_COMMAND = ''history -n; history -w; history -c; history -r; $PROMPT_COMMAND'';
+	} ;
       };
     }
 
@@ -221,7 +247,14 @@ in
     }
 
     {
-      programs.fzf.enable = true;
+      programs.fzf = {
+        enable = true;
+        #enableBashIntegration = true;
+        # see https://sourcegraph.com/search?q=file:%5E*.nix%24+%22--bind%22+fzf&patternType=keyword&sm=0 and https://github.com/junegunn/fzf/issues/2323#issuecomment-991335353
+        defaultOptions = [
+          "--bind 'ctrl-e:execute(echo {+} | ${lib.getExe' pkgs.findutils "xargs"} -o vi)'"
+	];
+      };
 
       # FIXME: set to sd-switch once it works for krypton, https://home-manager-options.extranix.com/?query=systemd.user.startServices&release=release-24.05
       systemd.user.startServices = true;
@@ -255,12 +288,12 @@ in
       # programs.starship.enable = true; # long lines are distorted
     })
 
-    (mkIf (!cfg.lightWeight) {
+    (mkIf (!cfg.lightWeight && !cfg.wsl) {
       custom.programs = {
         tmux.enable = true;
         emacs-configured.enable = true;
-	#helix.enable = true;
-	#yazi.enable = true;
+        #helix.enable = true;
+        #yazi.enable = true;
       };
 
       home.packages = attrValues {

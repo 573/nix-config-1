@@ -5,7 +5,39 @@
 }:
 
 let
-  pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; });
+  pkgsFor = forEachSystem (system: import ./nixpkgs.nix {
+    inherit inputs rootPath system;
+      config = {
+    # TODO additional discussion here https://github.com/NixOS/nixpkgs/issues/55674 
+    # IMHO this is currently the most predictable usage
+        # https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
+        allowUnfreePredicate =
+          pkg:
+          builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+	    "android-studio-stable"
+	    "google-chrome"
+	    "torch"
+	    "cuda_nvtx"
+	    "cuda_cudart"
+	    "cuda_cupti"
+	    "cuda_nvrtc"
+	    "cudnn"
+	    "libcublas"
+	    "libcusparse_lt"
+	    "libcufft"
+	    "libcufile"
+	    "libcurand"
+	    "libcusolver"
+	    "libnvjitlink"
+	    "libcusparse"
+	    "cuda_nvcc"
+	    "cuda_cccl"
+	    "triton"
+	    "firefox"
+	    "firefox-nightly"
+          ];
+      };
+  });
  
   # for deploy (build x86 target aarch): super.stdenv.targetPlatform.system
   # i. e. deploy from a x86_64-linux machine running the tool deploy a package hello on an aarch64-linux machine, then deployPkgs has to be x86_64-linux 
@@ -76,6 +108,7 @@ let
     system:
     import "${rootPath}/lib" {
       pkgs = pkgsFor.${system};
+      inherit inputs;
     }
   );
 
@@ -172,4 +205,5 @@ in
   mkDevenvPlaywright2 = wrapper ./builders/mkDevenvPlaywright2.nix;
   mkDevShellGhcwasm = wrapper ./builders/mkDevShellGhcwasm.nix;
   mkDevenvHaskell2 = wrapper ./builders/mkDevenvHaskell2.nix;
+  mkDevShellNixPath = wrapper ./builders/mkDevShellNixPath.nix;
 }

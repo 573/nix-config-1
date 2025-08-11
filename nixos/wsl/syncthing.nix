@@ -13,7 +13,7 @@ let
 in
 {
   options.custom.wsl.syncthing = {
-    enable = mkEnableOption "i" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable = mkEnableOption "enable syncthing config" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {
@@ -36,26 +36,26 @@ in
           };
           devices = {
             "Newer Laptop" = {
-              id = "FDBTMR3-XQDMU6L-AJF6WBP-WC65GPB-ZS67G4Q-7KWG3LY-2JGOSL7-Z4QUJQF";
+              id = config.sops.secrets."syncthing/device_1/id".path;
             };
             "Phone" = {
-              id = "A3G3H6Q-RF3GJOT-AXXJSNJ-ZZCC2WW-3R55I3Y-XR5EJD7-S6RQAXT-FI6HWA2";
-              label = "SM-G950F";
+              id = config.sops.secrets."syncthing/device_2/id".path;
+              label = config.sops.secrets."syncthing/device_2/label".path;
             };
             "Older Lenovo" = {
-              id = "JVIDDEN-NPYWDCO-V37UT56-ICT46YW-MIGUWO3-AHANFTX-LYJX7Y4-S5G7UQ2";
+              id = config.sops.secrets."syncthing/device_3/id".path;
             };
           };
           folders = {
-            "xbvei-t7pxz" = {
+            "eins" = {
               devices = [
                 "Newer Laptop"
                 "Phone"
                 "Older Lenovo"
               ];
-              path = "~/Musicupload";
-              id = "xbvei-t7pxz";
-              label = "Musicupload";
+              path = config.sops.secrets."syncthing/folder_1/path".path;
+              id = config.sops.secrets."syncthing/folder_1/id".path;
+              label = config.sops.secrets."syncthing/folder_1/label".path;
             };
           };
         };

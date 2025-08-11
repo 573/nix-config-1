@@ -8,12 +8,14 @@
   config ? {
     # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
     allowAliases = false;
-    allowUnfreePredicate =
-      pkg:
-      builtins.elem (inputs.nixpkgs.lib.getName pkg) [
-        "nvidia-x11"
-        "google-chrome"
-      ];
+    # TODO additional discussion here https://github.com/NixOS/nixpkgs/issues/55674 
+    # IMHO this is currently the most predictable usage
+#    allowUnfreePredicate =
+ #     pkg:
+  #    builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+   #     "nvidia-x11"
+    #    "google-chrome"
+     # ];
   },
 }:
 import pkgsSet {
@@ -79,7 +81,7 @@ import pkgsSet {
                 latest;
             };
           */
-          inherit (inputs.unstable.legacyPackages.${system}) nixos-facter;
+          #inherit (inputs.unstable.legacyPackages.${system}) nixos-facter;
           /*
             vimUtils =
             prev.vimUtils
@@ -97,7 +99,7 @@ import pkgsSet {
 
           somemore = prev.lib.composeManyExtensions moreOverlays final prev;
 
-          firefox = inputs.firefox.packages.${system}.firefox-bin;
+          #firefox = inputs.firefox.packages.${system}.firefox-bin;
 
           # the only alias that I need, this allows me to set allowAliases=false
           inherit
@@ -107,10 +109,11 @@ import pkgsSet {
             ;
         }
         // genAttrs [
+	  # TODO see https://github.com/inscapist/ruby-nix/blob/86b498e/README.md#the-gist
           "bundix"
 #          "talon"
           "devenv"
-          "zen-browser"
+#          "zen-browser"
         ] (name: inputs.${name}.packages.${system}.default)
       )
     ]
@@ -120,19 +123,19 @@ import pkgsSet {
       #inputs.rust-overlay
       inputs.nixpkgs-ruby
 #      inputs.neovim-nightly-overlay
-      inputs.deploy-rs
+#      inputs.deploy-rs
     ])
-    ++ [
-      (_final: prev: {
-        # https://discourse.nixos.org/t/overriding-torch-with-torch-bin-for-all-packages/37086/2
-        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-          (py-final: _py-prev: {
-            torch = py-final.torch-bin;
-          })
-        ];
-      })
-      (self: super: { deploy-rs = { inherit (pkgsSet.legacyPackages.${super.stdenv.hostPlatform.system}) deploy-rs; lib = super.deploy-rs.lib; }; })
-    ]
+#    ++ [
+#      (_final: prev: {
+#        # https://discourse.nixos.org/t/overriding-torch-with-torch-bin-for-all-packages/37086/2
+#        pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+#          (py-final: _py-prev: {
+#            torch = py-final.torch-bin;
+#          })
+#        ];
+#      })
+#      (self: super: { deploy-rs = { inherit (pkgsSet.legacyPackages.${super.stdenv.hostPlatform.system}) deploy-rs; lib = super.deploy-rs.lib; }; })
+#    ]
     ++ inputs.nixpkgs.lib.optionals nixOnDroid [
       inputs.nix-on-droid.overlays.default
       # prevent uploads to remote builder, https://ryantm.github.io/nixpkgs/functions/prefer-remote-fetch
