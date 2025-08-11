@@ -31,6 +31,12 @@ in
 */
 #inherit (pkgs.stdenv.hostPlatform) system;
 {
+
+  imports = [
+    #inputs.quadlet-nix.homeManagerModules.quadlet
+    inputs.nps.homeModules.nps
+  ];
+
   custom = {
     base = {
       desktop = {
@@ -66,11 +72,58 @@ in
 
       neovim = {
         enable = true;
-	# TODO should user- and hostname be rather module params
-	nixd.expr.home-manager = ''
-	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
-''; 
+        # TODO should user- and hostname be rather module params
+        nixd.expr.home-manager = ''
+          	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
+        '';
       };
+    };
+  };
+
+  # see https://github.com/Tarow/nix-podman-stacks/issues/195#issuecomment-3312196230
+  nps = {
+    # host ip here
+    hostIP4Address = "0.0.0.0";
+    # TODO use uid
+    hostUid = 1000;
+    storageBaseDir = "${config.home.homeDirectory}/stacks";
+    # FIXME better place
+    externalStorageBaseDir = "/tmp";
+    stacks = {
+      # needed: https://docs.podman.io/en/latest/markdown/podman.1.html#rootless-mode and
+      # podman system migrate
+      docker-socket-proxy.enable = true;
+      homepage = {
+        enable = true;
+      #  containers.homepage.ports = [ "3000:3000" ];
+	#containers.homepage.traefik = {};
+      # see https://tarow.github.io/nix-podman-stacks/book/container-options.html#servicespodmancontainersnametraefikservicehost
+      };
+
+    # FIXME password
+    paperless = {
+      enable = true;
+      adminProvisioning = {
+        username = "admin";
+        email = "admin@example.com";
+	# FIXME sops
+        passwordFile = ./../../files/keys/dummy; #pkgs.writeText "paperless-pw" "admin1234";
+      };
+      secretKeyFile = ./../../files/keys/dummy; #pkgs.writeText "paperless-secret" "1234567890abcdef1234567890abcdef";
+      db.passwordFile = ./../../files/keys/dummy; # pkgs.writeText "postgres-pw" "postgres";
+    };
+
+/*      traefik = {
+        enable = false;
+        domain = "192.168.178.44";
+        #extraEnv.CF_DNS_API_TOKEN.fromFile = config.sops.secrets."traefik/cf_api_token".path;
+        geoblock.allowedCountries = [ "DE" ];
+        #enablePrometheusExport = true;
+        #enableGrafanaMetricsDashboard = true;
+        #enableGrafanaAccessLogDashboard = true;
+        #crowdsec.middleware.bouncerKeyFile = config.sops.secrets."traefik/crowdsec_bouncer_key".path;
+      };
+      */
     };
   };
 
@@ -84,7 +137,7 @@ in
 
   #xsession = {
   #  enable = true;
-  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux 
+  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux
   #  windowManager.i3 = {
   #    enable = true;
   #  };
@@ -186,9 +239,9 @@ in
 
       inherit (unstable)
         tesseract
-	ocrmypdf
-	#teams-for-linux
-	;
+        ocrmypdf
+        #teams-for-linux
+        ;
 
       inherit (pkgs.usbutils)
         out
@@ -201,7 +254,7 @@ in
 
       inherit (pkgs.nixgl)
         nixGLIntel
-	#nixGLNvidiaBumblebee
+        #nixGLNvidiaBumblebee
         ;
 
       #inherit (libreoffice-postscript)
@@ -234,12 +287,11 @@ in
   xdg.enable = true;
 
   # templates (arch linux) in /etc/xdg/openbox/ (autostart and also rc.xml which is for key shortcuts)
+  # TODO read https://konfou.xyz/posts/nixos-without-display-manager/
   xdg.configFile = {
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 

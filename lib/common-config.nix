@@ -113,6 +113,7 @@ in
       ];
       experimental-features = [
         "nix-command"
+	"pipe-operators"
         "flakes"
         "configurable-impure-env"
         "auto-allocate-uids"

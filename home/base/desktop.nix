@@ -43,7 +43,7 @@ let
       "--force-device-scale-factor=1"
       "--high-dpi-support=1"
     ];
-    fixGL = true;
+ #   fixGL = true;
   };
 
   # different approach here: https://pmiddend.github.io/posts/nixgl-on-ubuntu
@@ -51,14 +51,33 @@ let
     name = "ausweisapp";
     source = pkgs.ausweisapp;
     path = "/bin/AusweisApp";
-    fixGL = true;
+ #   fixGL = true;
   };
+
+emacs = config.lib.custom.wrapProgram {
+  name = "emacs";
+  source = config.custom.programs.emacs-configured.finalPackage;
+  path = "/bin/emacs";
+};
 
   vlc = config.lib.custom.wrapProgram {
     name = "vlc";
     source = pkgs.vlc;
     path = "/bin/vlc";
-    fixGL = true;
+    # TODO proof of https://github.com/nix-community/home-manager/pull/5355#issuecomment-2426908650 more here https://nix-community.github.io/home-manager/#sec-usage-gpu-non-nixos
+#    fixGL = true;
+  };
+
+  wezterm = config.lib.custom.wrapProgram {
+    name = "wezterm";
+    source = pkgs.wezterm;
+    path = "/bin/wezterm";
+  };
+
+  kitty = config.lib.custom.wrapProgram {
+    name = "kitty";
+    source = pkgs.kitty;
+    path = "/bin/kitty";
   };
 
   /*
@@ -141,6 +160,11 @@ in
       };
     */
 
+    nixGL = {
+      packages = inputs.nixGL.packages;
+      defaultWrapper = "mesa";
+    };
+
     programs.firefox = {
       enable = true;
 
@@ -166,6 +190,7 @@ in
 	  (extension "qwantcom-for-firefox" "qwantcomforfirefox@jetpack")
 	  (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
           (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
+	  (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}")
 	];
         # To add additional extensions, https://github.com/tupakkatapa/mozid
     };
@@ -293,15 +318,19 @@ in
 
     home.packages =
       [
-        chrome
-        ausweisapp
-	vlc
+        (config.lib.nixGL.wrap chrome)
+        (config.lib.nixGL.wrap ausweisapp)
+	(config.lib.nixGL.wrap vlc)
+	(config.lib.nixGL.wrap wezterm)
+	(config.lib.nixGL.wrap kitty)
+	emacs
       ]
       ++ (attrValues {
 
         inherit (pkgs)
           pavucontrol
           pdftk
+	  csvkit
           qpdfview
           # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
           obconf
