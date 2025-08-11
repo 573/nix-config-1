@@ -34,6 +34,7 @@
 
   #services.paperless.enable = true;
 
+/*
   # see https://discourse.nixos.org/t/ollama-not-found-but-installed/70097/3
   services.ollama = {
     enable = true;
@@ -95,6 +96,7 @@
   ];
 
   services.open-webui.enable = true;
+*/ 
 
   systemd.tmpfiles.rules = [
     ''

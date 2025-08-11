@@ -12,6 +12,7 @@
   unstable,
   inputs,
   homeDir,
+  withNps,
   ...
 }:
 let
@@ -31,6 +32,7 @@ in
 */
 #inherit (pkgs.stdenv.hostPlatform) system;
 {
+
   custom = {
     base = {
       desktop = {
@@ -46,6 +48,10 @@ in
     };
 
     programs = {
+      sops-nix.enable = true;
+
+      nix-podman-stacks.enable = true;
+
       shell.initExtra = ''
         #. ${config.home.homeDirectory}/.aliases.sh
       '';
@@ -66,10 +72,10 @@ in
 
       neovim = {
         enable = true;
-	# TODO should user- and hostname be rather module params
-	nixd.expr.home-manager = ''
-	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
-''; 
+        # TODO should user- and hostname be rather module params
+        nixd.expr.home-manager = ''
+          	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
+        '';
       };
     };
   };
@@ -84,7 +90,7 @@ in
 
   #xsession = {
   #  enable = true;
-  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux 
+  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux
   #  windowManager.i3 = {
   #    enable = true;
   #  };
@@ -186,9 +192,9 @@ in
 
       inherit (unstable)
         tesseract
-	ocrmypdf
-	#teams-for-linux
-	;
+        ocrmypdf
+        #teams-for-linux
+        ;
 
       inherit (pkgs.usbutils)
         out
@@ -197,11 +203,6 @@ in
       inherit (pkgs.xorg)
         libxcvt
         xrandr
-        ;
-
-      inherit (pkgs.nixgl)
-        nixGLIntel
-	#nixGLNvidiaBumblebee
         ;
 
       #inherit (libreoffice-postscript)
@@ -234,12 +235,11 @@ in
   xdg.enable = true;
 
   # templates (arch linux) in /etc/xdg/openbox/ (autostart and also rc.xml which is for key shortcuts)
+  # TODO read https://konfou.xyz/posts/nixos-without-display-manager/
   xdg.configFile = {
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 
@@ -263,4 +263,25 @@ in
     ];
   };
 
+  /*
+    services.podman = {
+          enable = true;
+          enableTypeChecks = true; # Probably not required but seems better to enable
+
+          containers.wallos = {
+            image = "bellamy/wallos:4.3.0";
+
+            #volumes = [
+            #  "./db:/var/www/html/db"
+            #  "./logos:/var/www/html/images/uploads/logos"
+            #];
+
+            ports = [
+              "127.0.0.1:8080:80/tcp"
+            ];
+          };
+
+          # analog https://github.com/Tarow/nix-podman-stacks/blob/81df9c882ab9ebb78ef76cfdc83bd70363edfa9f/modules/paperless/default.nix#L157
+        };
+  */
 }

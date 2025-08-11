@@ -61,9 +61,9 @@ in
   options.custom.wsl.wsl-vpnkit = {
     enable =
       mkEnableOption "See https://github.com/nix-community/NixOS-WSL/issues/262#issuecomment-1896110651"
-      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+      // optionalAttrs (config.custom.base.general.wsl) { default = false; };
 
-    autoVPN = mkEnableOption "Auto-enable";
+    autoVPN = mkEnableOption "Auto-enable wsl-vpnkit asa WSL VM starts" // optionalAttrs (config.custom.wsl.wsl-vpnkit.enable) { /* yes when module is enabled */ default = true; };
 
     checkURL = lib.mkOption {
       type = lib.types.str;

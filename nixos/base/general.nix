@@ -29,7 +29,6 @@ in
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    inputs.nixos-wsl.nixosModules.wsl
   ];
 
   ###### interface
@@ -40,12 +39,13 @@ in
         default = true;
       };
 
-      wsl = mkEnableOption "nixos-wsl specific config";
+      wsl = mkEnableOption "nixos-wsl specific nixos config";
 
       hostname = mkOption {
         type = types.enum [
           "DANIELKNB1"
-	  "guitar"
+          "nixos"
+          "guitar"
           "twopi"
         ];
         description = "Host name.";
@@ -94,20 +94,20 @@ in
         "en_US.UTF-8/UTF-8"
       ];
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+      # Select internationalisation properties.
+      i18n.defaultLocale = "en_US.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "de_DE.UTF-8";
-    LC_IDENTIFICATION = "de_DE.UTF-8";
-    LC_MEASUREMENT = "de_DE.UTF-8";
-    LC_MONETARY = "de_DE.UTF-8";
-    LC_NAME = "de_DE.UTF-8";
-    LC_NUMERIC = "de_DE.UTF-8";
-    LC_PAPER = "de_DE.UTF-8";
-    LC_TELEPHONE = "de_DE.UTF-8";
-    LC_TIME = "de_DE.UTF-8";
-  };
+      i18n.extraLocaleSettings = {
+        LC_ADDRESS = "de_DE.UTF-8";
+        LC_IDENTIFICATION = "de_DE.UTF-8";
+        LC_MEASUREMENT = "de_DE.UTF-8";
+        LC_MONETARY = "de_DE.UTF-8";
+        LC_NAME = "de_DE.UTF-8";
+        LC_NUMERIC = "de_DE.UTF-8";
+        LC_PAPER = "de_DE.UTF-8";
+        LC_TELEPHONE = "de_DE.UTF-8";
+        LC_TIME = "de_DE.UTF-8";
+      };
 
       networking = {
         hostName = cfg.hostname;
@@ -142,23 +142,23 @@ in
 
       system = {
         configurationRevision = inputs.self.rev or "dirty";
+        # FIXME this should go in host configuration.nix as each host
+        # can be bootstrapped on a different version
         stateVersion = "24.11";
       };
 
       time.timeZone = "Europe/Berlin";
 
-      # for NixOS-WSL in case of own user, see https://github.com/nix-community/NixOS-WSL/blob/4840f5d/modules/wsl-distro.nix#L89C5-L93C7
-      users.users = {
-        dani = {
-          uid = config.custom.ids.uids.dani;
-          extraGroups = [ "wheel" ];
-          isNormalUser = true;
-        };
-      };
+      users.users = (
+        lib.optionalAttrs (!cfg.wsl) {
+          # for NixOS-WSL in case of own user, see https://github.com/nix-community/NixOS-WSL/blob/4840f5d/modules/wsl-distro.nix#L89C5-L93C7
+          dani = {
+            uid = config.custom.ids.uids.dani;
+            extraGroups = [ "wheel" ];
+            isNormalUser = true;
+          };
+        }
+      );
     }
-
-    (mkIf (cfg.wsl) {
-      custom.wsl.wsl-vpnkit.autoVPN = true;
-    })
   ]);
 }

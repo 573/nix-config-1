@@ -13,7 +13,7 @@ let
 in
 {
   options.custom.wsl.syncthing = {
-    enable = mkEnableOption "i" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable = mkEnableOption "enable syncthing config" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {

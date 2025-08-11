@@ -27,14 +27,14 @@ in
     };
 
     programs = {
-      hledger.enable = true;
-      tex.enable = true;
+      #hledger.enable = true;
+      #tex.enable = true;
       zellij.enable = true;
       nixbuild.enable = true;
-      alacritty.enable = true;
+      #alacritty.enable = true;
       neovim = {
         enable = true;
-	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.nixos.options.home-manager.users.type.getSubOptions [ ]'';
       };
     };
 
@@ -46,7 +46,7 @@ in
       sdks = {
         enable = false;
         links = {
-          inherit (pkgs) jdk21 python310;
+          inherit (pkgs) jdk21;
         };
       };
     };
