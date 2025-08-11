@@ -31,6 +31,11 @@ in
 */
 #inherit (pkgs.stdenv.hostPlatform) system;
 {
+
+  imports = [
+inputs.quadlet-nix.homeManagerModules.quadlet 
+  ];
+
   custom = {
     base = {
       desktop = {
@@ -73,6 +78,76 @@ in
       };
     };
   };
+
+  # see https://www.reddit.com/r/NixOS/comments/1msstpd/comment/n9exrgi/
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) networks pods;
+  in {
+    autoEscape = true;
+    autoUpdate.enable = true;
+    containers = {
+      paperless = {
+        autoStart = true;
+        containerConfig = {
+          image = "ghcr.io/paperless-ngx/paperless-ngx:2.16.2";
+          labels = [ "wud.tag.include=^\\d+\\.\\d+\\.\\d+$" ];
+          networks = [ networks.paperless.ref ];
+          publishPorts = [ "8002:8000" ];
+          volumes = [
+            "\${STATE_DIRECTORY}/data:/usr/src/paperless/data"
+            "\${STATE_DIRECTORY}/media:/usr/src/paperless/media"
+            "\${STATE_DIRECTORY}/export:/usr/src/paperless/export"
+            "\${STATE_DIRECTORY}/consume:/usr/src/paperless/consume"
+          ];
+          environments = {
+            "PAPERLESS_REDIS" = "redis://10.92.0.102";
+          };
+          environmentFiles = [ "/home/${user}/.config/paperless/env" ];
+        };
+        serviceConfig = {
+          ConfigurationDirectory = "paperless";
+          Restart = "always";
+          RestartSec = "60s";
+          StartLimitInterval = 0;
+          StateDirectory = "paperless";
+        };
+      };
+      paperless-redis = {
+        autoStart = true;
+        containerConfig = {
+          image = "docker.io/library/redis:7.4.4-alpine";
+          labels = [ "wud.tag.include=^7\\.\\d+\\.\\d+-alpine$" ];
+          networks = [ networks.paperless.ref ];
+          ip = "10.92.0.102";
+          volumes = [
+            "paperless-redis-data:/data"
+          ];
+        };
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "60s";
+          StartLimitInterval = 0;
+        };
+      };
+    };
+    networks = {
+      paperless = {
+        networkConfig = {
+          internal = true;
+          subnets = [ "10.92.0.0/24" ];
+        };
+      };
+    };
+    volumes = {
+      paperless-redis-data = {
+        volumeConfig = {
+          driver = "local";
+        };
+      };
+    };
+  };
+
+  services.podman.enable = true;
 
   # https://mipmip.github.io/home-manager-option-search/?query=syncthing
   services.syncthing = {
@@ -234,12 +309,11 @@ in
   xdg.enable = true;
 
   # templates (arch linux) in /etc/xdg/openbox/ (autostart and also rc.xml which is for key shortcuts)
+  # TODO read https://konfou.xyz/posts/nixos-without-display-manager/
   xdg.configFile = {
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 
