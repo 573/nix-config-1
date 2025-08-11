@@ -1,11 +1,12 @@
-{ config
-, lib
-, pkgs
-, inputs
-, unstable
-, makeNixvimWithModule
-, homeDir
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  unstable,
+  makeNixvimWithModule,
+  homeDir,
+  ...
 }:
 
 let
@@ -35,7 +36,7 @@ let
     };
 
   # keymaps
-  
+
   keymaps = [
     {
       mode = "n";
@@ -61,7 +62,10 @@ let
 
     # Show which-key
     {
-      mode = [ "n" "v" ];
+      mode = [
+        "n"
+        "v"
+      ];
       key = "<C-Space>";
       action = "<cmd>WhichKey<CR>";
       options.desc = "Which Key";
@@ -120,7 +124,144 @@ let
       '';
       options.desc = "Spelling suggestions";
     }
-  ];
+  ]
+  ++ (lib.optionals config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable [
+    {
+      mode = "n";
+      key = "<leader>dL";
+      action = "<CMD>lua require'osv'.launch({port = 8086}) <CR>";
+      options = {
+        desc = "nlua Launch";
+      };
+    }
+  ])
+  ++ (lib.optionals
+    (
+      config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable
+      && !config.custom.programs.neovim.minimalPackage.config.plugins.dap.lazyLoad.enable
+    )
+    [
+      {
+        mode = "n";
+        key = "<leader>db";
+        # action = "<CMD>DapToggleBreakpoint<CR>";
+        action = "<CMD>lua require('dap').toggle_breakpoint()<CR>";
+        options = {
+          desc = "Breakpoint toggle";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dc";
+        # action = "<CMD>DapContinue<CR>";
+        action = "<CMD>lua require('dap').continue()<CR>";
+        options = {
+          desc = "Continue Debugging (Start)";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dC";
+        action = "<CMD>lua require('dap').run_to_cursor()<CR>";
+        options = {
+          desc = "Run to cursor";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dg";
+        action = "<CMD>lua require('dap').goto_()<CR>";
+        options = {
+          desc = "Go to line (no execute)";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>di";
+        # action = "<CMD>DapStepInto<CR>";
+        action = "<CMD>lua require('dap').step_into()<CR>";
+        options = {
+          desc = "Step Into";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dj";
+        action = "<CMD>lua require('dap').down()<CR>";
+        options = {
+          desc = "Down";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dk";
+        action = "<CMD>lua require('dap').up()<CR>";
+        options = {
+          desc = "Up";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dl";
+        action = "<CMD>lua require('dap').run_last()<CR>";
+        options = {
+          desc = "Run Last";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>do";
+        # action = "<CMD>DapStepOut<CR>";
+        action = "<CMD>lua require('dap').step_out()<CR>";
+        options = {
+          desc = "Step Out";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dO";
+        # action = "<CMD>DapStepOver<CR>";
+        action = "<CMD>lua require('dap').step_over()<CR>";
+        options = {
+          desc = "Step Over";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dp";
+        action = "<CMD>lua require('dap').pause()<CR>";
+        options = {
+          desc = "Pause";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dr";
+        # action = "<CMD>DapToggleRepl<CR>";
+        action = "<CMD>lua require('dap').repl.toggle()<CR>";
+        options = {
+          desc = "Toggle REPL";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>ds";
+        action = "<CMD>lua require('dap').session()<CR>";
+        options = {
+          desc = "Session";
+        };
+      }
+      {
+        mode = "n";
+        key = "<leader>dt";
+        # action = "<CMD>DapTerminate<CR>";
+        action = "<CMD>lua require('dap').terminate()<CR>";
+        options = {
+          desc = "Terminate Debugging";
+        };
+      }
+    ]
+  );
 
   # plugins
   trouble.enable = true;
@@ -133,24 +274,32 @@ let
   # https://github.com/MattSturgeon/nix-config/blob/main/nvim/config/completion.nix
   cmp = {
     enable = true;
-        # Setting this means we don't need to explicitly enable
+    # Setting this means we don't need to explicitly enable
     # each completion source, so long as the plugin is listed
     # in https://github.com/nix-community/nixvim/blob/cd32dcd50fa98cd03e2916b6fd47e31deffbca24/plugins/completion/cmp/cmp-helpers.nix#L23
     autoEnableSources = true;
     settings = {
       sources = [
-        { name = "nvim_lsp";
-	  groupIndex = 2; }
-        { name = "buffer";
-	  groupIndex = 2; }
-        { name = "path";
-	  option.trailing_slash = true;
-	  groupIndex = 2; }
-        { name = "luasnip";
-	  groupIndex = 3; }
+        {
+          name = "nvim_lsp";
+          groupIndex = 2;
+        }
+        {
+          name = "buffer";
+          groupIndex = 2;
+        }
+        {
+          name = "path";
+          option.trailing_slash = true;
+          groupIndex = 2;
+        }
+        {
+          name = "luasnip";
+          groupIndex = 3;
+        }
         {
           name = "look";
-	  groupIndex = 1;
+          groupIndex = 1;
           keyword_length = 2;
           option.__raw = ''
             		  {
@@ -241,10 +390,10 @@ let
       };
       # FIXME Generates error, compare https://github.com/MattSturgeon/nix-config/blob/main/nvim/config/completion.nix and https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
       #snippet.expand = ''
-  #function(args)
-  #  require('luasnip').lsp_expand(args.body)
-  #end
-#'';
+      #function(args)
+      #  require('luasnip').lsp_expand(args.body)
+      #end
+      #'';
       mapping = {
         "<C-n>" = "cmp.mapping.select_next_item()";
         "<C-p>" = "cmp.mapping.select_prev_item()";
@@ -281,7 +430,7 @@ let
       };
     };
 
-      filetype = {
+    filetype = {
       gitcommit = {
         sources = [
           { name = "conventionalcommits"; }
@@ -295,12 +444,13 @@ let
     cmdline =
       let
         common = {
-          mapping.__raw = /* lua */ ''
-            cmp.mapping.preset.cmdline({
-              ["<C-Space>"] = cmp.mapping.complete(), -- Open list without typing
-            })
-          '';
-          sources = [{ name = "buffer"; }];
+          mapping.__raw = # lua
+            ''
+              cmp.mapping.preset.cmdline({
+                ["<C-Space>"] = cmp.mapping.complete(), -- Open list without typing
+              })
+            '';
+          sources = [ { name = "buffer"; } ];
         };
       in
       {
@@ -347,64 +497,64 @@ let
   #cmp-dictionary = { enable = true; };
 
   yazi = {
-      enable = false;
+    enable = false;
 
-      settings = {
-        log_level = "off";
-        open_for_directories = false;
-        use_ya_for_events_reading = false;
-        use_yazi_client_id_flag = false;
-        enable_mouse_support = false;
+    settings = {
+      log_level = "off";
+      open_for_directories = false;
+      use_ya_for_events_reading = false;
+      use_yazi_client_id_flag = false;
+      enable_mouse_support = false;
 
-        open_file_function.__raw = ''
-          function(chosen_file)
-            vim.cmd(string.format("edit %s", vim.fn.fnameescape(chosen_file)))
+      open_file_function.__raw = ''
+        function(chosen_file)
+          vim.cmd(string.format("edit %s", vim.fn.fnameescape(chosen_file)))
+        end
+      '';
+
+      clipboard_register = "*";
+
+      keymaps = {
+        show_help = "<f1>";
+        open_file_in_vertical_split = "<c-v>";
+        open_file_in_horizontal_split = "<c-x>";
+        open_file_in_tab = "<c-t>";
+        grep_in_directory = "<c-s>";
+        replace_in_directory = "<c-g>";
+        cycle_open_buffers = "<tab>";
+        copy_relative_path_to_selected_files = "<c-y>";
+        send_to_quickfix_list = "<c-q>";
+      };
+
+      set_keymappings_function = null;
+
+      hooks = {
+        yazi_opened.__raw = ''
+          function(preselected_path, yazi_buffer_id, config)
           end
         '';
 
-        clipboard_register = "*";
+        yazi_closed_successfully.__raw = ''
+          function(chosen_file, config, state)
+          end
+        '';
 
-        keymaps = {
-          show_help = "<f1>";
-          open_file_in_vertical_split = "<c-v>";
-          open_file_in_horizontal_split = "<c-x>";
-          open_file_in_tab = "<c-t>";
-          grep_in_directory = "<c-s>";
-          replace_in_directory = "<c-g>";
-          cycle_open_buffers = "<tab>";
-          copy_relative_path_to_selected_files = "<c-y>";
-          send_to_quickfix_list = "<c-q>";
-        };
-
-        set_keymappings_function = null;
-
-        hooks = {
-          yazi_opened.__raw = ''
-            function(preselected_path, yazi_buffer_id, config)
-            end
-          '';
-
-          yazi_closed_successfully.__raw = ''
-            function(chosen_file, config, state)
-            end
-          '';
-
-          yazi_opened_multiple_files.__raw = ''
-            function(chosen_files)
-              vim.cmd("args" .. table.concat(chosen_files, " "))
-            end
-          '';
-        };
-
-        highlight_groups = {
-          hovered_buffer = null;
-        };
-
-        floating_window_scaling_factor = 0.9;
-        yazi_floating_window_winblend = 0;
-        yazi_floating_window_border = "rounded";
+        yazi_opened_multiple_files.__raw = ''
+          function(chosen_files)
+            vim.cmd("args" .. table.concat(chosen_files, " "))
+          end
+        '';
       };
+
+      highlight_groups = {
+        hovered_buffer = null;
+      };
+
+      floating_window_scaling_factor = 0.9;
+      yazi_floating_window_winblend = 0;
+      yazi_floating_window_border = "rounded";
     };
+  };
 
   mini = {
     enable = true;
@@ -458,7 +608,15 @@ let
           __unkeyed-1 = "<leader>f";
           group = "files";
         }
-      ];
+      ]
+      ++ (lib.optionals config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable [
+        {
+          __unkeyed-1 = "<leader>d";
+          mode = "n";
+          desc = "Debug";
+          # icon = " ";
+        }
+      ]);
       # Using telescope for spelling
       plugins.spelling.enabled = false;
     };
@@ -479,41 +637,44 @@ let
         # Nix LS
         enable = true; # FIXME re-enable when crashes on termux are fixed
         settings =
-        let
+          let
             flake = ''(builtins.getFlake "${inputs.self}")'';
-        in
-        {
-          nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
-	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/formatting.html
-	  formatting.command = [ "nixfmt" ];
-	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/diagnostic.html
-          diagnostic.suppress = [
+          in
+          {
+            nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
+            # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/formatting.html
+            formatting.command = [ "nixfmt" ];
+            # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/diagnostic.html
+            diagnostic.suppress = [
               "sema-escaping-with"
               "var-bind-to-this"
             ];
-	  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/index.html#pluginslspserversnixdsettingsoptions
-          options = rec {
-            nixos.expr = "${flake}.nixosConfigurations.DANIELKNB1.options";
-	    # as in https://github.com/nix-community/NixOS-WSL/blob/d34d9412556d3a896e294534ccd25f53b6822e80/modules/wsl-conf.nix#L21
-	    nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
-	    # as in https://github.com/nix-community/home-manager/blob/e8c19a3cec2814c754f031ab3ae7316b64da085b/nixos/common.nix#L112
-            home-manager.expr = config.custom.programs.neovim.nixd.expr.home-manager;
-	    # TODO split up by making *.expr configurable by host in that neovim.nix module here
-            #home_manager.expr = ''
-            #  ${flake}.homeConfigurations."dani@maiziedemacchiato".options
-            #'';
-	    /* TODO https://github.com/nix-community/nixvim/blob/1fb1bf8a73ccf207dbe967cdb7f2f4e0122c8bd5/flake/default.nix#L10, is another approach i. e. with that config https://github.com/khaneliman/khanelivim/blob/a33e6ab/flake.nix
-	    nix-repl> :lf github:khaneliman/khanelivim
-	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options 
-	    same as
-	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
-	    */
-            nixondroid.expr = ''
-              ${flake}.nixOnDroidConfigurations.sams9.options
-            '';
+            # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/index.html#pluginslspserversnixdsettingsoptions
+            options = rec {
+              nixos.expr = "${flake}.nixosConfigurations.DANIELKNB1.options";
+              # as in https://github.com/nix-community/NixOS-WSL/blob/d34d9412556d3a896e294534ccd25f53b6822e80/modules/wsl-conf.nix#L21
+              nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
+              # as in https://github.com/nix-community/home-manager/blob/e8c19a3cec2814c754f031ab3ae7316b64da085b/nixos/common.nix#L112
+              home-manager.expr = config.custom.programs.neovim.nixd.expr.home-manager;
+              # TODO split up by making *.expr configurable by host in that neovim.nix module here
+              #home_manager.expr = ''
+              #  ${flake}.homeConfigurations."dani@maiziedemacchiato".options
+              #'';
+              /*
+                TODO https://github.com/nix-community/nixvim/blob/1fb1bf8a73ccf207dbe967cdb7f2f4e0122c8bd5/flake/default.nix#L10, is another approach i. e. with that config https://github.com/khaneliman/khanelivim/blob/a33e6ab/flake.nix
+                	    nix-repl> :lf github:khaneliman/khanelivim
+                	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
+                	    same as
+                	    nix-repl> nixvimConfigurations.x86_64-linux.khanelivim.options
+              */
+              nixondroid.expr = ''
+                ${flake}.nixOnDroidConfigurations.sams9.options
+              '';
+            };
           };
-        };
       };
+
+      superhtml.enable = true;
     };
 
     keymaps.lspBuf = {
@@ -605,30 +766,239 @@ let
     };
   };
 
-  extraConfigLuaPre = /* lua */ ''
-    -- Helper for telescope (<leader>ff)
-    function telescope_project_files()
-      -- We cache the results of "git rev-parse"
-      -- Process creation is expensive in Windows, so this reduces latency
-      local is_inside_work_tree = {}
+  # see https://github.com/pete3n/nixvim-flake/blob/51f1c485a52472386b375d4244b6c80d899aba60/config/debug.nix#L2C11-L10C5
+  # but also https://github.com/nix-community/nixvim/blob/f5026663f68261a201cd0700ced14971945d8dd9/plugins/by-name/dap-ui/deprecations.nix#L9
+  dap = {
+    enable = true;
 
-      local opts = {}
-
-      return function()
-        local cwd = vim.fn.getcwd()
-        if is_inside_work_tree[cwd] == nil then
-          vim.fn.system("git rev-parse --is-inside-work-tree")
-          is_inside_work_tree[cwd] = vim.v.shell_error == 0
+    luaConfig.content = ''
+      local dap = require("dap")
+      dap.adapters.nlua = function(callback, conf)
+        local adapter = {
+          type = "server",
+          host = conf.host or "127.0.0.1",
+          port = conf.port or 8086,
+        }
+        if conf.start_neovim then
+          local dap_run = dap.run
+          dap.run = function(c)
+            adapter.port = c.port
+            adapter.host = c.host
+          end
+          require("osv").run_this()
+          dap.run = dap_run
         end
+        callback(adapter)
+        end
+    '';
+    # TODO: support lua in nixvim
+    # adapters = {
+    #   servers = {
+    #     nlua = {
+    #       host = "127.0.0.1";
+    #       port = 8086;
+    #     };
+    #   };
+    # };
 
-        if is_inside_work_tree[cwd] then
-          require("telescope.builtin").git_files(opts)
-        else
-          require("telescope.builtin").find_files(opts)
+    configurations = {
+      lua = [
+        {
+          type = "nlua";
+          request = "attach";
+          name = "Run this file";
+          start_neovim = { };
+        }
+        {
+          type = "nlua";
+          request = "attach";
+          name = "Attach to running Neovim instance (port = 8086)";
+          port = 8086;
+        }
+      ];
+    };
+
+    lazyLoad.settings = {
+      # NOTE: Couldn't get lazy loading to work any other way...
+      # Hate plugins that require this verbosity for lazy load
+      keys = [
+        {
+          __unkeyed-1 = "<leader>db";
+          __unkeyed-2.__raw = ''
+            function() require('dap').toggle_breakpoint() end
+          '';
+          desc = "Breakpoint toggle";
+        }
+        {
+          __unkeyed-1 = "<leader>dc";
+          __unkeyed-2.__raw = ''
+            function() require('dap').continue() end
+          '';
+          desc = "Continue Debugging (Start)";
+        }
+        {
+          __unkeyed-1 = "<leader>dC";
+          __unkeyed-2.__raw = ''
+            function() require('dap').run_to_cursor() end
+          '';
+          desc = "Run to cursor";
+        }
+        {
+          __unkeyed-1 = "<leader>dg";
+          __unkeyed-2.__raw = ''
+            function() require('dap').goto_() end
+          '';
+          desc = "Go to line (no execute)";
+        }
+        {
+          __unkeyed-1 = "<leader>di";
+          __unkeyed-2.__raw = ''
+            function() require('dap').step_into() end
+          '';
+          desc = "Step Into";
+        }
+        {
+          __unkeyed-1 = "<leader>dj";
+          __unkeyed-2.__raw = ''
+            function() require('dap').down() end
+          '';
+          desc = "Down";
+        }
+        {
+          __unkeyed-1 = "<leader>dk";
+          __unkeyed-2.__raw = ''
+            function() require('dap').up() end
+          '';
+          desc = "Up";
+        }
+        {
+          __unkeyed-1 = "<leader>dl";
+          __unkeyed-2.__raw = ''
+            function() require('dap').run_last() end
+          '';
+          desc = "Run Last";
+        }
+        {
+          __unkeyed-1 = "<leader>do";
+          __unkeyed-2.__raw = ''
+            function() require('dap').step_out() end
+          '';
+          desc = "Step Out";
+        }
+        {
+          __unkeyed-1 = "<leader>dO";
+          __unkeyed-2.__raw = ''
+            function() require('dap').step_over() end
+          '';
+          desc = "Step Over";
+        }
+        {
+          __unkeyed-1 = "<leader>dp";
+          __unkeyed-2.__raw = ''
+            function() require('dap').pause() end
+          '';
+          desc = "Pause";
+        }
+        {
+          __unkeyed-1 = "<leader>dr";
+          __unkeyed-2.__raw = ''
+            function() require('dap').repl.toggle() end
+          '';
+          desc = "Toggle REPL";
+        }
+        {
+          __unkeyed-1 = "<leader>ds";
+          __unkeyed-2.__raw = ''
+            function() require('dap').session() end
+          '';
+          desc = "Session";
+        }
+        {
+          __unkeyed-1 = "<leader>dt";
+          __unkeyed-2.__raw = ''
+            function() require('dap').terminate() end
+          '';
+          desc = "Terminate Debugging";
+        }
+      ];
+    };
+
+    adapters = {
+      executables = {
+        gdb = {
+          command = "gdb";
+          args = [
+            "-i"
+            "dap"
+          ];
+        };
+      };
+    };
+
+    signs = {
+      dapBreakpoint = {
+        text = "";
+        texthl = "DapBreakpoint";
+      };
+      dapBreakpointCondition = {
+        text = "";
+        texthl = "DapBreakpointCondition";
+      };
+      dapBreakpointRejected = {
+        text = "";
+        texthl = "DapBreakpointRejected";
+      };
+      dapLogPoint = {
+        text = "";
+        texthl = "DapLogPoint";
+      };
+      dapStopped = {
+        text = "";
+        texthl = "DapStopped";
+      };
+    };
+
+    # see https://github.com/mfussenegger/nvim-dap?tab=readme-ov-file#usage "Via UI extensions:"
+    # or https://nix-community.github.io/nixvim/plugins/dap-ui/index.html
+  };
+
+  dap-ui = {
+    enable = true;
+  };
+
+  dap-virtual-text.enable = true;
+
+  # see https://rr-project.org/
+  # and https://nix-community.github.io/nixvim/plugins/dap-rr/settings.html
+  # and https://github.com/jonboh/nvim-dap-rr/blob/920e493/README.md#minimal-configuration
+  # good for rust TODO
+  #dap-rr.enable = true;
+
+  extraConfigLuaPre = # lua
+    ''
+      -- Helper for telescope (<leader>ff)
+      function telescope_project_files()
+        -- We cache the results of "git rev-parse"
+        -- Process creation is expensive in Windows, so this reduces latency
+        local is_inside_work_tree = {}
+
+        local opts = {}
+
+        return function()
+          local cwd = vim.fn.getcwd()
+          if is_inside_work_tree[cwd] == nil then
+            vim.fn.system("git rev-parse --is-inside-work-tree")
+            is_inside_work_tree[cwd] = vim.v.shell_error == 0
+          end
+
+          if is_inside_work_tree[cwd] then
+            require("telescope.builtin").git_files(opts)
+          else
+            require("telescope.builtin").find_files(opts)
+          end
         end
       end
-    end
-  '';
+    '';
 
   # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
   fzf-lua = {
@@ -693,14 +1063,18 @@ in
 
       nixd = {
         expr = {
-	  home-manager = mkOption {
-	    type = types.str;
-	    default = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
-	    description = let flake = ''(builtins.getFlake "${inputs.self}")''; in ''
-	    Either like ${flake}.homeConfigurations.nonnixos.options or like ${flake}.nixosConfigurations.nixosmachine.options.home-manager.users.type.getSubOptions [ ]
-	    '';
-	    };
-	};
+          home-manager = mkOption {
+            type = types.str;
+            default = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+            description =
+              let
+                flake = ''(builtins.getFlake "${inputs.self}")'';
+              in
+              ''
+                	    Either like ${flake}.homeConfigurations.nonnixos.options or like ${flake}.nixosConfigurations.nixosmachine.options.home-manager.users.type.getSubOptions [ ]
+                	    '';
+          };
+        };
       };
 
       lightWeight = mkEnableOption "light weight neovim (vi) config for low performance hosts" // {
@@ -736,9 +1110,10 @@ in
   config = mkIf cfg.enable (mkMerge [
     {
       # minimal nvim
-      custom.programs.neovim.minimalPackage =       makeNixvimWithModule {
+      custom.programs.neovim.minimalPackage = makeNixvimWithModule {
         #inherit pkgs;
-        module = { helpers, ... }: # import ./config; # import the module directly
+        module =
+          { helpers, ... }: # import ./config; # import the module directly
           {
             enableMan = false;
 
@@ -748,53 +1123,82 @@ in
 
             # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
             extraConfigLua = ''
-	            -- alacritty (+ tmux + neovim) workaround
-                    -- DONT vim.opt.paste = true -- as it breaks many other things i.e. fzf
-		    -- DONT [also] rather see https://jdhao.github.io/2021/02/01/bracketed_paste_mode/
-		    --      is nice but does not work even with only alacritty and no tmux inbetween  
-                    -- DONE like follows (hitting F2 to toggle paste on demand before C-S-v)
-		    -- see * https://stackoverflow.com/a/78629377
-		    --     * https://www.reddit.com/r/neovim/comments/uuh8xw/noob_vimkeymapset_vs_vimapinvim_set_keymap_key/
-                    --     * https://www.reddit.com/r/neovim/comments/xilic1/comment/ip3saw1/
-                    --     * or just using <BAR> as see https://www.reddit.com/r/neovim/comments/yd6ne9/comment/itq9ocx/
-		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
-		    -- TODO vim.notify("paste toggled")
-		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
-		    --      :set paste?<cr> https://stackoverflow.com/a/12060528
-                    -- not working see https://superuser.com/questions/468640/f2-in-paste-mode
-		    --             also https://vimhelp.org/options.txt.html#%27paste%27
-		    --vim.keymap.set('i', "<f2>", '<c-\><c-o>:set paste!<cr>', { noremap = true })
+              	            -- alacritty (+ tmux + neovim) workaround
+                                  -- DONT vim.opt.paste = true -- as it breaks many other things i.e. fzf
+              		    -- DONT [also] rather see https://jdhao.github.io/2021/02/01/bracketed_paste_mode/
+              		    --      is nice but does not work even with only alacritty and no tmux inbetween  
+                                  -- DONE like follows (hitting F2 to toggle paste on demand before C-S-v)
+              		    -- see * https://stackoverflow.com/a/78629377
+              		    --     * https://www.reddit.com/r/neovim/comments/uuh8xw/noob_vimkeymapset_vs_vimapinvim_set_keymap_key/
+                                  --     * https://www.reddit.com/r/neovim/comments/xilic1/comment/ip3saw1/
+                                  --     * or just using <BAR> as see https://www.reddit.com/r/neovim/comments/yd6ne9/comment/itq9ocx/
+              		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
+              		    -- TODO vim.notify("paste toggled")
+              		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
+              		    --      also https://vi.stackexchange.com/a/33077
+              		    --      :set paste?<cr> https://stackoverflow.com/a/12060528
+                                  -- not working see https://superuser.com/questions/468640/f2-in-paste-mode
+              		    --             also https://vimhelp.org/options.txt.html#%27paste%27
+              		    --vim.keymap.set('i', "<f2>", '<c-\><c-o>:set paste!<cr>', { noremap = true })
 
-              	    require('faster').setup()
+                            	    require('faster').setup()
 
-              	    -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
-              	    -- only for cmp-dictionary not for cmp-look	  
-              	    vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
+require('symbol-usage').setup()
+require("eyes-wide-bright").setup()
 
-              	    vim.g.clipboard = {
-              	      name = 'OSC 52',
-              	      copy = {                                                     
-              	        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-                        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-              	      },
-                      paste = {
-              	        ['+'] = require('vim.ui.clipboard.osc52').paste('+'), 
-              		['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                  
-              	      },                                                       
-              	    }
-              	    '';
+require('hlslens').setup()
+local kopts = {noremap = true, silent = true}
 
+vim.api.nvim_set_keymap('n', 'n',
+    [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+    kopts)
+vim.api.nvim_set_keymap('n', 'N',
+    [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+    kopts)
+vim.api.nvim_set_keymap('n', '*', [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
+vim.api.nvim_set_keymap('n', '#', [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)
+vim.api.nvim_set_keymap('n', 'g*', [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)
+vim.api.nvim_set_keymap('n', 'g#', [[g#<Cmd>lua require('hlslens').start()<CR>]], kopts)
 
+vim.api.nvim_set_keymap('n', '<Leader>l', '<Cmd>noh<CR>', kopts)
 
-            extraPlugins =
-              builtins.attrValues {
-                inherit (pkgs.vimPlugins)
-                  neoterm
-                  #nnn-vim
-                  faster-nvim
-                  ;
-              }
-            ;
+                            	    -- <C-x> <C-k> triggers dictionary completion, https://www.reddit.com/r/neovim/comments/16o22w0/how_to_use_nvimcmp_to_autocomplete_for_plain/
+                            	    -- only for cmp-dictionary not for cmp-look	  
+                            	    vim.api.nvim_set_option_value('dictionary', "${pkgs.scowl}/share/dict/words.txt", { buf = buf })
+
+                            	    vim.g.clipboard = {
+                            	      name = 'OSC 52',
+                            	      copy = {                                                     
+                            	        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+                                      ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+                            	      },
+                                    paste = {
+                            	       ['+'] = require('vim.ui.clipboard.osc52').paste('+'), 
+                            		['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                  
+                            	      },                                                       
+                            	    }
+                            	    '';
+
+            extraPlugins = builtins.attrValues {
+              inherit (pkgs.vimPlugins)
+                neoterm
+                #nnn-vim
+                faster-nvim
+                one-small-step-for-vimkind
+		nvim-hlslens
+                #   symbol-usage-nvim
+                ;
+	      # https://nix-community.github.io/nixvim/user-guide/faq.html?highlight=plugins#how-do-i-use-a-plugin-not-implemented-in-nixvim
+              symbol-usage-nvim = pkgs.vimUtils.buildVimPlugin {
+                name = "symbol-usage-nvim";
+                src = inputs.symbol-usage-nvim;
+              };
+
+	      eyes-wide-bright = pkgs.vimUtils.buildVimPlugin {
+	        name = "eyes-wide-bright";
+		src = inputs.eyes-wide-bright;
+	      };
+            };
 
             inherit keymaps;
 
@@ -803,40 +1207,40 @@ in
             # Override neovim-unwrapped with one from a flake input
             # Using `stdenv.hostPlatform` to access `system`
             nixpkgs.overlays = [
-              (
-                final: prev: {
-                  #neovim-unwrapped =
-                  #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+              (final: prev: {
+                #neovim-unwrapped =
+                #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
 
-                  vimPlugins =
-                    prev.vimPlugins
-                    // {
-                      faster-nvim = final.vimUtils.buildVimPlugin {
-                        name = "faster-nvim";
-                        src = inputs.faster-nvim;
-                      };
+                vimPlugins = prev.vimPlugins // {
+                  /*
+                    faster-nvim = final.vimUtils.buildVimPlugin {
+                      name = "faster-nvim";
+                      src = inputs.faster-nvim;
                     };
-                }
-              )
+                  */
+                };
+              })
             ];
 
             plugins = {
               inherit
-	        fzf-lua
+                fzf-lua
                 mini
                 which-key
                 comment
                 lsp
                 cmp
-                cmp-buffer# m
+                cmp-buffer # m
                 trouble
-		cmp_luasnip
-                cmp-path# m
-                cmp-look# m
-		luasnip
-		gitsigns
-		telescope
-		#yazi
+                cmp_luasnip
+                cmp-path # m
+                cmp-look # m
+                luasnip
+                gitsigns
+                telescope
+                #yazi
+                dap
+
                 ;
             };
           };
@@ -852,76 +1256,94 @@ in
           inherit (config.custom.programs.neovim) minimalPackage;
         in
         [
-          (pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-            mkdir -p $out/bin
-            makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
-          '')
+          # TODO symlinkJoin see https://discourse.nixos.org/t/how-can-you-set-a-default-option-to-a-program/68106/3
+          #(pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+          #  mkdir -p $out/bin
+          #  makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
+          #'')
+
+          (pkgs.symlinkJoin {
+            name = lib.getName minimalPackage;
+            paths = [ minimalPackage ];
+
+            nativeBuildInputs = [
+              pkgs.makeWrapper
+            ];
+
+            postBuild = ''
+              makeWrapper $out/bin/nvim $out/bin/vi \
+                --argv0 nvim
+            '';
+          })
         ];
 
-      home.sessionVariables = { EDITOR = lib.mkDefault "vi"; };
-
+      home.sessionVariables = {
+        EDITOR = lib.mkDefault "vi";
+      };
 
       custom.programs.shell.shellAliases = {
         f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
       };
     }
 
-    /*(mkIf (!cfg.lightWeight) {
-      # full nvim
-      custom.programs.neovim.finalPackage = config.programs.nixvim.build.package;
+    /*
+      (mkIf (!cfg.lightWeight) {
+            # full nvim
+            custom.programs.neovim.finalPackage = config.programs.nixvim.build.package;
 
-      programs.nixvim = lib.mkForce {
-        enable = true;
+            programs.nixvim = lib.mkForce {
+              enable = true;
 
-        enableMan = false;
+              enableMan = false;
 
-        colorschemes.gruvbox.enable = true;
+              colorschemes.gruvbox.enable = true;
 
-        extraPlugins =
-          builtins.attrValues
-            {
-              inherit (pkgs.vimPlugins)
-                #nnn-vim
-                neoterm
-                ;
-            }
-          ++ [
-            (pluggo "faster-nvim")
-          ];
+              extraPlugins =
+                builtins.attrValues
+                  {
+                    inherit (pkgs.vimPlugins)
+                      #nnn-vim
+                      neoterm
+                      ;
+                  }
+                ++ [
+                  (pluggo "faster-nvim")
+                ];
 
-        inherit keymaps;
+              inherit keymaps;
 
-        nixpkgs.pkgs = pkgs;
+              nixpkgs.pkgs = pkgs;
 
-        # Override neovim-unwrapped with one from a flake input
-        # Using `stdenv.hostPlatform` to access `system`
-        nixpkgs.overlays = [
-          (
-            final: prev: {
-              #neovim-unwrapped =
-              #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
-            }
-          )
-        ];
+              # Override neovim-unwrapped with one from a flake input
+              # Using `stdenv.hostPlatform` to access `system`
+              nixpkgs.overlays = [
+                (
+                  final: prev: {
+                    #neovim-unwrapped =
+                    #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
+                  }
+                )
+              ];
 
-        plugins = {
-          inherit
-            fzf-lua
-            mini
-            which-key
-            comment
-            lsp
-            cmp
-            cmp-buffer# m
-            #cmp-emoji
-            cmp-nvim-lsp
-            cmp-path# m
-            cmp_luasnip
-            cmp-look# m
-	    #yazi
-            ;
-        };
-      };
-    })*/
+              plugins = {
+                inherit
+                  fzf-lua
+                  mini
+                  which-key
+                  comment
+                  lsp
+                  cmp
+                  cmp-buffer# m
+                  #cmp-emoji
+                  cmp-nvim-lsp
+                  cmp-path# m
+                  cmp_luasnip
+                  cmp-look# m
+      	    #yazi
+                  ;
+              };
+            };
+          })
+    */
   ]);
 }
