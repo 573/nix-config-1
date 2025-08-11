@@ -44,6 +44,8 @@ inputs.nixpkgs.lib.nixosSystem {
     */
     "${rootPath}/hosts/${name}/configuration.nix"
     "${rootPath}/hosts/${name}/hardware-configuration.nix"
+    inputs.disko.nixosModules.disko
+    "${rootPath}/hosts/${name}/disko-config.nix"
 
     /**
       IDEA: This is just an anonymous module, so it might be possible to prefix it with it's own parameter set, just as in
