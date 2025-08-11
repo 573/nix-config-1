@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, inputs, ... }:
 
 let
   inherit (lib)
@@ -57,11 +57,11 @@ in
       '';
 
       bashrcExtra = ''
-      # TODO add https://github.com/magicmonty/bash-git-prompt to flake or make module 
-      if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
-    GIT_PROMPT_ONLY_IN_REPO=1
-    source "$HOME/.bash-git-prompt/gitprompt.sh"
-fi
+      # DONE add https://github.com/magicmonty/bash-git-prompt to flake or make module 
+      #if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+        GIT_PROMPT_ONLY_IN_REPO=1
+	source "${inputs.bash-git-prompt}/gitprompt.sh"
+      #fi
       '';
     };
 

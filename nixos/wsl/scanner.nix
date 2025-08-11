@@ -32,8 +32,7 @@ in
 
   options.custom.wsl.scanner = {
     enable =
-      mkEnableOption "Support the Canon LiDE 30 USB-scanner"
-      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+      mkEnableOption "Support the Canon LiDE 30 USB-scanner";
   };
 
   config = mkIf (cfg.enable) {

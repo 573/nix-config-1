@@ -274,6 +274,8 @@
 		   ;;                   "/storage/emulated/0/worknotes"
 		   )))
 
+(global-set-key (kbd "<f5>") #'deadgrep)
+
 ;; https://stackoverflow.com/a/78838107/3320256
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 (add-hook 'dired-mode-hook (lambda () (dired-omit-mode 1)))

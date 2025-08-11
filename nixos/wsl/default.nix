@@ -16,18 +16,19 @@ let
   cfg = config.custom.wsl;
 in
 {
+  imports = [
+    inputs.nixos-wsl.nixosModules.wsl
+  ];
   #imports = [ inputs.nix-ld-rs.nixosModules.nix-ld ];
 
   options.custom.wsl = {
     enable =
-      mkEnableOption "Wsl settings"
-      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+      mkEnableOption "Wsl settings" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {
     wsl = {
       enable = true;
-      interop.register = true;
     };
 
     environment.defaultPackages = [ pkgs.wslu ];
@@ -35,7 +36,11 @@ in
     custom.system.boot.enable = mkForce false;
 
     # https://github.com/nix-community/NixOS-WSL/discussions/71
-    security.sudo.wheelNeedsPassword = true;
+    security.sudo = {
+      # https://github.com/nix-community/NixOS-WSL/issues/829
+      # FIXME lib.asserts.assertMsg (config.users.users.nixos.password != "") "no password set";
+      wheelNeedsPassword = true;
+    };
 
     # https://github.com/nix-community/NixOS-WSL/issues/246#issuecomment-1577173622
     # to run: NIX_LD_LIBRARY_PATH=/usr/lib/wsl/lib/ /usr/lib/wsl/lib/nvidia-smi
@@ -50,23 +55,23 @@ in
       ];
     };
 
-services.locate = {
-  enable = true;
-  package = pkgs.plocate; # use faster locate implementation
-  prunePaths = [
-    "/media"
-    "/mnt/c" # don't index windows drives in WSL
-    "/mnt/d"
-    "/mnt/e"
-    "/mnt/f"
-    "/mnt/wsl"
-    "/nix/store"
-    "/nix/var/log/nix"
-    "/tmp"
-    "/var/spool"
-    "/var/tmp"
-  ];
-};
+    services.locate = {
+      enable = true;
+      package = pkgs.plocate; # use faster locate implementation
+      prunePaths = [
+        "/media"
+        "/mnt/c" # don't index windows drives in WSL
+        "/mnt/d"
+        "/mnt/e"
+        "/mnt/f"
+        "/mnt/wsl"
+        "/nix/store"
+        "/nix/var/log/nix"
+        "/tmp"
+        "/var/spool"
+        "/var/tmp"
+      ];
+    };
 
     /*
       environment.variables = {

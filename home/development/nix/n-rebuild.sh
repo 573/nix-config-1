@@ -4,7 +4,7 @@ _usage() {
   echo "$0 <debug|dev|boot|build|test|switch>"
 }
 
-args=(--flake "@nixConfigDir@")
+args=(--flake "@nixConfigDir@" --option experimental-features "nix-command flakes pipe-operators")
 case "${mode}" in
 debug) args+=(test --fast --show-trace) ;;
 dev) args+=(test --fast) ;;

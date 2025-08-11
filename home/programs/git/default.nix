@@ -138,9 +138,9 @@ in
         ca = "commit -q --branch --status --verbose --amend";
         cl = externGitAlias "git clone --recursive --progress";
         cm = "commit --branch --status --verbose";
-        cn = externGitAlias ''
-          git reflog expire --all && git fsck --unreachable --full && git prune && \
-                    git gc --aggressive --quiet && git repack -Adq && git prune-packed --quiet'';
+        #cn = externGitAlias ''
+        #  git reflog expire --all && git fsck --unreachable --full && git prune && \
+        #            git gc --aggressive --quiet && git repack -Adq && git prune-packed --quiet'';
         df = "diff";
         di = "diff --ignore-all-space";
         ds = "diff --staged";
@@ -190,9 +190,11 @@ in
 
         aliases = ''config --get-regexp "^alias"'';
 
-        bclean = externGitAlias ''
-          git for-each-ref --format "%(refname:short)" refs/heads |
-                    ${pkgs.gnugrep}/bin/grep -Ev "master|$(git branch-name)" | ${pkgs.findutils}/bin/xargs git bd'';
+        # Breaks git filter-repo, see https://github.com/newren/git-filter-repo/issues/603#issuecomment-2820510462
+	# git config --list | grep -E '^[^=]+$'
+        #bclean = externGitAlias ''
+        #  git for-each-ref --format "%(refname:short)" refs/heads |
+        #            ${pkgs.gnugrep}/bin/grep -Ev "master|$(git branch-name)" | ${pkgs.findutils}/bin/xargs git bd'';
 
         branch-name = externGitAlias ''git for-each-ref --format="%(refname:short)" $(git symbolic-ref HEAD)'';
         total-clean = externGitAlias "git co -f && git clean -dfx && git clean -dfX";

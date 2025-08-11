@@ -1,0 +1,20 @@
+# see https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L216
+# the keys in keys: are the age public keys in my case
+# see also https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L183
+keys:
+  - &dani_maizie age1tk6x53caq7yzkycjz8hw0lth2shdn500a6h8fcf7nk8gcpt02usqnhk0cy
+  - &nixos_wsl age1ahyd2sndref6n3eft6afhz0z8aqsqtp8qd6zt28lg7p0d06mk36ssrwj6v
+  # getting this error when sops anyfile.yaml ?:
+  # error loading config: no matching creation rules found
+  # answer: change path_regex below accordingly
+creation_rules:
+  # given keys.txt is written and the according folders each exist
+  # i.e., sops /home/nixos/.sops/secrets/secrets.yaml should now just work
+  # meaning as long as secrets/ as in the path_regex occurs to be in the
+  # yaml files basepath
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *dani_maizie
+      - *nixos_wsl
+

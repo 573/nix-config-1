@@ -29,6 +29,33 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
+    # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
+    # https://github.com/nix-community/NixOS-WSL/discussions/735
+    nixos-wsl = {
+      url = "github:nix-community/nixos-wsl/release-25.05";
+      #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
+      # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
+      #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
+      #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "flake-compat";
+      #inputs.flake-utils.follows = "flake-utils";
+    };
+
+    home-manager-latest = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "latest";
+    };
+    home-manager-2211 = {
+      url = "github:nix-community/home-manager/release-22.11";
+      inputs.nixpkgs.follows = "nixos-2211";
+    };
+
+    home-manager = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs = {
@@ -38,6 +65,12 @@
     };
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
+
+    #quadlet-nix = {
+    #  url = "github:SEIAROTg/quadlet-nix";
+    #};
+
+    nps.url = "github:Tarow/nix-podman-stacks";
 
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
@@ -56,7 +89,7 @@
     # TODO Is this up-to-date for release-23.11 still ? ghc cached based on nixpkgs-unstable (i. e. https://lazamar.co.uk/nix-versions/?package=ghc&version=9.4.6&fullName=ghc-9.4.6&keyName=ghc&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions)
     # see how-to: https://discourse.nixos.org/t/cache-for-other-ghc-versions/18511
     # https://lazamar.co.uk/nix-versions/?package=hledger&version=1.41&fullName=hledger-1.41&keyName=haskellPackages.hledger_1_41&revision=21808d22b1cda1898b71cf1a1beb524a97add2c4&channel=nixpkgs-unstable#instructions
-    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/c792c60b8a97daa7efe41a6e4954497ae410e0c1";  # 05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
+    ghc-nixpkgs-unstable.url = "github:NixOS/nixpkgs/c792c60b8a97daa7efe41a6e4954497ae410e0c1"; # 05bbf675397d5366259409139039af8077d695ce"; # e1ee359d16a1886f0771cc433a00827da98d861c";
 
     libreoffice-postscript.url = "github:NixOS/nixpkgs/eb090f7b923b1226e8beb954ce7c8da99030f4a8";
 
@@ -67,19 +100,11 @@
     # https://discourse.nixos.org/t/release-process-staging-branches/2799/4
     #glib-issue.url = "github:NixOS/nixpkgs/staging-next";
 
-    home-manager-latest = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "latest";
-    };
-    home-manager-2211 = {
-      url = "github:nix-community/home-manager/release-22.11";
-      inputs.nixpkgs.follows = "nixos-2211";
-    };
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+sops-nix.url = "github:Mic92/sops-nix";
+sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -146,6 +171,11 @@
       url = "https://github.com/jubnzv/virtual-types.nvim/archive/9ef9f31c58cc9deb914ee728b8bda8f217f9d1c7.tar.gz";
     };
 
+    bash-git-prompt = {
+      url = "github:magicmonty/bash-git-prompt";
+      flake = false;
+    };
+
     tree-setter-nvim = {
       flake = false;
       url = "github:filNaj/tree-setter";
@@ -190,6 +220,16 @@
     fsread-nvim = {
       flake = false;
       url = "github:nullchilly/fsread.nvim";
+    };
+
+    symbol-usage-nvim = {
+      flake = false;
+      url = "github:Wansmer/symbol-usage.nvim";
+    };
+
+    eyes-wide-bright = { 
+      url = "github:FractalCodeRicardo/eyes-wide-bright";
+      flake = false;
     };
 
     ruby-nix = {
@@ -261,8 +301,9 @@
     };
 
     nixGL = {
-      url = "github:guibou/nixGL";
+      url = "github:nix-community/nixGL";
       # follows nixpkgs (master)
+    #  inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # follows nixpkgs (master)
@@ -288,25 +329,13 @@
       flake = false;
     };
 
-    # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
-    nixos-wsl = {
-      url = "github:nix-community/nixos-wsl";
-      #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
-      # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
-      #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
-      #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-compat.follows = "flake-compat";
-      #inputs.flake-utils.follows = "flake-utils";
-    };
-
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
     };
 
     emacs-overlay-cached = {
-    # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
+      # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
       # n-o-d 24.11 not yet released, stateVersion also still on 24.05
       # this commit (pr) breaks my aarch64 emacs somehow: a20a230b4051096340ee5415d1a8d66648566810
       # with the one before it works f148a612dbb4c29162fd61558ca10bc1b6fdc669
@@ -476,17 +505,19 @@
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , nix-formatter-pack
-    , ...
+    {
+      self,
+      nixpkgs,
+      nix-formatter-pack,
+      ...
     }@inputs:
     let
       rootPath = self;
+      # TODO read https://discourse.nixos.org/t/cross-system-flakes-whats-your-favorite-forallsystems/68924/3 and https://nixcademy.com/posts/1000-instances-of-flake-utils/
       forEachSystem = nixpkgs.lib.genAttrs [
         "aarch64-linux"
         "x86_64-linux"
-	"armv7l-linux"
+        "armv7l-linux"
       ];
 
       # Eval the treefmt modules from ./treefmt.nix
@@ -525,7 +556,7 @@
           {
             inherit
               inputs
-              rootPath# specialArgs
+              rootPath # specialArgs
               forEachSystem
               ;
             #inherit (nixpkgs.pkgs.stdenv.hostPlatform) system;
@@ -556,7 +587,7 @@
         mkHome
         mkNixOnDroid
         mkNixos
-	mkRaspiNixos
+        mkRaspiNixos
         mkDeploy
         mkDevenvJvmLang
         mkDevenvDeno
@@ -567,7 +598,7 @@
         mkDevenvHaskell
         mkDevenvRustWasm32
         mkDevShellJdk
-	mkDevShellPostgreSQL
+        mkDevShellPostgreSQL
         mkDevenvRubyNix
         mkDevenvRubyVar3
         mkDevShellOcaml
@@ -579,6 +610,7 @@
         mkDevenvPlaywright2
         mkDevShellGhcwasm
         mkDevenvHaskell2
+	mkDevShellNixPath
         ;
 
       # NOTE https://discourse.nixos.org/t/installing-only-a-single-package-from-unstable/5598/30
@@ -608,14 +640,16 @@
       });
     in
     {
-      /* deploy.nodes.sams9 = { 
-        hostname = "localhost";
-        profiles.system = {
-          user = "nix-on-droid";
-            	  sshUser = "nix-on-droid";
-          path = inputs.deploy-rs.lib.x86_64-linux.activate.custom inputs.latest.legacyPackages.aarch64-linux.hello "./bin/hello";
+      /*
+        deploy.nodes.sams9 = {
+          hostname = "localhost";
+          profiles.system = {
+            user = "nix-on-droid";
+              	  sshUser = "nix-on-droid";
+            path = inputs.deploy-rs.lib.x86_64-linux.activate.custom inputs.latest.legacyPackages.aarch64-linux.hello "./bin/hello";
+          };
         };
-      }; */
+      */
 
       # nix shell nixpkgs#deploy-rs --command deploy -s .#sams9 -- --impure
       deploy = {
@@ -629,14 +663,13 @@
         ];
       };
 
-
       /**
-        Sample queries:
-       nix-repl> :p nixOnDroidConfigurations.sams9.config.home-manager.config.home.username
-       nix-repl> :p homeConfigurations."dani@maiziedemacchiato".config.home.username
-       nix-repl> :p nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.home.username
-       nix eval --json .#raspberries.twopi.config.system.build.sdImage --show-trace
-       nix eval --json .#raspberries.twopi.config.system.build.toplevel --show-trace
+         Sample queries:
+        nix-repl> :p nixOnDroidConfigurations.sams9.config.home-manager.config.home.username
+        nix-repl> :p homeConfigurations."dani@maiziedemacchiato".config.home.username
+        nix-repl> :p nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.home.username
+        nix eval --json .#raspberries.twopi.config.system.build.sdImage --show-trace
+        nix eval --json .#raspberries.twopi.config.system.build.toplevel --show-trace
       */
       homeConfigurations = listToAttrs [
         /**
@@ -654,8 +687,9 @@
       nixosConfigurations = listToAttrs [
         (mkNixos "x86_64-linux" "DANIELKNB1")
         (mkNixos "x86_64-linux" "guitar")
-	(mkRaspiNixos "aarch64-linux" "twopi")
-	(mkRaspiNixos "x86_64-linux" "twopivm")
+        (mkNixos "x86_64-linux" "nixos")
+        (mkRaspiNixos "aarch64-linux" "twopi")
+        (mkRaspiNixos "x86_64-linux" "twopivm")
       ];
 
       # Expose the necessary information in your flake so agenix-rekey
@@ -722,26 +756,26 @@
             '';
             path =
               pkgs:
-                with pkgs;
-                (map (x: "${x.custom.programs.emacs-no-el.finalPackage.outPath}") (
-                  (
-                    let
-                      inherit (pkgs.stdenv) isLinux isx86_64;
-                    in
-                    lib.optionals (isLinux && isx86_64) [
-                      self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
-                      self.homeConfigurations."dani@maiziedemacchiato".config
-                    ]
-                  )
-                  ++ (
-                    let
-                      inherit (pkgs.stdenv) isLinux isAarch64;
-                    in
-                    lib.optionals (isLinux && isAarch64) [
-                      self.nixOnDroidConfigurations.sams9.config.home-manager.config
-                    ]
-                  )
-                ));
+              with pkgs;
+              (map (x: "${x.custom.programs.emacs-no-el.finalPackage.outPath}") (
+                (
+                  let
+                    inherit (pkgs.stdenv) isLinux isx86_64;
+                  in
+                  lib.optionals (isLinux && isx86_64) [
+                    self.nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos
+                    self.homeConfigurations."dani@maiziedemacchiato".config
+                  ]
+                )
+                ++ (
+                  let
+                    inherit (pkgs.stdenv) isLinux isAarch64;
+                  in
+                  lib.optionals (isLinux && isAarch64) [
+                    self.nixOnDroidConfigurations.sams9.config.home-manager.config
+                  ]
+                )
+              ));
           })
 
           (mkApp system "nixos-shell" {
@@ -749,7 +783,7 @@
             path =
               pkgs:
               attrValues {
-                #pkgs: with pkgs; [ 
+                #pkgs: with pkgs; [
                 inherit (pkgs)
                   nixos-shell
                   gawk
@@ -764,7 +798,7 @@
             path =
               pkgs:
               attrValues {
-                #pkgs: with pkgs; [ 
+                #pkgs: with pkgs; [
                 inherit (pkgs)
                   coreutils
                   curl
@@ -773,7 +807,7 @@
                   hostname
                   jq
                   openssh
-		  nix
+                  nix
                   ;
               };
 
@@ -796,26 +830,26 @@
         nix-formatter-pack-check = nix-formatter-pack.lib.mkCheck formatterPackArgsFor.${system};
 
         /*
-          neovim-check-config = pkgs.runCommand "neovim-check-config"
-            {
-	      # TODO either config.custom.programs.neovim.minimalPackage or
-	      #  nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.minimalPackage
-              buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
+                    neovim-check-config = pkgs.runCommand "neovim-check-config"
+                      {
+          	      # TODO either config.custom.programs.neovim.minimalPackage or
+          	      #  nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.minimalPackage
+                        buildInputs = [ pkgs.git self.nixosConfigurations.DANIELKNB1.pkgs.neovim ];
 
-            } ''
-                                                                                                                                                                       	    mkdir -p "$out"
+                      } ''
+                                                                                                                                                                                 	    mkdir -p "$out"
 
-                        # prevent E886 ('/home-shelter' error)
-                                                                                                                                                                       	    export HOME=$TMPDIR
-                                                                                                                                                                       	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
-                                                                                                                                                                       	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
-                                                                                                                                                                       	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
+                                  # prevent E886 ('/home-shelter' error)
+                                                                                                                                                                                 	    export HOME=$TMPDIR
+                                                                                                                                                                                 	    # presumes prior devenv shell run in ~/debugpy-devshell/, https://github.com/mfussenegger/nvim-dap-python/blob/408186a/README.md#debugpy
+                                                                                                                                                                                 	    export VIRTUAL_ENV=/home/dkahlenberg/debugpy-devshell/.devenv/state/venv
+                                                                                                                                                                                 	    nvim --headless +":scriptnames | q" 2> "$out/nvim.log"
 
-                        if [ -n "$(cat "$out/nvim.log")" ]; then
-                                                                                                                                                                                                                                     	      echo "output: "$(cat "$out/nvim.log")""
-                                                                                                                                                                                                                                     	      exit 1
-                                                                                                                                                                       	    fi
-          '';
+                                  if [ -n "$(cat "$out/nvim.log")" ]; then
+                                                                                                                                                                                                                                               	      echo "output: "$(cat "$out/nvim.log")""
+                                                                                                                                                                                                                                               	      exit 1
+                                                                                                                                                                                 	    fi
+                    '';
         */
       });
 
@@ -884,6 +918,8 @@
               mkShell
               ;
           })
+	  # see https://discourse.nixos.org/t/angle-brackets-in-a-nix-flake-world/67855/12
+	  (mkDevShellNixPath system "nixpath" {})
         ]
         /*
           // {
@@ -926,7 +962,10 @@
           {
             aarch64-linux = {
               rpi-firmware = import ./files/nix/rpi-firmware.nix { inherit nixpkgs; };
-              rpi-image = import ./files/nix/rpi-image.nix { inherit nixpkgs rootPath; inherit (inputs) nixos-hardware; };
+              rpi-image = import ./files/nix/rpi-image.nix {
+                inherit nixpkgs rootPath;
+                inherit (inputs) nixos-hardware;
+              };
             };
             armv7l-linux = {
               # TODO try https://github.com/n8henrie/nixos-btrfs-pi/blob/master/flake.nix
@@ -937,63 +976,65 @@
             };
 
             x86_64-linux = {
-	      installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
-	      # https://discourse.nixos.org/t/get-qemu-guest-integration-when-running-nixos-rebuild-build-vm/22621
-	      # https://mattwidmann.net/notes/running-nixos-in-a-vm/
-	      # https://blog.yaymukund.com/posts/nixos-raspberry-pi-nixbuild-headless/
-	      # nix build --max-jobs 1 .#packages.x86_64-linux.demo-with-automatic-vm-integration
-	      # TODO https://wiki.nixos.org/wiki/NixOS_on_ARM/QEMU 
-	      #  nix-build flake:nixpkgs -A pkgsCross.aarch64-multiplatform.ubootQemuAarch64
-	      #  qemu-system-aarch64 -nographic -machine virt -cpu cortex-a57 -bios result/u-boot.bin ./nixos-image-sd-card-***-aarch64-linux.img -m 4G 
-	      demo-with-automatic-vm-integration = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
-          name = "run-nixos-vm";
-          runtimeInputs = [ nixpkgs.legacyPackages.x86_64-linux.pkgs.virt-viewer ];
-          text = ''
-	    echo hi
-            ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm & PID_QEMU="$!"
-            sleep 1 # I think some tools have an option to wait like -w
-            remote-viewer spice://127.0.0.1:5930
-            kill $PID_QEMU
-          '';
-	  };
-	  demo-nox = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
-            name = "run-nixos-vm";
-	    text = ''
-	    QEMU_KERNEL_PARAMS=console=ttyS0 ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm -nographic
-	    '';
-	  };
+              installer-image = import ./files/nix/installer-image.nix { inherit nixpkgs; };
+              # https://discourse.nixos.org/t/get-qemu-guest-integration-when-running-nixos-rebuild-build-vm/22621
+              # https://mattwidmann.net/notes/running-nixos-in-a-vm/
+              # https://blog.yaymukund.com/posts/nixos-raspberry-pi-nixbuild-headless/
+              # nix build --max-jobs 1 .#packages.x86_64-linux.demo-with-automatic-vm-integration
+              # TODO https://wiki.nixos.org/wiki/NixOS_on_ARM/QEMU
+              #  nix-build flake:nixpkgs -A pkgsCross.aarch64-multiplatform.ubootQemuAarch64
+              #  qemu-system-aarch64 -nographic -machine virt -cpu cortex-a57 -bios result/u-boot.bin ./nixos-image-sd-card-***-aarch64-linux.img -m 4G
+              demo-with-automatic-vm-integration =
+                nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication
+                  {
+                    name = "run-nixos-vm";
+                    runtimeInputs = [ nixpkgs.legacyPackages.x86_64-linux.pkgs.virt-viewer ];
+                    text = ''
+                      	    echo hi
+                                  ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm & PID_QEMU="$!"
+                                  sleep 1 # I think some tools have an option to wait like -w
+                                  remote-viewer spice://127.0.0.1:5930
+                                  kill $PID_QEMU
+                    '';
+                  };
+              demo-nox = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+                name = "run-nixos-vm";
+                text = ''
+                  	    QEMU_KERNEL_PARAMS=console=ttyS0 ${self.nixosConfigurations.twopivm.config.system.build.vm}/bin/run-twopi-vm -nographic
+                  	    '';
+              };
 
-          # TODO try what is suggested on discourse here https://discourse.nixos.org/t/looking-for-help-around-tightening-the-feedback-loop/67109/3
-	  raspi2qemu = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
-            name = "run-nixos-vm";
-	    text = #''
-	      #img=./raspi-in-qemu.img
-	      #cp ${inputs.self.nixosConfigurations.twopi.config.system.build.sdImage}/sd-image/${inputs.self.nixosConfigurations.twopi.options.sdImage.imageName.value} "$img"
-	      #chmod 0640 "$img"
-	      #echo $out
-              #cp "$img" $out
+              # TODO try what is suggested on discourse here https://discourse.nixos.org/t/looking-for-help-around-tightening-the-feedback-loop/67109/3
+              raspi2qemu = nixpkgs.legacyPackages.x86_64-linux.pkgs.writeShellApplication {
+                name = "run-nixos-vm";
+                text = # ''
+                  #img=./raspi-in-qemu.img
+                  #cp ${inputs.self.nixosConfigurations.twopi.config.system.build.sdImage}/sd-image/${inputs.self.nixosConfigurations.twopi.options.sdImage.imageName.value} "$img"
+                  #chmod 0640 "$img"
+                  #echo $out
+                  #cp "$img" $out
 
-	      # First make this work
-	      # FIXME this makes now - I think I just need to take twopi instead of twopivm now:
-	      # $ file /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm
-	      # /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm: symbolic link to qemu-system-x86_64
-	      # in run-twopi-vm
-	      ''
-	      echo ${self.nixosConfigurations.twopi.config.system.build.sdImage}
-	      ${self.nixosConfigurations.twopi.config.system.build.vm}/bin/run-twopi-vm
-	    '';
-	  };
-	    };
+                  # First make this work
+                  # FIXME this makes now - I think I just need to take twopi instead of twopivm now:
+                  # $ file /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm
+                  # /nix/store/7j6w11r078sr3xlw891cr9r79lgx7fpi-qemu-host-cpu-only-9.1.2/bin/qemu-kvm: symbolic link to qemu-system-x86_64
+                  # in run-twopi-vm
+                  ''
+                    	      echo ${self.nixosConfigurations.twopi.config.system.build.sdImage}
+                    	      ${self.nixosConfigurations.twopi.config.system.build.vm}/bin/run-twopi-vm
+                    	    '';
+              };
+            };
           }
           (
             nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
-            ++ [
-              (cachixDeployOutputNixondroid "sams9" self.nixOnDroidConfigurations.sams9)
-              (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato")
-            ]
+  #          ++ [
+	# FIXME unbreak nps : error: a 'x86_64-linux' with features {} is required to build '/nix/store/glhw8ks590s18wa34a5niaa25f0qyggl-await-podman-unshare.drv'
+              #(cachixDeployOutputNixondroid "sams" self.nixOnDroidConfigurations.sams)
+    #          (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato")
+   #         ]
           );
     };
-
 
   nixConfig = {
     # FIXME requires --accept-flake-config but might be better for nix develop
@@ -1001,7 +1042,9 @@
     #    "https://arm.cachix.org/"
     #];
     #extra-trusted-public-keys = [
-    #    "arm.cachix.org-1:K3XjAeWPgWkFtSS9ge5LJSLw3xgnNqyOaG7MDecmTQ8="
-    #];
+    #    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+#];
+    # only for bootstrap
+    #extra-experimental-features = [ "nix-command" "flakes" "pipe-operators" ];
   };
 }
