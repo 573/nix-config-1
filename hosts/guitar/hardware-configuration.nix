@@ -12,17 +12,31 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.enableCryptodisk = true;
+  # See https://github.com/nix-community/disko/issues/1068#issuecomment-2974926079
+  boot.loader.grub.devices = lib.mkForce [ "/dev/sda" ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/aa10d8ce-0844-4789-b345-2024e7449a0b";
-      fsType = "ext4";
-    };
+  # Setup keyfile
+  boot.initrd.secrets = {
+    "/boot/crypto_keyfile.bin" = null;
+  };
+###  boot.initrd.luks.devices."luks-35babb35-1c2d-49df-bf46-6c9efd7d44b6".keyFile = "/boot/crypto_keyfile.bin";
+###  boot.initrd.luks.devices."luks-7c125b64-c9f3-43dd-818e-1d5e9453b934".keyFile = "/boot/crypto_keyfile.bin";
 
-  boot.initrd.luks.devices."luks-35babb35-1c2d-49df-bf46-6c9efd7d44b6".device = "/dev/disk/by-uuid/35babb35-1c2d-49df-bf46-6c9efd7d44b6";
+# /dev/dm-0 name luks-35babb35-1c2d-49df-bf46-6c9efd7d44b6 - /dev/sda1 - mounts: /nix/store/ and /
+###  boot.initrd.luks.devices."luks-35babb35-1c2d-49df-bf46-6c9efd7d44b6".device = "/dev/disk/by-uuid/35babb35-1c2d-49df-bf46-6c9efd7d44b6";
+# /dev/dm-1 name luks-7c125b64-c9f3-43dd-818e-1d5e9453b934 - /dev/sda2 - mounts swap
+###  boot.initrd.luks.devices."luks-7c125b64-c9f3-43dd-818e-1d5e9453b934".device = "/dev/disk/by-uuid/7c125b64-c9f3-43dd-818e-1d5e9453b934";
 
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/3ea81e03-fc18-498f-bc61-5fdc11c23fdd"; }
-    ];
+###  swapDevices =
+###    [ { device = "/dev/disk/by-uuid/3ea81e03-fc18-498f-bc61-5fdc11c23fdd"; }
+###    ];
+
+###  fileSystems."/" =
+###    { device = "/dev/disk/by-uuid/aa10d8ce-0844-4789-b345-2024e7449a0b";
+###      fsType = "ext4";
+###    };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

@@ -29,6 +29,33 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
+    # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
+    # https://github.com/nix-community/NixOS-WSL/discussions/735
+    nixos-wsl = {
+      url = "github:nix-community/nixos-wsl/release-25.05";
+      #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
+      # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
+      #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
+      #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "flake-compat";
+      #inputs.flake-utils.follows = "flake-utils";
+    };
+
+    home-manager-latest = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "latest";
+    };
+    home-manager-2211 = {
+      url = "github:nix-community/home-manager/release-22.11";
+      inputs.nixpkgs.follows = "nixos-2211";
+    };
+
+    home-manager = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs = {
@@ -67,19 +94,8 @@
     # https://discourse.nixos.org/t/release-process-staging-branches/2799/4
     #glib-issue.url = "github:NixOS/nixpkgs/staging-next";
 
-    home-manager-latest = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "latest";
-    };
-    home-manager-2211 = {
-      url = "github:nix-community/home-manager/release-22.11";
-      inputs.nixpkgs.follows = "nixos-2211";
-    };
-
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -261,7 +277,7 @@
     };
 
     nixGL = {
-      url = "github:guibou/nixGL";
+      url = "github:nix-community/nixGL";
       # follows nixpkgs (master)
     };
 
@@ -286,18 +302,6 @@
     "garbage-day.nvim" = {
       url = "github:Zeioth/garbage-day.nvim";
       flake = false;
-    };
-
-    # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
-    nixos-wsl = {
-      url = "github:nix-community/nixos-wsl";
-      #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
-      # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
-      #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
-      #url = "github:nix-community/nixos-wsl?ref=refs/pull/478/head"; # fix: set wsl.useWindowsDriver when the nvidia-ctk is enabled
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-compat.follows = "flake-compat";
-      #inputs.flake-utils.follows = "flake-utils";
     };
 
     emacs-overlay = {
@@ -483,6 +487,7 @@
     }@inputs:
     let
       rootPath = self;
+      # TODO read https://discourse.nixos.org/t/cross-system-flakes-whats-your-favorite-forallsystems/68924/3 and https://nixcademy.com/posts/1000-instances-of-flake-utils/
       forEachSystem = nixpkgs.lib.genAttrs [
         "aarch64-linux"
         "x86_64-linux"

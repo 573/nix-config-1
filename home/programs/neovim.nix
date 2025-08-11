@@ -120,7 +120,136 @@ let
       '';
       options.desc = "Spelling suggestions";
     }
-  ];
+  ] ++ (lib.optionals config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable [
+    {
+      mode = "n";
+      key = "<leader>dL";
+      action = "<CMD>lua require'osv'.launch({port = 8086}) <CR>";
+      options = {
+        desc = "nlua Launch";
+      };
+    }
+]) ++ (lib.optionals (config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable && !config.custom.programs.neovim.minimalPackage.config.plugins.dap.lazyLoad.enable) [
+    {
+      mode = "n";
+      key = "<leader>db";
+      # action = "<CMD>DapToggleBreakpoint<CR>";
+      action = "<CMD>lua require('dap').toggle_breakpoint()<CR>";
+      options = {
+        desc = "Breakpoint toggle";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dc";
+      # action = "<CMD>DapContinue<CR>";
+      action = "<CMD>lua require('dap').continue()<CR>";
+      options = {
+        desc = "Continue Debugging (Start)";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dC";
+      action = "<CMD>lua require('dap').run_to_cursor()<CR>";
+      options = {
+        desc = "Run to cursor";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dg";
+      action = "<CMD>lua require('dap').goto_()<CR>";
+      options = {
+        desc = "Go to line (no execute)";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>di";
+      # action = "<CMD>DapStepInto<CR>";
+      action = "<CMD>lua require('dap').step_into()<CR>";
+      options = {
+        desc = "Step Into";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dj";
+      action = "<CMD>lua require('dap').down()<CR>";
+      options = {
+        desc = "Down";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dk";
+      action = "<CMD>lua require('dap').up()<CR>";
+      options = {
+        desc = "Up";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dl";
+      action = "<CMD>lua require('dap').run_last()<CR>";
+      options = {
+        desc = "Run Last";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>do";
+      # action = "<CMD>DapStepOut<CR>";
+      action = "<CMD>lua require('dap').step_out()<CR>";
+      options = {
+        desc = "Step Out";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dO";
+      # action = "<CMD>DapStepOver<CR>";
+      action = "<CMD>lua require('dap').step_over()<CR>";
+      options = {
+        desc = "Step Over";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dp";
+      action = "<CMD>lua require('dap').pause()<CR>";
+      options = {
+        desc = "Pause";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dr";
+      # action = "<CMD>DapToggleRepl<CR>";
+      action = "<CMD>lua require('dap').repl.toggle()<CR>";
+      options = {
+        desc = "Toggle REPL";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>ds";
+      action = "<CMD>lua require('dap').session()<CR>";
+      options = {
+        desc = "Session";
+      };
+    }
+    {
+      mode = "n";
+      key = "<leader>dt";
+      # action = "<CMD>DapTerminate<CR>";
+      action = "<CMD>lua require('dap').terminate()<CR>";
+      options = {
+        desc = "Terminate Debugging";
+      };
+    }
+  ]);
 
   # plugins
   trouble.enable = true;
@@ -458,7 +587,14 @@ let
           __unkeyed-1 = "<leader>f";
           group = "files";
         }
-      ];
+      ] ++ (lib.optionals config.custom.programs.neovim.minimalPackage.config.plugins.dap.enable [
+      {
+        __unkeyed-1 = "<leader>d";
+        mode = "n";
+        desc = "Debug";
+        # icon = " ";
+      }
+    ]);
       # Using telescope for spelling
       plugins.spelling.enabled = false;
     };
@@ -604,6 +740,219 @@ let
       };
     };
   };
+
+  # see https://github.com/pete3n/nixvim-flake/blob/51f1c485a52472386b375d4244b6c80d899aba60/config/debug.nix#L2C11-L10C5
+  # but also https://github.com/nix-community/nixvim/blob/f5026663f68261a201cd0700ced14971945d8dd9/plugins/by-name/dap-ui/deprecations.nix#L9
+dap = {
+    enable = true;
+
+    luaConfig.content = ''
+        local dap = require("dap")
+        dap.adapters.nlua = function(callback, conf)
+          local adapter = {
+            type = "server",
+            host = conf.host or "127.0.0.1",
+            port = conf.port or 8086,
+          }
+          if conf.start_neovim then
+            local dap_run = dap.run
+            dap.run = function(c)
+              adapter.port = c.port
+              adapter.host = c.host
+            end
+            require("osv").run_this()
+            dap.run = dap_run
+          end
+          callback(adapter)
+          end
+      '';
+      # TODO: support lua in nixvim
+      # adapters = {
+      #   servers = {
+      #     nlua = {
+      #       host = "127.0.0.1";
+      #       port = 8086;
+      #     };
+      #   };
+      # };
+
+      configurations = {
+        lua = [
+          {
+            type = "nlua";
+            request = "attach";
+            name = "Run this file";
+            start_neovim = { };
+          }
+          {
+            type = "nlua";
+            request = "attach";
+            name = "Attach to running Neovim instance (port = 8086)";
+            port = 8086;
+          }
+        ];
+      };
+
+lazyLoad.settings = {
+        # NOTE: Couldn't get lazy loading to work any other way...
+        # Hate plugins that require this verbosity for lazy load
+        keys = [
+          {
+            __unkeyed-1 = "<leader>db";
+            __unkeyed-2.__raw = ''
+              function() require('dap').toggle_breakpoint() end
+            '';
+            desc = "Breakpoint toggle";
+          }
+          {
+            __unkeyed-1 = "<leader>dc";
+            __unkeyed-2.__raw = ''
+              function() require('dap').continue() end
+            '';
+            desc = "Continue Debugging (Start)";
+          }
+          {
+            __unkeyed-1 = "<leader>dC";
+            __unkeyed-2.__raw = ''
+              function() require('dap').run_to_cursor() end
+            '';
+            desc = "Run to cursor";
+          }
+          {
+            __unkeyed-1 = "<leader>dg";
+            __unkeyed-2.__raw = ''
+              function() require('dap').goto_() end
+            '';
+            desc = "Go to line (no execute)";
+          }
+          {
+            __unkeyed-1 = "<leader>di";
+            __unkeyed-2.__raw = ''
+              function() require('dap').step_into() end
+            '';
+            desc = "Step Into";
+          }
+          {
+            __unkeyed-1 = "<leader>dj";
+            __unkeyed-2.__raw = ''
+              function() require('dap').down() end
+            '';
+            desc = "Down";
+          }
+          {
+            __unkeyed-1 = "<leader>dk";
+            __unkeyed-2.__raw = ''
+              function() require('dap').up() end
+            '';
+            desc = "Up";
+          }
+          {
+            __unkeyed-1 = "<leader>dl";
+            __unkeyed-2.__raw = ''
+              function() require('dap').run_last() end
+            '';
+            desc = "Run Last";
+          }
+          {
+            __unkeyed-1 = "<leader>do";
+            __unkeyed-2.__raw = ''
+              function() require('dap').step_out() end
+            '';
+            desc = "Step Out";
+          }
+          {
+            __unkeyed-1 = "<leader>dO";
+            __unkeyed-2.__raw = ''
+              function() require('dap').step_over() end
+            '';
+            desc = "Step Over";
+          }
+          {
+            __unkeyed-1 = "<leader>dp";
+            __unkeyed-2.__raw = ''
+              function() require('dap').pause() end
+            '';
+            desc = "Pause";
+          }
+          {
+            __unkeyed-1 = "<leader>dr";
+            __unkeyed-2.__raw = ''
+              function() require('dap').repl.toggle() end
+            '';
+            desc = "Toggle REPL";
+          }
+          {
+            __unkeyed-1 = "<leader>ds";
+            __unkeyed-2.__raw = ''
+              function() require('dap').session() end
+            '';
+            desc = "Session";
+          }
+          {
+            __unkeyed-1 = "<leader>dt";
+            __unkeyed-2.__raw = ''
+              function() require('dap').terminate() end
+            '';
+            desc = "Terminate Debugging";
+          }
+        ];
+      };
+
+
+
+
+
+   adapters = {
+        executables = {
+          gdb = {
+            command = "gdb";
+            args = [
+              "-i"
+              "dap"
+            ];
+          };
+        };
+      };
+
+
+      signs = {
+        dapBreakpoint = {
+          text = "";
+          texthl = "DapBreakpoint";
+        };
+        dapBreakpointCondition = {
+          text = "";
+          texthl = "DapBreakpointCondition";
+        };
+        dapBreakpointRejected = {
+          text = "";
+          texthl = "DapBreakpointRejected";
+        };
+        dapLogPoint = {
+          text = "";
+          texthl = "DapLogPoint";
+        };
+        dapStopped = {
+          text = "";
+          texthl = "DapStopped";
+        };
+      };
+
+   # see https://github.com/mfussenegger/nvim-dap?tab=readme-ov-file#usage "Via UI extensions:"
+      # or https://nix-community.github.io/nixvim/plugins/dap-ui/index.html
+  };
+
+  dap-ui = {
+    enable = true;
+  };
+
+  dap-virtual-text.enable = true;
+
+  # see https://rr-project.org/
+  # and https://nix-community.github.io/nixvim/plugins/dap-rr/settings.html
+  # and https://github.com/jonboh/nvim-dap-rr/blob/920e493/README.md#minimal-configuration
+  # good for rust TODO
+  #dap-rr.enable = true;
 
   extraConfigLuaPre = /* lua */ ''
     -- Helper for telescope (<leader>ff)
@@ -760,6 +1109,7 @@ in
 		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
 		    -- TODO vim.notify("paste toggled")
 		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
+		    --      also https://vi.stackexchange.com/a/33077
 		    --      :set paste?<cr> https://stackoverflow.com/a/12060528
                     -- not working see https://superuser.com/questions/468640/f2-in-paste-mode
 		    --             also https://vimhelp.org/options.txt.html#%27paste%27
@@ -792,6 +1142,7 @@ in
                   neoterm
                   #nnn-vim
                   faster-nvim
+		  one-small-step-for-vimkind
                   ;
               }
             ;
@@ -837,6 +1188,7 @@ in
 		gitsigns
 		telescope
 		#yazi
+		dap
                 ;
             };
           };
@@ -852,6 +1204,7 @@ in
           inherit (config.custom.programs.neovim) minimalPackage;
         in
         [
+	  # TODO symlinkJoin see https://discourse.nixos.org/t/how-can-you-set-a-default-option-to-a-program/68106/3
           (pkgs.runCommand "minimal-nvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
             mkdir -p $out/bin
             makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
