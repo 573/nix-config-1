@@ -57,6 +57,9 @@ in
     };
   };
 
+  # see https://github.com/wezterm/wezterm/issues/2826#issuecomment-1426557160
+  programs.wezterm.enableBashIntegration = true;
+
   #  programs.doom-emacs = {
   #    enable = true;
   #    doomPrivateDir = "${rootPath}/home/misc/doom.d";
