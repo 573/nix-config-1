@@ -1,4 +1,8 @@
-{ lib, pkgs }:
+{
+  lib,
+  pkgs,
+  inputs,
+}:
 
 {
   wrapProgram =
@@ -38,6 +42,7 @@
             out = placeholder "out";
 
             # TODO test https://github.com/soupglasses/nix-system-graphics
+            # TODO https://github.com/nix-community/home-manager/pull/5355
             content = readFile "${pkgs.nixgl.nixGLIntel}/bin/nixGLIntel";
             lines = splitString "\n" content;
 
@@ -72,4 +77,11 @@
                                       ${lib.optionalString (flags != [ ]) ''--add-flags "${toString flags}"''}
           '';
       };
+
+
+  home.packages = lib.attrValues {
+    inherit (pkgs.nixgl)
+      nixGLIntel
+      ;
+  };
 }

@@ -181,6 +181,7 @@ in
           hunspell
           aspell
           enchant
+	  ripgrep
           ;
 
         inherit (pkgs.hunspellDicts)

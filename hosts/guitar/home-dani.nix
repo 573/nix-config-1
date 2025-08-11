@@ -54,10 +54,6 @@ in
       nix-prefetch
       pcmanfm
       ;
-
-    inherit (pkgs.nixgl)
-      nixGLIntel
-      ;
   };
   xdg.enable = true;
 }

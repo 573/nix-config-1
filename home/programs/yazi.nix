@@ -70,63 +70,45 @@ in
       initLua = ''
         require("git"):setup()
 
-              require("yatline-githead"):setup({
-          show_branch = true,
-          branch_prefix = "on",
-          prefix_color = "white",
-          branch_color = "blue",
-          branch_symbol = "",
-          branch_borders = "()",
-
-          commit_color = "bright magenta",
-          commit_symbol = "@",
-
-          show_behind_ahead = true,
-          behind_color = "bright magenta",
-          behind_symbol = "⇣",
-          ahead_color = "bright magenta",
-          ahead_symbol = "⇡",
-
-          show_stashes = true,
-          stashes_color = "bright magenta",
-          stashes_symbol = "$",
-
-          show_state = true,
-          show_state_prefix = true,
-          state_color = "red",
-          state_symbol = "~",
-
-          show_staged = true,
-          staged_color = "bright yellow",
-          staged_symbol = "+",
-
-          show_unstaged = true,
-          unstaged_color = "bright yellow",
-          unstaged_symbol = "!",
-
-          show_untracked = true,
-          untracked_color = "blue",
-          untracked_symbol = "?",
-        })
-                      require("yamb"):setup {
-                      -- Optional, the cli of fzf.
-                      cli = "fzf",
-                      -- Optional, a string used for randomly generating keys, where the preceding characters have higher priority.
-                      keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                      -- Optional, the path of bookmarks
-                      path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
-                             (os.getenv("HOME") .. "/.config/yazi/bookmark"),
-                      }
+        require("yamb"):setup {
+          -- Optional, the cli of fzf.
+          cli = "fzf",
+          -- Optional, a string used for randomly generating keys, where the preceding characters have higher priority.
+          keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+          -- Optional, the path of bookmarks
+          path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
+	    (os.getenv("HOME") .. "/.config/yazi/bookmark"),
+        }
       '';
 
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
+	  # https://github.com/sxyazi/yazi/discussions/2928
+	  {
+	    on = "s";
+	    run = [ "tab_create ~" "search --via=fd" ];
+	    desc = "Search in $HOME";
+	  }
+	  # https://github.com/sxyazi/yazi/discussions/3022#discussioncomment-14196133
+	  {
+	    on = [ "ß" ];
+	    # copied https://github.com/lpnh/fr.yazi/blob/3d32e55b7367334abaa91f36798ef723098d0a6b/main.lua#L48
+	    # see also https://github.com/phiresky/ripgrep-all/issues/151#issuecomment-1823138420
+	    # default (via htop) seems --pre-glob *.{epub,EPUB,odt,ODT,docx,DOCX,fb2,FB2,ipynb,IPYNB,html,HTML,htm,HTM,pdf,PDF,asciipagebreaks,ASCIIPAGEBREAKS,mkv,MKV,mp4,MP4,avi,AVI,mp3,MP3,ogg,OGG,flac,FLAC,webm,WEBM,zip,ZIP,jar,JAR,xpi,XPI,kra,KRA,snagx,SNAGX,als,ALS,bz2,BZ2,gz,GZ,tbz,TBZ,tbz2,TBZ2,tgz,TGZ,xz,XZ,zst,ZST,tar,TAR,db,DB,db3,DB3,sqlite,SQLITE,sqlite3,SQLITE3}
+	    run = ''search --via=rga --args="-g '!~$*'"'';
+	    desc = "Search via rga";
+	  }
           {
             run = "plugin ouch --args=zip";
             on = [ "C" ];
             desc = "Compress with ouch";
           }
+	  {
+	    run = "search --via=fd --args='-HI'";
+	    on = [ "s" ];
+	    desc = "Search files by name via fd";
+	  }
           {
             on = [
               "c"
@@ -208,14 +190,6 @@ in
             desc = "run gitui";
           }
           {
-            on = [
-              "g"
-              "u"
-            ];
-            run = "plugin gitui";
-            desc = "run gitui";
-          }
-          {
             on = "<A-t>";
             # See https://github.com/sxyazi/yazi/discussions/1430#discussion-7021191 and https://www.reddit.com/r/commandline/comments/8itpmd/comment/dyumsw3/
             # Also this does not help here but https://github.com/phiresky/ripgrep-all/discussions/168
@@ -232,8 +206,6 @@ in
       plugins = with unstable.yaziPlugins; {
         inherit
           ouch
-          gitui
-          yatline-githead
           git
           ;
         bat = inputs.yazi-plugin-bat;

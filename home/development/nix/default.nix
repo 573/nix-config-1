@@ -65,7 +65,7 @@ in
 
       home.packages = [
         (buildWithDiff "hm-build"
-          "nix build --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
+          "nix build --option experimental-features \"nix-command flakes pipe-operators\" --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
           "${config.home.homeDirectory}/.local/state/nix/profiles/home-manager"
         )
       ];
@@ -73,12 +73,14 @@ in
 
     (mkIf cfg.nix-on-droid.enable {
       custom.programs.shell.shellAliases = {
-        nod-switch = "nix-on-droid switch --flake '${nixConfigDir}#sams9'";
+        # FIXME sams / sams9 still hard coded here
+        nod-switch = "nix-on-droid switch --flake '${nixConfigDir}#sams' --option experimental-features 'nix-command flakes pipe-operators'";
       };
 
       home.packages = [
         (buildWithDiff "nod-build"
-          "nix build --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams9.activationPackage\" --impure"
+	  # FIXME sams / sams9 still hard coded here
+          "nix build --option experimental-features \"nix-command flakes pipe-operators\" --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams.activationPackage\" --impure"
           "/nix/var/nix/profiles/nix-on-droid"
         )
       ];

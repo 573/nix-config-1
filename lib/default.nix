@@ -1,9 +1,10 @@
-{ pkgs }:
+{ pkgs, inputs }:
 
 let
   callPackage = pkgs.lib.callPackageWith {
     inherit pkgs;
     inherit (pkgs) lib;
+    inherit inputs;
   };
 
   commonConfig = callPackage ./common-config.nix { };

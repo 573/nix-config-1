@@ -15,7 +15,7 @@ let
 in
 {
   options.custom.wsl.yubikey = {
-    enable = mkEnableOption "i" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable = mkEnableOption "enable yubikey support" // optionalAttrs (config.custom.base.general.wsl && config.custom.wsl.usbip.enable) { default = true; };
   };
 
   config = mkIf (cfg.enable) {

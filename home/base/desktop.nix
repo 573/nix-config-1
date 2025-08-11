@@ -6,6 +6,7 @@
   lib,
   pkgs,
   inputs,
+  system,
   ...
 }:
 
@@ -43,7 +44,7 @@ let
       "--force-device-scale-factor=1"
       "--high-dpi-support=1"
     ];
-    fixGL = true;
+    #   fixGL = true;
   };
 
   # different approach here: https://pmiddend.github.io/posts/nixgl-on-ubuntu
@@ -51,14 +52,33 @@ let
     name = "ausweisapp";
     source = pkgs.ausweisapp;
     path = "/bin/AusweisApp";
-    fixGL = true;
+    #   fixGL = true;
+  };
+
+  emacs = config.lib.custom.wrapProgram {
+    name = "emacs";
+    source = config.custom.programs.emacs-configured.finalPackage;
+    path = "/bin/emacs";
   };
 
   vlc = config.lib.custom.wrapProgram {
     name = "vlc";
     source = pkgs.vlc;
     path = "/bin/vlc";
-    fixGL = true;
+    # TODO proof of https://github.com/nix-community/home-manager/pull/5355#issuecomment-2426908650 more here https://nix-community.github.io/home-manager/#sec-usage-gpu-non-nixos
+    #    fixGL = true;
+  };
+
+  wezterm = config.lib.custom.wrapProgram {
+    name = "wezterm";
+    source = pkgs.wezterm;
+    path = "/bin/wezterm";
+  };
+
+  kitty = config.lib.custom.wrapProgram {
+    name = "kitty";
+    source = pkgs.kitty;
+    path = "/bin/kitty";
   };
 
   /*
@@ -131,7 +151,7 @@ in
       };
     */
     # above not working, FIXME override differently see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
-    # creates the .config/systemd/user/xss-lock.service file and 
+    # creates the .config/systemd/user/xss-lock.service file and
     # running just systemctl status --user xss-lock.service succeeds
     /*
       services.screen-locker = {
@@ -141,34 +161,44 @@ in
       };
     */
 
-    programs.firefox = {
+  # FIXME careful changing that, Workaround: nix run --impure github:nix-community/nixGL -- AusweisApp
+  nixGL = {
+    packages = inputs.nixGL.packages;#import inputs.nixGL { inherit pkgs; }; # 
+    defaultWrapper = "mesa";
+  };
+
+    programs.firefox = lib.optionalAttrs (!config.custom.base.general.wsl) {
       enable = true;
 
       # https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/17
       policies = {
-      ExtensionSettings = with builtins;
-        let extension = shortId: uuid: {
-          name = uuid;
-          value = {
-            install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
-            installation_mode = "normal_installed";
-          };
-        };
-        in listToAttrs [
-          (extension "tree-style-tab" "treestyletab@piro.sakura.ne.jp")
-          (extension "ublock-origin" "uBlock0@raymondhill.net")
-          (extension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}")
-          (extension "tabliss" "extension@tabliss.io")
-          (extension "umatrix" "uMatrix@raymondhill.net")
-          #(extension "libredirect" "7esoorv3@alefvanoon.anonaddy.me")
-          (extension "clearurls" "{74145f27-f039-47ce-a470-a662b129930a}")
-          (extension "privacy-badger17" "jid1-MnnxcxisBPnSXQ@jetpack")
-	  (extension "qwantcom-for-firefox" "qwantcomforfirefox@jetpack")
-	  (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
-          (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
-	];
+        ExtensionSettings =
+          with builtins;
+          let
+            extension = shortId: uuid: {
+              name = uuid;
+              value = {
+                install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
+                installation_mode = "normal_installed";
+              };
+            };
+          in
+          listToAttrs [
+            (extension "tree-style-tab" "treestyletab@piro.sakura.ne.jp")
+            (extension "ublock-origin" "uBlock0@raymondhill.net")
+            (extension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}")
+            (extension "tabliss" "extension@tabliss.io")
+            (extension "umatrix" "uMatrix@raymondhill.net")
+            #(extension "libredirect" "7esoorv3@alefvanoon.anonaddy.me")
+            (extension "clearurls" "{74145f27-f039-47ce-a470-a662b129930a}")
+            (extension "privacy-badger17" "jid1-MnnxcxisBPnSXQ@jetpack")
+            (extension "qwantcom-for-firefox" "qwantcomforfirefox@jetpack")
+            (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
+            (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
+            (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}")
+          ];
         # To add additional extensions, https://github.com/tupakkatapa/mozid
-    };
+      };
 
       profiles.dani = {
         #bookmarks = { };
@@ -250,14 +280,17 @@ in
           "security.webauth.webauthn_enable_usbtoken" = true;
 
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        } // { "layout.css.devPixelsPerPx" = "-1.0"; };
+        }
+        // {
+          "layout.css.devPixelsPerPx" = "-1.0";
+        };
 
         #userChrome = lib.readFile "${inputs.penguin-fox}/files/chrome/userChrome.css";
         #userContent = lib.readFile "${inputs.penguin-fox}/files/chrome/userContent.css";
       };
-      # https://home-manager-options.extranix.com/?query=firefox 
-      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/firefox/wrapper.nix 
-      package = pkgs.wrapFirefox pkgs.firefox-unwrapped {
+      # https://home-manager-options.extranix.com/?query=firefox
+      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/firefox/wrapper.nix
+      package = pkgs.wrapFirefox inputs.firefox.packages.${system}.firefox-nightly-bin.unwrapped {
         # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
         extraPolicies = {
           DisableTelemetry = true;
@@ -291,17 +324,49 @@ in
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 
-    home.packages =
-      [
-        chrome
-        ausweisapp
-	vlc
-      ]
-      ++ (attrValues {
+    home.packages = attrValues (
+      {
+        keyboard-de = pkgs.writeShellApplication {
+          name = "keyboard-de";
+          runtimeInputs = [
+            pkgs.xorg.setxkbmap
+            pkgs.runtimeShell
+          ];
+
+          text = ''
+            #!${pkgs.runtimeShell}
+
+            setxkbmap -model pc104 -layout de
+          '';
+        };
+
+        keyboard-en = pkgs.writeShellApplication {
+          name = "keyboard-en";
+          runtimeInputs = [
+            pkgs.xorg.setxkbmap
+            pkgs.runtimeShell
+          ];
+
+          text = ''
+            #!${pkgs.runtimeShell}
+
+            setxkbmap -model pc104 -layout us -variant altgr-intl
+          '';
+        };
+      }
+      // lib.optionalAttrs (!config.custom.base.general.wsl) {
+        # only install these if not on nixos-wsl
+        chrome = config.lib.nixGL.wrap chrome;
+        ausweisapp = config.lib.nixGL.wrap ausweisapp;
+        vlc = config.lib.nixGL.wrap vlc;
+        wezterm = config.lib.nixGL.wrap wezterm;
+        kitty = config.lib.nixGL.wrap kitty;
+        emacs = config.lib.nixGL.wrap emacs;
 
         inherit (pkgs)
           pavucontrol
           pdftk
+          csvkit
           qpdfview
           # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
           obconf
@@ -323,33 +388,8 @@ in
         inherit (pkgs.lxde)
           lxsession
           ;
-
-      keyboard-de =
-        pkgs.writeShellApplication { 
-	  name = "keyboard-de";
-	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
-
-	  text = ''
-          #!${pkgs.runtimeShell}
-
-          setxkbmap -model pc104 -layout de
-        '';
-	}
-      ;
-
-      keyboard-en =
-        pkgs.writeShellApplication { 
-	  name = "keyboard-en";
-	  runtimeInputs = [ pkgs.xorg.setxkbmap pkgs.runtimeShell ];
-
-	  text = ''
-          #!${pkgs.runtimeShell}
-
-          setxkbmap -model pc104 -layout us -variant altgr-intl
-        '';
-	}
-	;
-      });
+      }
+    );
 
     # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb
     # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl

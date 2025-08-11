@@ -29,4 +29,5 @@ source @bashLib@
 # loaded temporary in autorandr and saved
 # to a profile named mobile that I load
 # when laptop is off dock.
+# TODO [when on NixOS] https://discourse.nixos.org/t/change-sddm-refresh-rate/68535/2
 xrandr --output eDP-1 --off --output VGA-1 --off --output DP-1 --off --output HDMI-1 --off --output DP-2 --off --output HDMI-2 --off --output DP-2-1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-2-2 --off --output DP-2-3 --off
