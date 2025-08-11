@@ -122,6 +122,15 @@ in
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
+	  # https://github.com/sxyazi/yazi/discussions/3022#discussioncomment-14196133
+	  {
+	    on = [ "ß" ];
+	    # copied https://github.com/lpnh/fr.yazi/blob/3d32e55b7367334abaa91f36798ef723098d0a6b/main.lua#L48
+	    # see also https://github.com/phiresky/ripgrep-all/issues/151#issuecomment-1823138420
+	    # default (via htop) seems --pre-glob *.{epub,EPUB,odt,ODT,docx,DOCX,fb2,FB2,ipynb,IPYNB,html,HTML,htm,HTM,pdf,PDF,asciipagebreaks,ASCIIPAGEBREAKS,mkv,MKV,mp4,MP4,avi,AVI,mp3,MP3,ogg,OGG,flac,FLAC,webm,WEBM,zip,ZIP,jar,JAR,xpi,XPI,kra,KRA,snagx,SNAGX,als,ALS,bz2,BZ2,gz,GZ,tbz,TBZ,tbz2,TBZ2,tgz,TGZ,xz,XZ,zst,ZST,tar,TAR,db,DB,db3,DB3,sqlite,SQLITE,sqlite3,SQLITE3}
+	    run = ''search --via=rga --args="-g '!~$*'"'';
+	    desc = "Search via rga";
+	  }
           {
             run = "plugin ouch --args=zip";
             on = [ "C" ];

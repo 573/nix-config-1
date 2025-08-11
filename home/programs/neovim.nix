@@ -760,6 +760,7 @@ in
 		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
 		    -- TODO vim.notify("paste toggled")
 		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
+		    --      also https://vi.stackexchange.com/a/33077
 		    --      :set paste?<cr> https://stackoverflow.com/a/12060528
                     -- not working see https://superuser.com/questions/468640/f2-in-paste-mode
 		    --             also https://vimhelp.org/options.txt.html#%27paste%27

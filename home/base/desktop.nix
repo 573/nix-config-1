@@ -43,7 +43,7 @@ let
       "--force-device-scale-factor=1"
       "--high-dpi-support=1"
     ];
-    fixGL = true;
+ #   fixGL = true;
   };
 
   # different approach here: https://pmiddend.github.io/posts/nixgl-on-ubuntu
@@ -51,14 +51,15 @@ let
     name = "ausweisapp";
     source = pkgs.ausweisapp;
     path = "/bin/AusweisApp";
-    fixGL = true;
+ #   fixGL = true;
   };
 
   vlc = config.lib.custom.wrapProgram {
     name = "vlc";
     source = pkgs.vlc;
     path = "/bin/vlc";
-    fixGL = true;
+    # TODO proof of https://github.com/nix-community/home-manager/pull/5355#issuecomment-2426908650 more here https://nix-community.github.io/home-manager/#sec-usage-gpu-non-nixos
+#    fixGL = true;
   };
 
   /*
@@ -140,6 +141,11 @@ in
         inactiveInterval = 1;
       };
     */
+
+    nixGL = {
+      packages = inputs.nixGL.packages;
+      defaultWrapper = "mesa";
+    };
 
     programs.firefox = {
       enable = true;
@@ -293,9 +299,9 @@ in
 
     home.packages =
       [
-        chrome
-        ausweisapp
-	vlc
+        (config.lib.nixGL.wrap chrome)
+        (config.lib.nixGL.wrap ausweisapp)
+	(config.lib.nixGL.wrap vlc)
       ]
       ++ (attrValues {
 
