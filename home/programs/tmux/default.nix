@@ -208,6 +208,7 @@ in
         (config.lib.custom.mkScript "tprofile" ./tprofile.sh [ pkgs.tmux ] {
           inherit tmuxProfiles;
         })
+	pkgs.xsel
       ];
     };
 
@@ -230,7 +231,7 @@ in
       # * https://unix.stackexchange.com/questions/15715/getting-tmux-to-copy-a-buffer-to-the-clipboard#comment43977_16405
       # * https://superuser.com/a/582069
       # so this is prefix+shift+p in tmux, means when vi runs in tmux toggle nopaste (go insert mode) and hit prefix+shift+p here
-      bind P run -b "xsel --clipboard | tr -d '\r' | tmux load-buffer -; tmux paste-buffer"
+      bind P run -b "${lib.getExe pkgs.xsel} --clipboard | tr -d '\r' | tmux load-buffer -; tmux paste-buffer"
 ''; 
 
 

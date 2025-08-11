@@ -122,6 +122,12 @@ in
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
+	  # https://github.com/sxyazi/yazi/discussions/3022#discussioncomment-14196133
+	  {
+	    on = [ "ß" ];         
+	    run = "search --via=rga";
+	    desc = "Search via rga";
+	  }
           {
             run = "plugin ouch --args=zip";
             on = [ "C" ];

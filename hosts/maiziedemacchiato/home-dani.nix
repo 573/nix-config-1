@@ -238,8 +238,6 @@ in
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 
