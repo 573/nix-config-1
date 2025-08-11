@@ -12,6 +12,7 @@
   unstable,
   inputs,
   homeDir,
+  withNps,
   ...
 }:
 let
@@ -31,6 +32,8 @@ in
 */
 #inherit (pkgs.stdenv.hostPlatform) system;
 {
+  imports = [inputs.sops-nix.homeManagerModules.sops];
+
   custom = {
     base = {
       desktop = {
@@ -66,10 +69,10 @@ in
 
       neovim = {
         enable = true;
-	# TODO should user- and hostname be rather module params
-	nixd.expr.home-manager = ''
-	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
-''; 
+        # TODO should user- and hostname be rather module params
+        nixd.expr.home-manager = ''
+          	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
+        '';
       };
     };
   };
@@ -84,7 +87,7 @@ in
 
   #xsession = {
   #  enable = true;
-  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux 
+  #  # the default is fine here, then I only need to create ~/.xsession file in Archlinux
   #  windowManager.i3 = {
   #    enable = true;
   #  };
@@ -182,13 +185,14 @@ in
         #spotify-player
         #gtt
         notepad-next
+	sops
         ;
 
       inherit (unstable)
         tesseract
-	ocrmypdf
-	#teams-for-linux
-	;
+        ocrmypdf
+        #teams-for-linux
+        ;
 
       inherit (pkgs.usbutils)
         out
@@ -199,10 +203,10 @@ in
         xrandr
         ;
 
-      inherit (pkgs.nixgl)
-        nixGLIntel
-	#nixGLNvidiaBumblebee
-        ;
+#      inherit (pkgs.nixgl)
+#        nixGLIntel
+#        #nixGLNvidiaBumblebee
+#        ;
 
       #inherit (libreoffice-postscript)
       #  libreoffice
@@ -210,6 +214,18 @@ in
 
       nerdfonts = pkgs.nerd-fonts.ubuntu-mono; # TODO nerd-fonts.monaspace
 
+    };
+
+# see https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L786
+    sops = {
+      defaultSopsFile = "/home/dani/.sops/secrets/secrets.yaml";
+      age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+      #secrets.my-config = {
+      #  sopsFile = ...;
+      #};
+      # TODO if applies see https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L851
+      # for ~/.sops/secrets/secrets.yaml template see https://github.com/Tarow/nix-config/blob/abf0d8560594475661a0b80fd47d477cbc8a459f/secrets/secrets.yaml
+      # FIXME https://github.com/search?q=repo%3Agetsops%2Fsops%20sops%20metadata%20not%20found&type=issues&p=2 I guess solution was along the lines of https://github.com/getsops/sops/issues/856#issuecomment-821153667
     };
 
     sessionPath = [
@@ -234,12 +250,11 @@ in
   xdg.enable = true;
 
   # templates (arch linux) in /etc/xdg/openbox/ (autostart and also rc.xml which is for key shortcuts)
+  # TODO read https://konfou.xyz/posts/nixos-without-display-manager/
   xdg.configFile = {
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 
@@ -264,3 +279,62 @@ in
   };
 
 }
+// (lib.attrsets.optionalAttrs withNps {
+/*
+services.podman = {
+      enable = true;
+      enableTypeChecks = true; # Probably not required but seems better to enable
+
+      containers.wallos = {
+        image = "bellamy/wallos:4.3.0";
+
+        #volumes = [
+        #  "./db:/var/www/html/db"
+        #  "./logos:/var/www/html/images/uploads/logos"
+        #];
+
+        ports = [
+          "127.0.0.1:8080:80/tcp"
+        ];
+      };
+
+      # https://github.com/Tarow/nix-podman-stacks/blob/81df9c882ab9ebb78ef76cfdc83bd70363edfa9f/modules/paperless/default.nix#L157
+    };
+*/
+  imports = [ inputs.nps.homeModules.nps ];
+  # see https://github.com/Tarow/nix-podman-stacks/issues/195#issuecomment-3312196230
+  nps = {
+    # host ip here
+    hostIP4Address = "0.0.0.0";
+    # TODO use uid
+    hostUid = 1000;
+    storageBaseDir = "${config.home.homeDirectory}/stacks";
+    # FIXME better place
+    externalStorageBaseDir = "/tmp";
+    stacks = {
+      # needed: https://docs.podman.io/en/latest/markdown/podman.1.html#rootless-mode and
+      # podman system migrate
+      docker-socket-proxy.enable = true;
+      homepage = {
+        enable = true;
+        #  containers.homepage.ports = [ "3000:3000" ];
+        #containers.homepage.traefik = {};
+        # see https://tarow.github.io/nix-podman-stacks/book/container-options.html#servicespodmancontainersnametraefikservicehost
+      };
+
+      # FIXME password
+      paperless = {
+        enable = true;
+        adminProvisioning = {
+          username = "admin";
+          email = "admin@example.com";
+          # FIXME sops
+          passwordFile = ./../../files/keys/dummy; # pkgs.writeText "paperless-pw" "admin1234";
+        };
+        secretKeyFile = ./../../files/keys/dummy; # pkgs.writeText "paperless-secret" "1234567890abcdef1234567890abcdef";
+        db.passwordFile = ./../../files/keys/dummy; # pkgs.writeText "postgres-pw" "postgres";
+      };
+
+    };
+  };
+})

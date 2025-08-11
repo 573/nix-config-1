@@ -61,6 +61,11 @@ inputs.home-manager.lib.homeManagerConfiguration {
       else
         "/home/${username}";
     inherit username;
+    withNps =
+      if isLinux && isAarch64 then
+        false
+      else
+        true;
   };
 
   modules = [

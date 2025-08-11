@@ -1,0 +1,10 @@
+# see https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L216
+# the keys in keys: are the age public keys in my case
+# see also https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L183
+keys:
+  - &dani age1tk6x53caq7yzkycjz8hw0lth2shdn500a6h8fcf7nk8gcpt02usqnhk0cy
+creation_rules:
+  - path_regex: /home/dani/.sops/secrets/secrets.yaml$
+    key_groups:
+      - age:
+          - *dani

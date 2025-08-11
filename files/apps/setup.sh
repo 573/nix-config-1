@@ -70,14 +70,14 @@ elif [[ ${USER} == "nix-on-droid" ]]; then
   nix build \
     --option extra-substituters "https://573-bc.cachix.org/" \
     --option extra-trusted-public-keys "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs=" \
-    --option extra-substituters "https://nix-on-droid.cachix.org/" \
-    --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
-    --option extra-substituters "https://nix-community.cachix.org/" \
-    --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" \
-    --option extra-substituters "https://nixvim.cachix.org/" \
-    --option extra-trusted-public-keys "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA=" \
-    --option extra-substituters "https://yazi.cachix.org" \
-    --option extra-trusted-public-keys "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" \
+#    --option extra-substituters "https://nix-on-droid.cachix.org/" \
+#    --option extra-trusted-public-keys "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU=" \
+#    --option extra-substituters "https://nix-community.cachix.org/" \
+#    --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" \
+#    --option extra-substituters "https://nixvim.cachix.org/" \
+#    --option extra-trusted-public-keys "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA=" \
+#    --option extra-substituters "https://yazi.cachix.org" \
+#    --option extra-trusted-public-keys "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k=" \
     "git+file:///${nix_config}#nixOnDroidConfigurations.${confname}.activationPackage" \
     -L --impure --keep-going -vvv --out-link /data/data/com.termux.nix/files/home/result
 else
