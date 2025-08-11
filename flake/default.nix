@@ -5,7 +5,18 @@
 }:
 
 let
-  pkgsFor = forEachSystem (system: import ./nixpkgs.nix { inherit inputs rootPath system; });
+  pkgsFor = forEachSystem (system: import ./nixpkgs.nix {
+    inherit inputs rootPath system;
+      config = {
+        # https://discourse.nixos.org/t/too-dumb-to-use-allowunfreepredicate/39956/17
+        allowUnfreePredicate =
+          pkg:
+          builtins.elem (inputs.nixpkgs.lib.getName pkg) [
+	    "android-studio-stable"
+	    "google-chrome"
+          ];
+      };
+  });
  
   # for deploy (build x86 target aarch): super.stdenv.targetPlatform.system
   # i. e. deploy from a x86_64-linux machine running the tool deploy a package hello on an aarch64-linux machine, then deployPkgs has to be x86_64-linux 

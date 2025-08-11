@@ -234,12 +234,11 @@ in
   xdg.enable = true;
 
   # templates (arch linux) in /etc/xdg/openbox/ (autostart and also rc.xml which is for key shortcuts)
+  # TODO read https://konfou.xyz/posts/nixos-without-display-manager/
   xdg.configFile = {
     "openbox/rc.xml".source = "${rootPath}/home/openbox/rc.xml";
 
     "openbox/autostart".text = ''
-      ${pkgs.xorg.xrandr}/bin/xrandr --listmonitors
-
       # FIXME rather store path ? https://search.nixos.org/packages?query=pcmanfm or https://search.nixos.org/packages?query=pcmanfm-qt
       ${pkgs.pcmanfm}/bin/pcmanfm -d &
 

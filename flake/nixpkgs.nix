@@ -8,6 +8,8 @@
   config ? {
     # FIXME https://discourse.nixos.org/t/unexpected-11h-build-after-auto-update/39907/9
     allowAliases = false;
+    # TODO additional discussion here https://github.com/NixOS/nixpkgs/issues/55674 
+    # IMHO this is currently the most predictable usage
     allowUnfreePredicate =
       pkg:
       builtins.elem (inputs.nixpkgs.lib.getName pkg) [
