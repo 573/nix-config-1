@@ -199,6 +199,7 @@ in
 	  MY_BM_HMSESSIONVARS = "/etc/profiles/per-user/nixos/etc/profile.d/hm-session-vars.sh";
 	  # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix
 	  # See here as well https://github.com/nix-community/home-manager/blob/fce051eaf881220843401df545a1444ab676520c/modules/misc/vte.nix#L40
+	  # and https://www.reddit.com/r/NixOS/comments/1e2quog/help_escaping_triple_single_quotes/
 	  PROMPT_COMMAND = ''history -n; history -w; history -c; history -r; $PROMPT_COMMAND'';
           PAGER = lib.getExe pkgs.less;
           SHELL = "bash";
