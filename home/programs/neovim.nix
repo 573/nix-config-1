@@ -818,6 +818,7 @@ let
       ];
     };
 
+    /*
     lazyLoad.settings = {
       # NOTE: Couldn't get lazy loading to work any other way...
       # Hate plugins that require this verbosity for lazy load
@@ -922,6 +923,7 @@ let
         }
       ];
     };
+    */
 
     adapters = {
       executables = {

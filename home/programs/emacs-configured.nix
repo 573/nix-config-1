@@ -147,12 +147,16 @@ in
           # If being bool, the value of config is used.
           # Its value can also be a derivation like this if you want to do some
           # substitution:
-          defaultInitFile = pkgs.substituteAll {
+          defaultInitFile = pkgs.substitute {
             name = "default.el";
             # meaning el-file may contain @out@ etc. references to drv
             src = "${rootPath}/home/misc/emacs-gui.el";
-            inherit (pkgs) scowl;
-            hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
+	    substitutions = [
+	      "--subst-var-by" "scowl" pkgs.scowl
+	      "--subst-var-by" "hunspellDicts_de_DE" pkgs.hunspellDicts.de_DE 
+	    ];
+            #inherit (pkgs) scowl;
+            #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
           };
         }
       );

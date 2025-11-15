@@ -202,7 +202,7 @@ in
 
       profiles.dani = {
         #bookmarks = { };
-        extensions = with inputs.firefox-addons.packages.${system}; [
+        extensions.packages = with inputs.firefox-addons.packages.${system}; [
           privacy-possum
           # sourcegraph # > error: cannot download sourcegraph_for_firefox-23.10.9.2250.xpi from any mirror
           facebook-container
@@ -320,7 +320,7 @@ in
     };
 
     # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
-    home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
+    #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 

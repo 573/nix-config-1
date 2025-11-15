@@ -82,7 +82,8 @@ in
 
   # https://mipmip.github.io/home-manager-option-search/?query=syncthing
   services.syncthing = {
-    enable = true;
+    # FIXME when journal error fixed back to true
+    enable = false;
     tray.enable = true;
     overrideDevices = true;
     overrideFolders = true;
@@ -160,40 +161,18 @@ in
       #inherit (inputs.talon.packages.x86_64-linux) default;
       # with pkgs; [
       inherit (pkgs)
-        #my-neovim
-        #ranger
-        #photoprism
-        #alejandra
         shellharden
         shfmt
-        #rnix-lsp
-        #deadnix
-        #statix
-        #nixfmt
-        #stylua
-        #shellcheck
-        #yt-dlp
-        #micro
-        #ranger
-        #masterpdfeditor
         abcde
         cups-filters
-        #      talon
-        #scrcpy
         autorandr
         mons
         maim
         xdotool
         xclip
         keepassxc
-        #swappy
         arandr
         xterm
-        #signal-desktop
-        #tailscale # and openssh to custom package, i. e. home/programs/ssh
-        #my-emacs
-        #openssh
-        #dstask
         # TODO https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/ https://wiki.hyprland.org/Nix/Hyprland-on-other-distros/ https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8 https://wiki.archlinux.org/title/Display_manager
         pcmanfm
         #chafa
@@ -284,9 +263,15 @@ in
     '';
   };
 
-  # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
+    # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
+    #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
+ 
+ # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
   services.screen-locker = {
     enable = true;
+    lockCmdEnv = [
+      "XSECURELOCK_PAM_SERVICE=lxdm"
+    ];
     xautolock.enable = false;
     lockCmd = "xsecurelock";
     xss-lock.extraOptions = [
@@ -294,6 +279,15 @@ in
       "-l"
     ];
   };
+
+  news.entries = [
+      {
+        time = "2025-11-15T14:04:00+00:00";
+        condition = true;# builtins.pathExists config.home.file.".local/share/PowerShell/Home-Manager-Managed.ps1".source;
+        message = ''
+	  hm-managed screen-locker uses the archlinux managed xsecurelock, as only the latter has suid bit set
+	'';
+	}];
 
   /*
     services.podman = {
