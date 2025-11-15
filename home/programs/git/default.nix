@@ -111,11 +111,10 @@ in
     home.packages = [
       pkgs.git-absorb
       pkgs.tig
-      # TODO remove ./git-initial-commit.sh
-      #(config.lib.custom.mkScript "git-initial-commit" ./git-initial-commit.sh [
-      #  pkgs.coreutils
-      #  pkgs.git
-      #] { })
+      (config.lib.custom.mkScript "git-initial-commit" ./git-initial-commit.sh [
+        pkgs.coreutils
+        pkgs.git
+      ] { })
       pkgs.lefthook
     ];
 
@@ -199,9 +198,8 @@ in
 
         branch-name = externGitAlias ''git for-each-ref --format="%(refname:short)" $(git symbolic-ref HEAD)'';
         total-clean = externGitAlias "git co -f && git clean -dfx && git clean -dfX";
-	initial-commit = externGitAlias "git init && git commit --allow-empty --message 'chore: initial commit'";
+
         disable-upstream-push = "remote set-url upstream --push DISABLED";
-	set-head = "remote set-head origin --auto";
         set-upstream = externGitAlias "git branch --set-upstream-to=origin/$(git branch-name) $(git branch-name)";
       };
 
