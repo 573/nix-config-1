@@ -71,6 +71,7 @@ in
       # >error: The option `home.file."/home/dani/.config/systemd/user/podman-paperless.service".source' has conflicting definition values:
       # for the unitConfig.After thing above
       # readme says: avoid [adding secret.yaml to store] by adding a string to the full path
+      validateSopsFiles = false;
       defaultSopsFile = "${config.home.homeDirectory}/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
       age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
       # see https://discourse.nixos.org/t/sops-nix-secrets-yaml-is-not-valid-and-key-cannot-be-found/68071/5
