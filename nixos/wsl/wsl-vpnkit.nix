@@ -6,7 +6,7 @@
   lib,
   pkgs,
   inputs,
-  unstable,
+  #unstable,
   ...
 }:
 let
@@ -26,7 +26,7 @@ let
   # FIXME is workaround until upstream has the PR accepted, see https://github.com/nix-community/NixOS-WSL/issues/262#issuecomment-1825648537
   wsl-vpnkit =
     let
-      inherit (unstable)
+      inherit (pkgs)
         lib
         findutils
         pstree

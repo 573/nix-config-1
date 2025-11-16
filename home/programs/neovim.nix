@@ -3,7 +3,7 @@
   lib,
   pkgs,
   inputs,
-  unstable,
+  #unstable,
   makeNixvimWithModule,
   homeDir,
   ...

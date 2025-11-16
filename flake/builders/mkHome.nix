@@ -41,7 +41,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
         then
         inputs.nixos-2405.legacyPackages.${system}.zellij
       else
-        inputs.unstable.legacyPackages.${system}.zellij; 
+        inputs.nixpkgs.legacyPackages.${system}.zellij; 
     emacs =
       if isLinux && isAarch64 then
         inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox

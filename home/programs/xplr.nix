@@ -3,7 +3,7 @@
   config,
   lib,
   inputs,
-  unstable,
+  #unstable,
   ...
 }:
 
@@ -47,7 +47,7 @@ in
     programs.xplr = {
       enable = true;
 
-      package = unstable.xplr;
+      #package = unstable.xplr;
 
       extraConfig = ''
 require("ouch").setup()
@@ -67,7 +67,7 @@ require("ouch").setup()
 #    '';
     # https://github.com/GianniBYoung/rsync.yazi https://github.com/KKV9/compress.yazi https://github.com/ndtoan96/ouch.yazi
     home.packages = [
-      unstable._7zz
+      pkgs._7zz
 #      unstable.ouch
     ];
   };

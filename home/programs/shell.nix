@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  unstable,
+  #unstable,
   ...
 }:
 
@@ -113,7 +113,7 @@ let
       rm = "rm -iv";
       ln = "ln -iv";
 
-      cat = "${unstable.bat}/bin/bat --color=always --paging=never --style=plain";
+      cat = "${pkgs.bat}/bin/bat --color=always --paging=never --style=plain";
 
       ytmp3 = ''${pkgs.yt-dlp}/bin/yt-dlp -x --continue --add-metadata --embed-thumbnail --audio-format mp3 --audio-quality 0 --metadata-from-title="%(artist)s - %(title)s" --prefer-ffmpeg -o "%(title)s.%(ext)s"'';
 

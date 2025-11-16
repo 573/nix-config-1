@@ -8,7 +8,7 @@
   config,
   lib,
   pkgs,
-  unstable,
+#unstable,
   hostname,
   ...
 }:
@@ -97,13 +97,13 @@ in
 
         zoxide = {
           enable = true;
-          package = unstable.zoxide;
+          #package = unstable.zoxide;
           enableBashIntegration = true;
         };
         bat = {
           enable = true;
-          package = unstable.bat;
-          extraPackages = with unstable.bat-extras; [
+          #package = unstable.bat;
+          extraPackages = with pkgs.bat-extras; [
             batpipe
             batman
           ];
@@ -111,7 +111,7 @@ in
         eza = {
           enable = true;
           enableBashIntegration = true;
-          package = unstable.eza;
+          #package = unstable.eza;
         };
       };
 

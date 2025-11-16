@@ -14,7 +14,7 @@ let
   #inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions)
   #  nix_2_24
   inherit (pkgs.nixVersions)
-   stable nix_2_22 nix_2_28
+   stable nix_2_22 latest
     ;
 in
 {
@@ -30,13 +30,13 @@ in
       extraSpecialArgs = {
         inherit inputs rootPath;
         inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim makeNixvimWithModule;
-        inherit (inputs.unstable.legacyPackages.${pkgs.system}) yazi;
+        #inherit (inputs.unstable.legacyPackages.${pkgs.system}) yazi;
     zellij =
       if isLinux && isAarch64
         then
         inputs.nixos-2405.legacyPackages.${pkgs.system}.zellij
       else
-        inputs.unstable.legacyPackages.${pkgs.system}.zellij; 
+        inputs.nixpkgs.legacyPackages.${pkgs.system}.zellij; 
         nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.system};
         unstable = inputs.unstable.legacyPackages.${pkgs.system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskellPackages;
@@ -136,7 +136,7 @@ in
       flake-registry = null; # "${inputs.flake-registry}/flake-registry.json"; # maybe DONT as this causes potential inconsistencies: just compare https://github.com/NixOS/flake-registry/blob/ffa18e3/flake-registry.json#L308 (nixpkgs-unstable) vs. inputs.nixpkgs (nixos-24.05)
     };
 
-    package = nix_2_28; #stable;
+    package = latest; # nix_2_28; #stable;
     # until fixed: https://discourse.nixos.org/t/need-help-with-this-git-related-flake-update-error/50538/7
 
     # https://discourse.nixos.org/t/flake-registry-set-to-a-store-path-keeps-copying/44613

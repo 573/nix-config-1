@@ -3,7 +3,7 @@
   config,
   lib,
   inputs,
-  unstable,
+  #unstable,
   ...
 }:
 
@@ -53,7 +53,7 @@ in
       # FIXME https://github.com/sxyazi/yazi/issues/1726 (in upstream main only, use https://yazi-rs.github.io/docs/installation#cache)
       # also tried as in: https://discourse.nixos.org/t/patching-src-fails-and-limiting-hunks-doesnt-work-either/54406
       package = (
-        unstable.yazi.override {
+        pkgs.yazi.override {
           optionalDeps = with pkgs; [
             jq
             _7zz
@@ -203,7 +203,7 @@ in
         ];
       };
 
-      plugins = with unstable.yaziPlugins; {
+      plugins = with pkgs.yaziPlugins; {
         inherit
           ouch
           git
@@ -381,7 +381,7 @@ in
     # https://github.com/GianniBYoung/rsync.yazi https://github.com/KKV9/compress.yazi https://github.com/ndtoan96/ouch.yazi
     home.packages =
       builtins.attrValues {
-        inherit (unstable)
+        inherit (pkgs)
           _7zz
           zathura
           poppler
@@ -390,7 +390,7 @@ in
           ;
       }
       ++ [
-        (lib.hiPrio unstable.ouch)
+        (lib.hiPrio pkgs.ouch)
       ];
   };
 }

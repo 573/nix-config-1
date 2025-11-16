@@ -3,7 +3,7 @@
   lib,
   inputs,
   pkgs,
-  unstable,
+  #unstable,
   ...
 }:
 
@@ -71,7 +71,7 @@ in
           ;
       };
 
-      package = unstable.helix;
+      #package = unstable.helix;
 
       ignores = [
         ".build/"
