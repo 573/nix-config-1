@@ -25,9 +25,9 @@ in
   #    )
   #  ];
 
-  imports = [
-    inputs.catppuccin.homeModules.catppuccin
-  ];
+#  imports = [
+#    inputs.catppuccin.homeModules.catppuccin
+#  ];
 
   ###### interface
 

@@ -213,9 +213,9 @@ in
         yamb = inputs.yamb-yazi;
       };
 
-      theme = builtins.fromTOML (
-        builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml"
-      );
+#      theme = builtins.fromTOML (
+#        builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml"
+#      );
 
       # https://yazi-rs.github.io/docs/resources
       # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1

@@ -1119,7 +1119,7 @@ in
           {
             enableMan = false;
 
-            colorschemes.catppuccin.enable = true;
+#            colorschemes.catppuccin.enable = true;
 
             inherit extraConfigLuaPre;
 
