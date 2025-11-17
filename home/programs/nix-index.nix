@@ -31,7 +31,7 @@ in
   config = mkIf cfg.enable {
 
     home.file.".cache/nix-index/files".source =
-      inputs.nix-index-database.packages.${pkgs.system}.nix-index-database;
+      inputs.nix-index-database.packages.${pkgs.stdenv.hostPlatform.system}.nix-index-database;
 
     programs.nix-index = {
       enable = true;

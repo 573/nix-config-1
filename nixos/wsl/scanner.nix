@@ -24,9 +24,9 @@ in
   #  # TODO could this be elevated to use unstable home-manager modules in parallel to release-XX as well ?
   #  (args@{ config, lib, pkgs, ... }:
   #    import "${inputs.nixpkgs.outPath}/nixos/modules/services/hardware/sane.nix"
-  #      (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.system}; })
+  #      (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.stdenv.hostPlatform.system}; })
   #    # above works, but FIXME does not work (again) in unstable yet
-  #    #(args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
+  #    #(args // { pkgs = inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}; })
   #  )
   #];
 

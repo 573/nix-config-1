@@ -21,7 +21,7 @@ in
   #  imports = [ 
   #    (args@{ config, lib, pkgs, ... }:
   #      import "${inputs.home-manager-2211.outPath}/modules/misc/gtk.nix"
-  #        (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.system}; })
+  #        (args // { pkgs = inputs.nixos-2211.legacyPackages.${pkgs.stdenv.hostPlatform.system}; })
   #    )
   #  ];
 

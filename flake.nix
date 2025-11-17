@@ -563,7 +563,8 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
           };
 
       formatterPackArgsFor = forEachSystem (system: {
-        inherit nixpkgs system;
+        inherit nixpkgs;
+	inherit (nixpkgs.legacyPackages.${system}.hostPlatform) system;
         checkFiles = [ self ];
 
         config.tools = {
@@ -949,7 +950,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
 
           cachixDeployOutput = builder: name: module: {
-            ${module.pkgs.system}."cachix-deploy-spec-${name}" = cachixSpecBuilder module.pkgs {
+            ${module.pkgs.hostPlatform.system}."cachix-deploy-spec-${name}" = cachixSpecBuilder module.pkgs {
               agents.${name} = builder module;
             };
           };

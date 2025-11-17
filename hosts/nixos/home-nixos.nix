@@ -69,7 +69,7 @@ in
   #  (args@{ config, lib, pkgs, ... }:
   #    # Pattern: home-manager@master follows nixpkgs@nixpkgs-unstable
   #    import "${inputs.latest-home-manager.outPath}/modules/services/window-managers/hyprland.nix"
-  #      (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.system}; })
+  #      (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}; })
   #  )
   #];
 

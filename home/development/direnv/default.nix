@@ -15,7 +15,7 @@ let
 
   cfg = config.custom.development.direnv;
 
-  devShells = attrNames inputs.self.devShells.${pkgs.system};
+  devShells = attrNames inputs.self.devShells.${pkgs.stdenv.hostPlatform.system};
 in
 
 {

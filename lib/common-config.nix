@@ -11,7 +11,7 @@ _:
 }:
 let
   inherit (pkgs.stdenv) isLinux isAarch64;
-  #inherit (inputs.unstable.legacyPackages.${pkgs.system}.pkgs.nixVersions)
+  #inherit (inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.pkgs.nixVersions)
   #  nix_2_24
   inherit (pkgs.nixVersions)
    stable nix_2_22 latest
@@ -29,29 +29,29 @@ in
       */
       extraSpecialArgs = {
         inherit inputs rootPath;
-        inherit (inputs.nixvim.legacyPackages.${pkgs.system}) makeNixvim makeNixvimWithModule;
-        #inherit (inputs.unstable.legacyPackages.${pkgs.system}) yazi;
+        inherit (inputs.nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system}) makeNixvim makeNixvimWithModule;
+        #inherit (inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}) yazi;
     zellij =
       if isLinux && isAarch64
         then
-        inputs.nixos-2405.legacyPackages.${pkgs.system}.zellij
+        inputs.nixos-2405.legacyPackages.${pkgs.stdenv.hostPlatform.system}.zellij
       else
-        inputs.nixpkgs.legacyPackages.${pkgs.system}.zellij; 
-        nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.system};
-        unstable = inputs.unstable.legacyPackages.${pkgs.system};
-        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system}.haskellPackages;
-        ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.system};
+        inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.zellij; 
+        nixos-2405 = inputs.nixos-2405.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+        unstable = inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+        haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskellPackages;
+        ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
         emacs =
           if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.packages.${pkgs.system}.emacs-unstable-nox
+            inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
           else
-            inputs.emacs-overlay.packages.${pkgs.system}.emacs-unstable;
+            inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
 
         emacsWithPackagesFromUsePackage =
           if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.lib.${pkgs.system}.emacsWithPackagesFromUsePackage
+            inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
           else
-            inputs.emacs-overlay.lib.${pkgs.system}.emacsWithPackagesFromUsePackage;
+            inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
     homeDir =
       if isLinux && isAarch64 then
         # TODO figure out :p homeConfigurations."dani@maiziedemacchiato".config.home.homeDirectory
