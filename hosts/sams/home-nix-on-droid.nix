@@ -79,6 +79,11 @@ in
     services.tailscale.enable = true;
   };
 
+  services.restic.backups.localbackup = {
+    
+    dailySnapshotsToKeep = 2;
+  };
+
   home = {
     # for compat with ../../home/programs/nixbuild.nix
     homeDirectory = homeDir; #config.home-manager.config.home.
