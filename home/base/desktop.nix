@@ -361,7 +361,7 @@ in
         vlc = config.lib.nixGL.wrap vlc;
         wezterm = config.lib.nixGL.wrap wezterm;
         kitty = config.lib.nixGL.wrap kitty;
-        emacs = config.lib.nixGL.wrap emacs;
+        #emacs = config.lib.nixGL.wrap emacs;
 
         inherit (pkgs)
           pavucontrol

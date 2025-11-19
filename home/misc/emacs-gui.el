@@ -32,8 +32,8 @@
 ;;   (insert-file-contents "/sdcard/wordlist-german.txt")
 ;; )
 
-(use-package bind-key
-  :demand t)
+;;(use-package bind-key
+;;  :demand t)
 
 (use-package corfu
   :custom

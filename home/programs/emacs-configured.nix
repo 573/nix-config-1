@@ -89,7 +89,7 @@ in
         builtins.attrValues {
           inherit (epkgs)
             moe-theme
-            bind-key # u
+            #	bind-key # u
             use-package # u
             which-key # https://elpa.gnu.org/packages/which-key.html
             emacs # u
