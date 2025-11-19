@@ -97,6 +97,7 @@ in
 #        "https://nixvim.cachix.org/"
 #        "https://yazi.cachix.org"
 #        "https://cuda-maintainers.cachix.org/"
+"ssh://eu.nixbuild.net"
       ];
       trusted-public-keys = lib.mkForce [
 #        "laut.cachix.org-1:0VdPZQIzKf4dbk8eHrZPjZc53y6DzdNsUt/VB6ju66g="
@@ -122,6 +123,7 @@ in
 #        "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA="
 #        "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
 #        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+"nixbuild.net/corocoton-1:q3gIl2UIkLJbl1IP3l38NoAFnoV3ohZ2C9Xhk90NdsI="
       ];
       experimental-features = [
         "nix-command"
