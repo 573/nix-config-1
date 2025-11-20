@@ -521,6 +521,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     let
       rootPath = self;
       # TODO read https://discourse.nixos.org/t/cross-system-flakes-whats-your-favorite-forallsystems/68924/3 and https://nixcademy.com/posts/1000-instances-of-flake-utils/
+      # DONE https://discourse.nixos.org/t/copy-formatter-config-from-another-flake-error/53224/4
       forEachSystem = nixpkgs.lib.genAttrs [
         "aarch64-linux"
         "x86_64-linux"
