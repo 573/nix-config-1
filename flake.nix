@@ -329,8 +329,15 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       flake = false;
     };
 
+    # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
+    e-nixpkgs-stable.url = "github:NixOS/nixpkgs/50ab793786d9de88ee30ec4e4c24fb4236fc2674?narHash=sha256-/bVBlRpECLVzjV19t5KMdMFWSwKLtb5RyXdjz3LJT%2Bg%3D";
+    e-nixpkgs.url = "github:NixOS/nixpkgs/85dbfc7aaf52ecb755f87e577ddbe6dbbdbc1054?narHash=sha256-iAcj9T/Y%2B3DBy2J0N%2ByF9XQQQ8IEb5swLFzs23CdP88%3D";
+
     emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
+      # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
+      url = "github:nix-community/emacs-overlay/a8f1ef391d688e3287095e44589278381756bea7?narHash=sha256-SnBESJKoVg/W9CSHEPCWM9khl1sNWnC2UCRJJYgdFng%3D";
+      inputs.nixpkgs-stable.follows = "e-nixpkgs-stable";
+      inputs.nixpkgs.follows = "e-nixpkgs";
       #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
     };
 
