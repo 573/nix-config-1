@@ -9,7 +9,7 @@
 }:
 
 let
-  # splits "username@hostname
+  # splits "username@hostname"
   splittedName = inputs.nixpkgs.lib.splitString "@" name;
 
   username = builtins.elemAt splittedName 0;
@@ -28,7 +28,8 @@ inputs.home-manager.lib.homeManagerConfiguration {
     These herein are needed for ./../../home/ modules' parameters
   */
   extraSpecialArgs = {
-    inherit inputs rootPath system;
+    inherit inputs rootPath;
+    system = "${system}";
     libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
 
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim makeNixvimWithModule;
@@ -36,36 +37,29 @@ inputs.home-manager.lib.homeManagerConfiguration {
     ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
     unstable = inputs.unstable.legacyPackages.${system};
     zellij =
-      if isLinux && isAarch64 then
+      if isLinux && isAarch64
+        then
         inputs.nixos-2405.legacyPackages.${system}.zellij
       else
-        inputs.nixpkgs.legacyPackages.${system}.zellij;
-        emacs =
-          if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
-          else
-            inputs.emacs-overlay.packages.${system}.emacs-unstable;
+        inputs.nixpkgs.legacyPackages.${system}.zellij; 
+    emacs =
+      if isLinux && isAarch64 then
+        inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
+      else
+        inputs.emacs-overlay.packages.${system}.emacs-unstable;
 
-        emacsWithPackagesFromUsePackage =
-          if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
-          else
-            inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
-#    emacs =
-#      if isLinux && isAarch64 then
-#        inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
-#      else
-#        inputs.emacs-overlay.packages.${system}.emacs-unstable;
-
-#    emacsWithPackagesFromUsePackage =
-#      if isLinux && isAarch64 then
-#        inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
-#      else
-#        inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
+    emacsWithPackagesFromUsePackage =
+      if isLinux && isAarch64 then
+        inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
+      else
+        inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
 
     homeDir =
       # should not break with raspberry as it concerns only non-nixos
-      if isLinux && isAarch64 then "/data/data/com.termux.nix/files/home" else "/home/${username}";
+      if isLinux && isAarch64 then
+        "/data/data/com.termux.nix/files/home"
+      else
+        "/home/${username}";
     inherit username;
   };
 
@@ -74,6 +68,5 @@ inputs.home-manager.lib.homeManagerConfiguration {
       as in ./../../lib/common-config.nix `homeManager.userConfig`
     */
     "${rootPath}/hosts/${hostname}/home-${username}.nix"
-  ]
-  ++ homeModulesFor.${system};
+  ] ++ homeModulesFor.${system};
 }
