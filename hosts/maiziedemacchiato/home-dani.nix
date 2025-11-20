@@ -161,6 +161,7 @@ in
       #inherit (inputs.talon.packages.x86_64-linux) default;
       # with pkgs; [
       inherit (pkgs)
+        tutanota-desktop
         shellharden
         shfmt
         abcde
