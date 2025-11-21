@@ -2,7 +2,11 @@ _:
 
 {
   lib,
-  config,
+  # TODO need it for homeDir, but is that the right place ?
+  # does it rather belong to mkHome.nix ?
+  # Or could it just go to lib/default rather and homeDir with it ?
+  # Or homedir goes entirely via userConfig.
+  #config,
   pkgs,
   homeModules ? [ ],
   inputs,
@@ -41,26 +45,26 @@ in
         unstable = inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskellPackages;
         ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-        emacs =
-          if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
-          else
-            inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
+#        emacs =
+#          if isLinux && isAarch64 then
+#            inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
+#          else
+#            inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
 
-        emacsWithPackagesFromUsePackage =
-          if isLinux && isAarch64 then
-            inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
-          else
-            inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
-    homeDir =
-      if isLinux && isAarch64 then
+#        emacsWithPackagesFromUsePackage =
+#          if isLinux && isAarch64 then
+#            inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
+#          else
+#            inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
+    #homeDir =
+    #  if isLinux && isAarch64 then
         # TODO figure out :p homeConfigurations."dani@maiziedemacchiato".config.home.homeDirectory
 	# :p nixOnDroidConfigurations.sams9.config.user.home => cfg.user.home
-        config.user.home
-      else # TODO for now only user nixos anyway on nixos-wsl
+    #    config.user.home
+    #  else # TODO for now only user nixos anyway on nixos-wsl
            # :p nixosConfigurations.DANIELKNB1.config.wsl.defaultUser
-        "/home/${config.wsl.defaultUser}";
-      };
+    #    "/home/${config.wsl.defaultUser}";
+  };
       sharedModules = homeModules;
       useGlobalPkgs = true; # disables options nixpkgs.*
       useUserPackages = true;
@@ -121,7 +125,8 @@ in
 #        "nixvim.cachix.org-1:8xrm/43sWNaE3sqFYil49+3wO5LqCbS4FHGhMCuPNNA="
 #        "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
 #        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-"nixbuild.net/corocoton-1:q3gIl2UIkLJbl1IP3l38NoAFnoV3ohZ2C9Xhk90NdsI="
+#        "nixbuild.net/corocoton-1:q3gIl2UIkLJbl1IP3l38NoAFnoV3ohZ2C9Xhk90NdsI="
+        "cache.corocoton-nixbuild.net-2:aiggtAc2pIcZXw3rMHBUhahHMiwUd8/YP/v9nek80jo="
       ];
       experimental-features = [
         "nix-command"

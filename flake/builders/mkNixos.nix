@@ -24,17 +24,17 @@ inputs.nixpkgs.lib.nixosSystem {
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
     # NOTE one can alternatively also just (with only inherit inputs;) use in the downstream nix file then: inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
     unstable = inputs.unstable.legacyPackages.${system};
-    emacs =
-      if isLinux && isAarch64 then
-        inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
-      else
-        inputs.emacs-overlay.packages.${system}.emacs-unstable;
+#    emacs =
+#      if isLinux && isAarch64 then
+#        inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
+#      else
+#        inputs.emacs-overlay.packages.${system}.emacs-unstable;
 
-    emacsWithPackagesFromUsePackage =
-      if isLinux && isAarch64 then
-        inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
-      else
-        inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
+#    emacsWithPackagesFromUsePackage =
+#      if isLinux && isAarch64 then
+#        inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
+#      else
+#        inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
     homeModules = homeModulesFor.${system};
   };
 

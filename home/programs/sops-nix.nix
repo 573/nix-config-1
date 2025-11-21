@@ -74,6 +74,10 @@ in
       validateSopsFiles = false;
       defaultSopsFile = "${config.home.homeDirectory}/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
       age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+ 
+      # see https://github.com/Mic92/sops-nix/issues/498
+      #templates."nixbuild-sshconfig".content = ''${config.sops.placeholder."signing_key/secret_key"}'';
+
       # see https://discourse.nixos.org/t/sops-nix-secrets-yaml-is-not-valid-and-key-cannot-be-found/68071/5
       # also (not tested as it seems to imply --impure as well) https://github.com/Mic92/sops-nix/issues/287#issuecomment-1764207071
       secrets = {
@@ -112,6 +116,9 @@ in
         "syncthing/folder_1/label" = {
           key = "syncthing/folder_1/label";
         };
+        "ssh/secret_env" = {
+          key = "ssh/secret_env";
+	};
       };
       #  sopsFile = ...;
       #};

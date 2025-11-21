@@ -40,6 +40,13 @@ in
           serverAliveInterval = 60;
 	  identitiesOnly = true;
           identityFile = "${config.home.homeDirectory}/.ssh/my-nixbuild-key";
+	  #setEnv = {
+	  #  # builtins.readFile would put the secret into store
+	  # Also not what to do, rather use ssh -F config-loc with https://github.com/Mic92/sops-nix?tab=readme-ov-file#templates
+	  #  or see that https://discourse.nixos.org/t/sops-nix-templates-in-config-file/40225/2
+	  #  or even - though tat didn't work for openssh https://www.reddit.com/r/NixOS/comments/1draqf1/comment/lb3tyvc/
+	  #  NIXBUILDNET_SIGNING_KEY_FOR_BUILDS = config.sops.templates."nixbuild-sshconfig".content;
+	  #};
       };
 
       # explainer why lib.debug.traceIf (...) here would give infinite recursion: here, with potential workaround `mkMergeTopLevel` function https://gist.github.com/udf uses: https://gist.github.com/573/1ff0527f8b42b0123dc3a13bc523f487

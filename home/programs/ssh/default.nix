@@ -131,7 +131,7 @@ in
         controlPath = "~/.ssh/socket-%C";
         controlPersist = "10m";
 
-        includes = [ "~/.ssh/config.d/*" ];
+        includes = [ "~/.ssh/config.d/*" "${config.sops.secrets."ssh/secret_env".path}" ];
         extraConfig = ''
           CheckHostIP yes
           ConnectTimeout 60
