@@ -78,6 +78,8 @@ in
       # see https://github.com/Mic92/sops-nix/issues/498
       #templates."nixbuild-sshconfig".content = ''${config.sops.placeholder."signing_key/secret_key"}'';
 
+      templates."syncthing/device_1/id".content = ''${config.sops.placeholder."syncthing/device_1/id"}'';
+
       # see https://discourse.nixos.org/t/sops-nix-secrets-yaml-is-not-valid-and-key-cannot-be-found/68071/5
       # also (not tested as it seems to imply --impure as well) https://github.com/Mic92/sops-nix/issues/287#issuecomment-1764207071
       secrets = {

@@ -83,41 +83,44 @@ in
   # https://mipmip.github.io/home-manager-option-search/?query=syncthing
   services.syncthing = {
     # FIXME when journal error fixed back to true
-    enable = false;
+    enable = true;
     tray.enable = true;
-    overrideDevices = true;
-    overrideFolders = true;
+    extraOptions = [
+  "--config" "newloc"
+];
     # https://docs.syncthing.net/users/syncthing.html#cmdoption-home
     settings = {
-    options = {
-      localAnnounceEnabled = false;
-      urAccepted = -1;
-      relaysEnabled = false;
-    };
+      options = {
+        localAnnounceEnabled = false;
+        urAccepted = -1;
+        relaysEnabled = false;
+        globalAnnounceEnabled = false;
+	natEnabled = false;
+      };
       devices = {
-            "Newer Laptop" = {
-              id = config.sops.secrets."syncthing/device_1/id".path;
-            };
-            "Phone" = {
-              id = config.sops.secrets."syncthing/device_2/id".path;
-#              label = config.sops.secrets."syncthing/device_2/label".path;
-            };
-            "Older Lenovo" = {
-              id = config.sops.secrets."syncthing/device_3/id".path;
-            };
-	 };
-          folders = {
-            "eins" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = config.sops.secrets."syncthing/folder_1/path".path;
-              id = config.sops.secrets."syncthing/folder_1/id".path;
-              label = config.sops.secrets."syncthing/folder_1/label".path;
-            };
-          };
+        "Newer Laptop" = {
+          id = config.sops.templates."syncthing/device_1/id".content;
+        };
+        /*"Phone" = {
+          id = config.sops.secrets."syncthing/device_2/id".path;
+          #              label = config.sops.secrets."syncthing/device_2/label".path;
+        };
+        "Older Lenovo" = {
+          id = config.sops.secrets."syncthing/device_3/id".path;
+        };*/
+      };
+      /*folders = {
+        "eins" = {
+          devices = [
+            "Newer Laptop"
+            "Phone"
+            "Older Lenovo"
+          ];
+          path = config.sops.secrets."syncthing/folder_1/path".path;
+          id = config.sops.secrets."syncthing/folder_1/id".path;
+          label = config.sops.secrets."syncthing/folder_1/label".path;
+        };
+      };*/
     };
   };
 
@@ -264,10 +267,10 @@ in
     '';
   };
 
-    # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
-    #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
- 
- # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
+  # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
+  #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
+
+  # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
   services.screen-locker = {
     enable = true;
     lockCmdEnv = [
@@ -282,13 +285,14 @@ in
   };
 
   news.entries = [
-      {
-        time = "2025-11-15T14:04:00+00:00";
-        condition = true;# builtins.pathExists config.home.file.".local/share/PowerShell/Home-Manager-Managed.ps1".source;
-        message = ''
-	  hm-managed screen-locker uses the archlinux managed xsecurelock, as only the latter has suid bit set
-	'';
-	}];
+    {
+      time = "2025-11-15T14:04:00+00:00";
+      condition = true; # builtins.pathExists config.home.file.".local/share/PowerShell/Home-Manager-Managed.ps1".source;
+      message = ''
+        	  hm-managed screen-locker uses the archlinux managed xsecurelock, as only the latter has suid bit set
+        	'';
+    }
+  ];
 
   /*
     services.podman = {
