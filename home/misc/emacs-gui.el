@@ -280,3 +280,18 @@
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 (add-hook 'dired-mode-hook (lambda () (dired-omit-mode 1)))
 
+
+;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Defining-Functions.html
+(defun foofoo () "my zettelkasten" (interactive)
+       ;; see https://emacs.stackexchange.com/questions/50737/force-opening-file-in-new-buffer
+       (let* ((buf (create-file-buffer "zettelkasten")))
+	 (with-current-buffer buf 
+       (find-alternate-file (expand-file-name "zettelkasten" (getenv "HOME")))
+       (forward-page)))
+       )
+;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Standard-Hooks.html (via https://emacs.stackexchange.com/a/15099)
+(add-hook 'window-setup-hook #'foofoo)
+
+;; https://org-roam.discourse.group/t/opening-internal-links-in-the-same-window-frame/542
+(add-to-list 'org-link-frame-setup '(file . find-file))
+
