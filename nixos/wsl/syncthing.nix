@@ -17,88 +17,61 @@ in
     inputs.sops-nix.nixosModules.sops
   ];
 
-
   options.custom.wsl.syncthing = {
-    enable = mkEnableOption "enable syncthing config" // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+    enable =
+      mkEnableOption "enable syncthing config"
+      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
   };
 
   config = mkIf (cfg.enable) {
     sops = {
       validateSopsFiles = false;
-      /* 
-      when using this form:
-      defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml";
-      error:
-       Failed assertions:
-       - '/home/nixos/.sops/secrets/secrets.yaml' is not in the Nix store. Either add it to the Nix store or
-set sops.validateSopsFiles to false
+      /*
+              when using this form:
+              defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml";
+              error:
+               Failed assertions:
+               - '/home/nixos/.sops/secrets/secrets.yaml' is not in the Nix store. Either add it to the Nix store or
+        set sops.validateSopsFiles to false
       */
       defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
       age.keyFile = "/home/nixos/.config/sops/age/keys.txt";
       secrets = {
-        "syncthing/device_1/id" = {
-          key = "syncthing/device_1/id";
+        "syncthing_ts_key" = {
         };
-        "syncthing/device_2/id" = {
-          key = "syncthing/device_2/id";
-        };
-        "syncthing/device_2/label" = {
-          key = "syncthing/device_2/label";
-        };
-        "syncthing/device_3/id" = {
-          key = "syncthing/device_3/id";
-        };
-        "syncthing/folder_1/id" = {
-          key = "syncthing/folder_1/id";
-        };
-        "syncthing/folder_1/path" = {
-          key = "syncthing/folder_1/path";
-        };
-        "syncthing/folder_1/label" = {
-          key = "syncthing/folder_1/label";
+        "syncthing_ts_cert" = {
         };
       };
     };
+    systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true";
     services = {
       syncthing = {
+
         enable = true;
-        overrideFolders = true;
-        overrideDevices = true;
         # see https://nixos.wiki/wiki/Syncthing
         user = "nixos";
         configDir = "/home/nixos/.config/syncthing";
+        key = ''${config.sops.secrets."syncthing_ts_key".path}'';
+        cert = ''${config.sops.secrets."syncthing_ts_cert".path}'';
         # https://search.nixos.org/options?channel=unstable&show=services.syncthing.settings&from=0&size=50&sort=alpha_asc&type=packages&query=services.syncthing
         settings = {
           options = {
-            # https://docs.syncthing.net/users/faq.html#should-i-keep-my-device-ids-secret 
+            # https://docs.syncthing.net/users/faq.html#should-i-keep-my-device-ids-secret
             announceLANAddresses = false;
             globalAnnounceEnabled = false;
             # https://forum.syncthing.net/t/enable-nat-traversal-what-does-it-do/13044/4
             natEnabled = false;
+            localAnnounceEnabled = false;
+            urAccepted = -1;
+            relaysEnabled = false;
           };
           devices = {
-            "Newer Laptop" = {
-              id = config.sops.secrets."syncthing/device_1/id".path;
-            };
-            "Phone" = {
-              id = config.sops.secrets."syncthing/device_2/id".path;
-#              label = config.sops.secrets."syncthing/device_2/label".path;
-            };
-            "Older Lenovo" = {
-              id = config.sops.secrets."syncthing/device_3/id".path;
-            };
-          };
-          folders = {
-            "eins" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = config.sops.secrets."syncthing/folder_1/path".path;
-              id = config.sops.secrets."syncthing/folder_1/id".path;
-              label = config.sops.secrets."syncthing/folder_1/label".path;
-            };
+            Phone.name = "Phone";
+            Phone.id = "A3G3H6Q-RF3GJOT-AXXJSNJ-ZZCC2WW-3R55I3Y-XR5EJD7-S6RQAXT-FI6HWA2";
+            "Older Lenovo".name = "Older Lenovo";
+            "Older Lenovo".id = "U37SSAX-BKPDCLM-VLYMAQ7-P5I256H-FWRUTZQ-WS2R4UM-5VTDREP-3BUG7QB";
+            Samsung.name = "Samsung";
+            Samsung.id = "KTQ3YZD-722APNB-ONOELMK-3WYUV44-75VXJYC-IFTQ43G-HDS7BZ2-X2BWWQW";
           };
         };
       };

@@ -80,44 +80,41 @@ in
     };
   };
 
+  systemd.user.sessionVariables.STNODEFAULTFOLDER = "true";
   # https://mipmip.github.io/home-manager-option-search/?query=syncthing
+  #home.sessionVariables.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
+  # https://wrycode.com/reproducible-syncthing-deployments/
+  # If accidentally config.xml etc. are removed while systemctl --user stop syncthing was not yet run, IDK
+  # was able to recover syncthing only be setting enable = false rebuild then remove config.xml, cert.pem and key.pem then enable = true rebuild
   services.syncthing = {
     # FIXME when journal error fixed back to true
-    enable = false;
-    tray.enable = true;
-    overrideDevices = true;
-    overrideFolders = true;
+    enable = true;
+    #tray.enable = true;
+    # passwordFile might assume gui.user to be set as well, or it is for curl REST access only
+    # currently seems to have an issue with guiAddress as well - syncthing-init.service always fails
+    #passwordFile = ''${config.sops.secrets."syncthing/passwordFile".path}'';
+    key = ''${config.sops.secrets."syncthing_maizie_key".path}'';
+    cert = ''${config.sops.secrets."syncthing_maizie_cert".path}'';
     # https://docs.syncthing.net/users/syncthing.html#cmdoption-home
     settings = {
-    options = {
-      localAnnounceEnabled = false;
-      urAccepted = -1;
-      relaysEnabled = false;
-    };
+      #gui = {
+      #  user = "test";
+      #};
+      options = {
+        natEnabled = false;
+        globalAnnounceEnabled = false;
+        localAnnounceEnabled = false;
+        urAccepted = -1;
+        relaysEnabled = false;
+      };
       devices = {
-            "Newer Laptop" = {
-              id = config.sops.secrets."syncthing/device_1/id".path;
-            };
-            "Phone" = {
-              id = config.sops.secrets."syncthing/device_2/id".path;
-#              label = config.sops.secrets."syncthing/device_2/label".path;
-            };
-            "Older Lenovo" = {
-              id = config.sops.secrets."syncthing/device_3/id".path;
-            };
-	 };
-          folders = {
-            "eins" = {
-              devices = [
-                "Newer Laptop"
-                "Phone"
-                "Older Lenovo"
-              ];
-              path = config.sops.secrets."syncthing/folder_1/path".path;
-              id = config.sops.secrets."syncthing/folder_1/id".path;
-              label = config.sops.secrets."syncthing/folder_1/label".path;
-            };
-          };
+        Phone.name = "Phone";
+        Phone.id = "A3G3H6Q-RF3GJOT-AXXJSNJ-ZZCC2WW-3R55I3Y-XR5EJD7-S6RQAXT-FI6HWA2";
+        "Newer Laptop".name = "Newer Laptop";
+        "Newer Laptop".id = "FDBTMR3-XQDMU6L-AJF6WBP-WC65GPB-ZS67G4Q-7KWG3LY-2JGOSL7-Z4QUJQF";
+        Samsung.name = "Samsung";
+        Samsung.id = "KTQ3YZD-722APNB-ONOELMK-3WYUV44-75VXJYC-IFTQ43G-HDS7BZ2-X2BWWQW";
+      };
     };
   };
 
@@ -264,10 +261,10 @@ in
     '';
   };
 
-    # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
-    #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
- 
- # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
+  # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
+  #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
+
+  # see https://sourcegraph.com/github.com/thiagokokada/nix-configs@e9980c5b31c1aae55c5cb9465fb15137349f7680/-/blob/home-manager/desktop/i3/screen-locker.nix?L24:13
   services.screen-locker = {
     enable = true;
     lockCmdEnv = [
@@ -282,13 +279,14 @@ in
   };
 
   news.entries = [
-      {
-        time = "2025-11-15T14:04:00+00:00";
-        condition = true;# builtins.pathExists config.home.file.".local/share/PowerShell/Home-Manager-Managed.ps1".source;
-        message = ''
-	  hm-managed screen-locker uses the archlinux managed xsecurelock, as only the latter has suid bit set
-	'';
-	}];
+    {
+      time = "2025-11-15T14:04:00+00:00";
+      condition = true; # builtins.pathExists config.home.file.".local/share/PowerShell/Home-Manager-Managed.ps1".source;
+      message = ''
+        	  hm-managed screen-locker uses the archlinux managed xsecurelock, as only the latter has suid bit set
+        	'';
+    }
+  ];
 
   /*
     services.podman = {
