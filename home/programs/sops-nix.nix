@@ -82,43 +82,23 @@ in
       # also (not tested as it seems to imply --impure as well) https://github.com/Mic92/sops-nix/issues/287#issuecomment-1764207071
       secrets = {
         "paperless/admin_password" = {
-          key = "paperless/admin_password";
         };
         "paperless/secret_key" = {
-          key = "paperless/secret_key";
         };
         "paperless/db_password" = {
-          key = "paperless/db_password";
         };
         # TODO to provoke the error where key leaking is demonstrated, i.e.,
         # secrets.yaml in store as opposed to the recipe spec
         # /nix/store/hash-secrets.yaml
         # just uncomment following line and comment lines after that then
         #"syncthing/id".key = "syncthing/id";
-        "syncthing/device_1/id" = {
-          key = "syncthing/device_1/id";
-        };
-        "syncthing/device_2/id" = {
-          key = "syncthing/device_2/id";
-        };
-        "syncthing/device_2/label" = {
-          key = "syncthing/device_2/label";
-        };
-        "syncthing/device_3/id" = {
-          key = "syncthing/device_3/id";
-        };
-        "syncthing/folder_1/id" = {
-          key = "syncthing/folder_1/id";
-        };
-        "syncthing/folder_1/path" = {
-          key = "syncthing/folder_1/path";
-        };
-        "syncthing/folder_1/label" = {
-          key = "syncthing/folder_1/label";
-        };
+        "syncthing/passwordFile" = { };
         "ssh/secret_env" = {
-          key = "ssh/secret_env";
 	};
+	"syncthing_maizie_cert" = { };
+	"syncthing_maizie_key"  = { };
+	"syncthing_ts_cert" = { };
+	"syncthing_ts_key"  = { };
       };
       #  sopsFile = ...;
       #};
