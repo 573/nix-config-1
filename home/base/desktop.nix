@@ -196,6 +196,7 @@ in
             (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
             (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
             (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}")
+	    (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
           ];
         # To add additional extensions, https://github.com/tupakkatapa/mozid
       };
