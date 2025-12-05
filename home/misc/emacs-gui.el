@@ -5,7 +5,7 @@
 ;; @hunspellDicts_de_DE@/share/hunspell/de_DE.aff
 ;; my legacy stolen configs https://github.com/573/nix-config-1/commit/b534362097b3ca0d4011561b1085de40df0a7292#diff-9038ab981032e7f24c7ee557adf7d2ea5fbb6702153e6242d80dc61b3e256051
 (message "https://www.gnu.org/software/emacs/manual/html_node/efaq/Learning-how-to-do-something.html")
-(message "configuration is %S" "templated from home/misc/emacs.el: @out@ see C-x b *Messages* for the real path of emacs.el")
+(message "configuration is %S" "templated from home/misc/emacs-gui.el: @out@ see C-x b *Messages* for the real path of emacs.el")
 (message "works")
 
 ;; ;;https://emacs.stackexchange.com/questions/27027/how-to-supply-ispell-program-with-dictionaries
@@ -295,5 +295,5 @@
 ;; https://org-roam.discourse.group/t/opening-internal-links-in-the-same-window-frame/542
 ;; https://emacs.stackexchange.com/questions/62720/open-org-link-in-the-same-window
 ;; FIXME does not work in non-nixos full-nix-managed emacs
-(add-to-list 'org-link-frame-setup '(file . find-file))
+;;(add-to-list 'org-link-frame-setup '(file . find-file))
 

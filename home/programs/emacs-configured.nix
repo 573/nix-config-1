@@ -36,7 +36,7 @@ in
 
     custom.programs.emacs-configured = {
 
-      enable = mkEnableOption "emacs where you load (via -l elfile) your own config";
+      enable = mkEnableOption "emacs where you load (via -q -l elfile) your own config";
 
       finalPackage = mkOption {
         type = types.nullOr types.package;
@@ -152,6 +152,7 @@ in
             # meaning el-file may contain @out@ etc. references to drv
             src = "${rootPath}/home/misc/emacs-gui.el";
 	    substitutions = [
+	      "--subst-var-by" "out" ''${builtins.placeholder "out"}''
 	      "--subst-var-by" "scowl" pkgs.scowl
 	      "--subst-var-by" "hunspellDicts_de_DE" pkgs.hunspellDicts.de_DE 
 	    ];
