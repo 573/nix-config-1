@@ -293,5 +293,7 @@
 (add-hook 'window-setup-hook #'foofoo)
 
 ;; https://org-roam.discourse.group/t/opening-internal-links-in-the-same-window-frame/542
+;; https://emacs.stackexchange.com/questions/62720/open-org-link-in-the-same-window
+;; FIXME does not work in non-nixos full-nix-managed emacs
 (add-to-list 'org-link-frame-setup '(file . find-file))
 
