@@ -182,6 +182,14 @@ in
                 installation_mode = "normal_installed";
               };
             };
+            oextension = shortId: uuid: {
+              name = uuid;
+              value = {
+	        # manual work see https://github.com/zotero/zotero-connectors/tags (https://gist.github.com/rponte/fdc0724dd984088606b0?permalink_comment_id=3666911#gistcomment-3666911): curl -s GET https://api.github.com/repos/zotero/zotero-connectors/tags | jq -r '.[].name' | head -n1
+                install_url = "https://download.zotero.org/connector/firefox/release/Zotero_Connector-5.0.193.xpi";
+                installation_mode = "normal_installed";
+              };
+            };
           in
           listToAttrs [
             (extension "tree-style-tab" "treestyletab@piro.sakura.ne.jp")
@@ -197,6 +205,10 @@ in
             (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
             (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}")
 	    (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
+	    (oextension "zotero-connector" "zotero@chnm.gmu.edu")
+	    (extension "ghosttext" "ghosttext@bfred.it")
+	    (extension "youtube-subscription-groups" "danabok16@gmail.com")
+	    (extension "keepassxc-browser" "keepassxc-browser@keepassxc.org")
           ];
         # To add additional extensions, https://github.com/tupakkatapa/mozid
       };
