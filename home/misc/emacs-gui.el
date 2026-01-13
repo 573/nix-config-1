@@ -6,7 +6,9 @@
 ;; my legacy stolen configs https://github.com/573/nix-config-1/commit/b534362097b3ca0d4011561b1085de40df0a7292#diff-9038ab981032e7f24c7ee557adf7d2ea5fbb6702153e6242d80dc61b3e256051
 (message "https://www.gnu.org/software/emacs/manual/html_node/efaq/Learning-how-to-do-something.html")
 (message "configuration is %S" "templated from home/misc/emacs-gui.el: @out@ see C-x b *Messages* for the real path of emacs.el")
-(message "works")
+(message "To play around a bit put this into a file ~/.emacs:")
+(message "(add-hook 'emacs-startup-hook\n	  (lambda () \"hello-world\" (interactive)\n	    (message \"Hello.\")))")
+;;(message "works")
 
 ;; ;;https://emacs.stackexchange.com/questions/27027/how-to-supply-ispell-program-with-dictionaries
  (setenv "LC_ALL" "de_DE.UTF-8")
@@ -282,18 +284,32 @@
 
 
 ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Defining-Functions.html
-(defun foofoo () "my zettelkasten" (interactive)
-       ;; see https://emacs.stackexchange.com/questions/50737/force-opening-file-in-new-buffer
-       (let* ((buf (create-file-buffer "zettelkasten")))
-	 (with-current-buffer buf 
-       (find-alternate-file (expand-file-name "zettelkasten" (getenv "HOME")))
-       (forward-page)))
-       )
 ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Standard-Hooks.html (via https://emacs.stackexchange.com/a/15099)
-(add-hook 'window-setup-hook #'foofoo)
+(add-hook 'emacs-startup-hook
+	  (lambda () "dirdir" (interactive)
+	    (let* ((buf (create-file-buffer "zettelkasten")))
+	      (with-current-buffer buf
+		(find-alternate-file (expand-file-name "zettelkasten" (getenv "HOME")))
+		(forward-page)))))
 
 ;; https://org-roam.discourse.group/t/opening-internal-links-in-the-same-window-frame/542
 ;; https://emacs.stackexchange.com/questions/62720/open-org-link-in-the-same-window
 ;; FIXME does not work in non-nixos full-nix-managed emacs
+;; rather use customize-variable org-link-frame-setup https://stackoverflow.com/questions/1854214/how-do-i-keep-emacs-org-mode-from-splitting-windows
 ;;(add-to-list 'org-link-frame-setup '(file . find-file))
+(add-hook 'org-mode-hook (lambda () 
+(add-to-list 'org-link-frame-setup '(file . find-file))))
+
+; Source - https://stackoverflow.com/a
+; Posted by krzysz00
+; Retrieved 2025-12-08, License - CC BY-SA 3.0
+
+;;(add-to-list 'org-link-frame-setup '(file find-file))
+
+;; same as above even better maybe bc not only for org files
+; Source - https://stackoverflow.com/a
+; Posted by Trey Jackson
+; Retrieved 2025-12-08, License - CC BY-SA 2.5
+
+;;(setq same-window-regexps '("."))
 

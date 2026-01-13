@@ -329,7 +329,10 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       flake = false;
     };
 
+/*
     # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
+    #  cause not exactly clear but error disappears when I'm not using a remote builder, see issue's last comment
+
     e-nixpkgs-stable.url = "github:NixOS/nixpkgs/50ab793786d9de88ee30ec4e4c24fb4236fc2674?narHash=sha256-/bVBlRpECLVzjV19t5KMdMFWSwKLtb5RyXdjz3LJT%2Bg%3D";
     e-nixpkgs.url = "github:NixOS/nixpkgs/85dbfc7aaf52ecb755f87e577ddbe6dbbdbc1054?narHash=sha256-iAcj9T/Y%2B3DBy2J0N%2ByF9XQQQ8IEb5swLFzs23CdP88%3D";
 
@@ -340,6 +343,9 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs.follows = "e-nixpkgs";
       #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
     };
+    */
+
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
 
     emacs-overlay-cached = {
       # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
