@@ -233,8 +233,8 @@
 (set-register ?e (cons 'file user-init-file))
 ;;(set-register ?d (cons 'file "/storage/emulated/0/zettelkasten/"))
 ;;(set-register ?a (cons 'file "/storage/emulated/0/"))
-(add-to-list 'default-frame-alist
-             '(font . "Monaspace Radon Var 16"))
+;;(add-to-list 'default-frame-alist
+;;             '(font . "Monaspace Radon Var 16"))
 
 ;;(use-package vundo)
 
