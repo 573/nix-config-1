@@ -218,6 +218,8 @@ in
       #  libreoffice
       #  ;
 
+      # see: https://github.com/nix-community/home-manager/issues/605#issuecomment-1678754229
+      # see: https://discourse.nixos.org/t/latest-update-breaks-nerdfonts-declared-in-home-manager/57244/8
       nerdfonts = pkgs.nerd-fonts.ubuntu-mono; # TODO nerd-fonts.monaspace
 
     };
@@ -240,6 +242,8 @@ in
   #    # are we enabled ?
   #  '';
   #};
+
+  fonts.fontconfig.enable = true;
 
   xdg.enable = true;
 
