@@ -10,15 +10,15 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixos-2405.url = "github:NixOS/nixpkgs/nixos-24.05";
-    nixos-2305.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "https://channels.nixos.org/nixos-25.05/nixexprs.tar.xz";
+    nixos-2405.url = "https://channels.nixos.org/nixos-24.05/nixexprs.tar.xz";
+    nixos-2305.url = "https://channels.nixos.org/nixos-23.05/nixexprs.tar.xz";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
     #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # seems plausible: https://github.com/NixOS/flake-registry/blob/895a65f8d5acf848136ee8fe8e8f736f0d27df96/flake-registry.json#L301-L311
-    nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
+    nixos-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
+    unstable.url = "https://nixos.org/channels/nixpkgs-unstable/nixexprs.tar.xz"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
     # latest is not cached, also github:NixOS/nixpkgs points to master/latest so no branch spec needed
     latest.url = "github:NixOS/nixpkgs"; # "github:NixOS/nixpkgs/master";
@@ -32,6 +32,7 @@
     # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
     # https://github.com/nix-community/NixOS-WSL/discussions/735
     nixos-wsl = {
+      # until https://github.com/nix-community/NixOS-WSL/issues/397
       url = "github:nix-community/nixos-wsl/release-25.05";
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
