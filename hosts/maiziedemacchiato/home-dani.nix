@@ -197,6 +197,7 @@ in
         #spotify-player
         #gtt
         notepad-next
+	reader
         ;
 
       inherit (nixos-unstable)
