@@ -17,6 +17,7 @@
     # FIXME Remove pin, when https://github.com/NixOS/nixpkgs/pull/276887 is reverted, it broke hm, see https://github.com/nix-community/home-manager/issues/4875
     #    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # seems plausible: https://github.com/NixOS/flake-registry/blob/895a65f8d5acf848136ee8fe8e8f736f0d27df96/flake-registry.json#L301-L311
+    # see https://discourse.nixos.org/t/the-nixpkgs-unstable-channel-seems-to-be-stuck/75524/6 for difference nixos-unstable vs. nixpkgs-unstable
     nixos-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
     unstable.url = "https://nixos.org/channels/nixpkgs-unstable/nixexprs.tar.xz"; # PR 276887 is reverted, so /b2e4fd1049a3e92c898c99adc8832361fa7e1397"; #/635a306fc8ede2e34cb3dd0d6d0a5d49362150ed"; # nvim broken in 8d447c5626cfefb9b129d5b30103344377fe09bc, see https://github.com/573/nix-config-1/actions/runs/4960709342/jobs/8876554875#step:6:3671
     #unstable.url = "github:NixOS/nixpkgs/c4d0026e7346ad2006c2ba730d5a712c18195aab";
@@ -641,6 +642,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
         nixpkgs = inputs.nixpkgs.legacyPackages.${system};
         latest = inputs.latest.legacyPackages.${system};
         unstable = inputs.unstable.legacyPackages.${system};
+        nixos-unstable = inputs.nixos-unstable.legacyPackages.${system};
         nixos-2405 = inputs.nixos-2405.legacyPackages.${system};
         libreoffice-postscript = inputs.libreoffice-postscript.legacyPackages.${system};
         haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskellPackages;
