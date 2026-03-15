@@ -10,6 +10,7 @@
   libreoffice-postscript,
   rootPath,
   unstable,
+  nixos-unstable,
   inputs,
   homeDir,
   withNps,
@@ -158,7 +159,6 @@ in
       #inherit (inputs.talon.packages.x86_64-linux) default;
       # with pkgs; [
       inherit (pkgs)
-        tutanota-desktop
         shellharden
         shfmt
         abcde
@@ -198,6 +198,10 @@ in
         #gtt
         notepad-next
         ;
+
+      inherit (nixos-unstable)
+        tutanota-desktop
+	;
 
       inherit (unstable)
         tesseract

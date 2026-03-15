@@ -35,6 +35,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
     haskellPackages = inputs.ghc-nixpkgs-unstable.legacyPackages.${system}.haskellPackages;
     ghc-nixpkgs-unstable = inputs.ghc-nixpkgs-unstable.legacyPackages.${system};
     unstable = inputs.unstable.legacyPackages.${system};
+    nixos-unstable = inputs.nixos-unstable.legacyPackages.${system};
     zellij =
       if isLinux && isAarch64 then
         inputs.nixos-2405.legacyPackages.${system}.zellij
