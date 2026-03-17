@@ -57,6 +57,7 @@ in
 	fontconfig.enable = true;
         fontconfig.defaultFonts.monospace = [ "UbuntuMono Nerd Font" ];
 
+        # fc-list for font names
         packages = with pkgs; [
           nerd-fonts.ubuntu-mono
         ];

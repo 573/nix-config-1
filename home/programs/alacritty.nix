@@ -37,6 +37,7 @@ in
       };
     };
 
+    # fonts.packages only in nixos modules
     home.packages = [ pkgs.nerd-fonts.ubuntu-mono ];
 
     programs.alacritty = {
