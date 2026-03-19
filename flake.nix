@@ -427,6 +427,11 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     firefox = {
       url = "github:nix-community/flake-firefox-nightly";
+      # the firefox-nightlies nixos-unstable-small reference is updated daily/nightly anyways, so I make them follow my nixos-unstable reference at least that way I get a 
+      # firefox as fresh as my unstable installed everytime I flake update unstable and do remind myself to also flake update firefox then
+      # TODO note: this is only due to that firefox-nightlies seem to built anyway on my nix-powered arch at least where I'm forced to use sandbox false as long as I have not
+      # fixed the sandbox issue I have there
+      inputs.nixpkgs.follows = "unstable";
     };
 
     rust-dev-template = {
