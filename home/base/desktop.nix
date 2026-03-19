@@ -168,6 +168,7 @@ in
   };
 
     programs.firefox = lib.optionalAttrs (!config.custom.base.general.wsl) {
+      # stick to that (has all the links as well) https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/1
       enable = true;
 
       # https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/17
@@ -203,7 +204,7 @@ in
             (extension "qwantcom-for-firefox" "qwantcomforfirefox@jetpack")
             (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
             (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
-            (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}")
+            # (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}") # nice but too distracting, use https://now.hackertab.dev/
 	    (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
 	    (oextension "zotero-connector" "zotero@chnm.gmu.edu")
 	    (extension "ghosttext" "ghosttext@bfred.it")
@@ -321,12 +322,31 @@ in
             in
             {
               # Privacy settings
-              #"extensions.pocket.enabled" = lock-false;
+              "extensions.pocket.enabled" = lock-false;
               #"browser.newtabpage.pinned" = lock-empty-string;
               "browser.topsites.contile.enabled" = lock-false;
               "browser.newtabpage.activity-stream.showSponsored" = lock-false;
               "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
               "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
+
+              # TODO have to stop cargo-culting about these, clarify what works more
+	      #  i.e., https://discourse.nixos.org/t/nixos-firefox-configuration-with-policies-preferences-extensions-search-engines-and-cookie-exceptions/73747 
+	      #  might or might not get applied in about:config even though the settings make sense probably
+	      #  potentially also cc there are about some more sources:
+	      #  https://forum.level1techs.com/t/browser-hardening-privacy-anti-fingerprint-and-anti-telemetry-guide/198039
+	      #  https://forums.informaction.com/viewtopic.php?t=26365
+	      # consider https://www.waterfox.com/
+	     "trailhead.firstrun.didSeeAboutWelcome" = lock-false;
+	      "toolkit.telemetry.pioneer-new-studies-available" = lock-false;
+
+
+	      "browser.ai.control.default" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.linkPreviewKeyPoints" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.pdfjsAltText" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.sidebarChatbot" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.smartTabGroups" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.smartWindow" = { Value = "blocked"; Status = "locked"; };
+"browser.ai.control.translations" = { Value = "blocked"; Status = "locked"; };
             };
         };
       };
