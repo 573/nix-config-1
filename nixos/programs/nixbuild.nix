@@ -55,7 +55,7 @@ in
       buildMachines = [
         {
           hostName = "eu.nixbuild.net";
-          systems = [ "aarch64-linux" "armv7l-linux" ];
+          systems = [ "aarch64-linux" "armv7l-linux" "x86_64-linux" ];
           maxJobs = 100;
           supportedFeatures = [
             "benchmark"

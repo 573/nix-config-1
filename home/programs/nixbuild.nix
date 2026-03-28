@@ -12,7 +12,7 @@ let
     mkMerge
     ;
 
-  nixbuild-builder = lib.optionalString config.custom.base.non-nixos.enable "ssh-ng://root@eu.nixbuild.net aarch64-linux,armv7l-linux ${config.home.homeDirectory}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
+  nixbuild-builder = lib.optionalString config.custom.base.non-nixos.enable "ssh-ng://root@eu.nixbuild.net aarch64-linux,armv7l-linux,x86_64-linux ${config.home.homeDirectory}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
 
   cfg = config.custom.programs.nixbuild;
 in
