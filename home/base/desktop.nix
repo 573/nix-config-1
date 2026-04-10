@@ -388,6 +388,7 @@ in
         };
       }
       // lib.optionalAttrs (!config.custom.base.general.wsl) {
+        # FIXME emacs still is built on WSL though at least not installed, when n-rebuild switch --impure there, need to rework
         # only install these if not on nixos-wsl
         chrome = config.lib.nixGL.wrap chrome;
         ausweisapp = config.lib.nixGL.wrap ausweisapp;

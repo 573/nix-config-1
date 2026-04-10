@@ -41,6 +41,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.nixos-2405.legacyPackages.${system}.zellij
       else
         inputs.nixpkgs.legacyPackages.${system}.zellij;
+    /* # should be addressed by lib/common-config.nix already
     emacs =
       if isLinux && isAarch64 then
         inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
@@ -52,7 +53,7 @@ inputs.home-manager.lib.homeManagerConfiguration {
         inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
       else
         inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
-
+*/
     homeDir =
       # should not break with raspberry as it concerns only non-nixos
       if isLinux && isAarch64 then "/data/data/com.termux.nix/files/home" else "/home/${username}";

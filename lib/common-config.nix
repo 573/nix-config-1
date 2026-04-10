@@ -34,6 +34,8 @@ in
       /**
         as in ./../flake/default.nix `homeManagerConfiguration.extraSpecialArgs`
       */
+      # NOTE this is extraSpecialArgs / home.nix and -modules, so if OTOH I push specialArgs / configuration.nix and -modules, as in
+      # flake/builders/mkNixos.nix, they go there directly.
       extraSpecialArgs = {
         inherit inputs rootPath;
         inherit (inputs.nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system})
@@ -52,17 +54,17 @@ in
           inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskellPackages;
         ghc-nixpkgs-unstable =
           inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-        #        emacs =
-        #          if isLinux && isAarch64 then
-        #            inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
-        #          else
-        #            inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
+                emacs =
+                  if isLinux && isAarch64 then
+                    inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
+                  else
+                    inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
 
-        #        emacsWithPackagesFromUsePackage =
-        #          if isLinux && isAarch64 then
-        #            inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
-        #          else
-        #            inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
+                emacsWithPackagesFromUsePackage =
+                  if isLinux && isAarch64 then
+                    inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
+                  else
+                    inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
         homeDir =
           if isLinux && isAarch64 then
             # TODO figure out :p homeConfigurations."dani@maiziedemacchiato".config.home.homeDirectory

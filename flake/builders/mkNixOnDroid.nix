@@ -39,6 +39,7 @@ inputs.nix-on-droid.lib.nixOnDroidConfiguration {
     inherit inputs rootPath;
     unstable = inputs.unstable.legacyPackages.${system};
     inherit (inputs.nixvim.legacyPackages.${system}) makeNixvim;
+    /* should be addressed by lib/common-config.nix already
     emacs =
       if isLinux && isAarch64 then
         inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
@@ -50,6 +51,7 @@ inputs.nix-on-droid.lib.nixOnDroidConfiguration {
         inputs.emacs-overlay-cached.lib.${system}.emacsWithPackagesFromUsePackage
       else
         inputs.emacs-overlay.lib.${system}.emacsWithPackagesFromUsePackage;
+	*/
     homeModules = homeModulesFor.${system};
   };
 }
