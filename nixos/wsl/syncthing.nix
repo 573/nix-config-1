@@ -20,7 +20,8 @@ in
   options.custom.wsl.syncthing = {
     enable =
       mkEnableOption "enable syncthing config"
-      // optionalAttrs (config.custom.base.general.wsl) { default = true; };
+      #// optionalAttrs (config.custom.base.general.wsl) { default = true; }
+      ;
   };
 
   config = mkIf (cfg.enable) {

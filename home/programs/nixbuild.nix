@@ -30,6 +30,7 @@ in
   ###### implementation
   config = mkIf cfg.enable (mkMerge [
     (mkIf (config.custom.base.non-nixos.enable) {
+#      programs.ssh.includes = config.programs.ssh.includes ++ [ "${config.sops.secrets."ssh/secret_env".path}" ];
       programs.ssh.matchBlocks.nixbuild = lib.debug.traceIf (config.custom.base.non-nixos.builders != []) ''setting builder entry: ${builtins.toString nixbuild-builder}'' {
 	  hostname = "eu.nixbuild.net";
 	  user = "root";

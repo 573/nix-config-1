@@ -27,11 +27,12 @@ in
     };
 
     programs = {
-      sops-nix.enable = true;
+      # DONT, rather via nixos module
+      #sops-nix.enable = true;
 #      hledger.enable = true;
 #      tex.enable = true;
       zellij.enable = true;
-      nixbuild.enable = true;
+#      nixbuild.enable = true;
 #      alacritty.enable = true;
       neovim = {
         enable = true;

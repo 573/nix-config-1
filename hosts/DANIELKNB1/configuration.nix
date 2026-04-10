@@ -8,6 +8,9 @@
 }:
 
 {
+  imports = [
+    inputs.sops-nix.nixosModules.sops
+  ];
 
   # FIXME currently disabled due to Windows-Update 21.11.23
   # https://mynixos.com/nixpkgs/option/boot.binfmt.emulatedSystems
@@ -116,5 +119,19 @@
       "users"
     ];
     #isSystemUser = lib.mkForce true;
+  };
+
+  sops.validateSopsFiles = false;
+  # You can avoid adding to store by adding a string to the full path instead, i.e.
+  sops.defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml";
+  # This will automatically import SSH keys as age keys
+  #sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  # This is using an age key that is expected to already be in the filesystem
+  sops.age.keyFile = "/home/nixos/.config/sops/age/keys.txt";
+  # This will generate a new key if the key specified above does not exist
+  #sops.age.generateKey = true;
+  # This is the actual specification of the secrets.
+  sops.secrets."ssh/secret_env" = {
+    owner = config.users.users."nixos".name;
   };
 }

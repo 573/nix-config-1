@@ -28,6 +28,7 @@ in
       homedir = config.home-manager.users."${nixosUser}".home.homeDirectory;
   in mkIf cfg.enable {
     # use root's .ssh here as nix-daemon runs with root permissions
+    # The Include does add a line SetEnv SIGNING_KEY within Host block
     programs.ssh.extraConfig = ''
     Host nixbuild
         HostName eu.nixbuild.net
@@ -37,6 +38,7 @@ in
         IPQoS throughput
         IdentitiesOnly yes
         IdentityFile ${homedir}/.ssh/my-nixbuild-key
+        Include ${config.sops.secrets."ssh/secret_env".path} 
     '';
 
 #    programs.ssh.knownHosts = {
