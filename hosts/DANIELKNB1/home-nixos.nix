@@ -61,6 +61,16 @@ in
   # see https://github.com/wezterm/wezterm/issues/2826#issuecomment-1426557160
   programs.wezterm.enableBashIntegration = true;
 
+  programs.television = { 
+    # will try it again, when on 25.11+
+    #enable = true;
+    enableBashIntegration = true;
+    channels = {
+      # wait until https://github.com/nix-community/home-manager/blob/release-25.11/tests/modules/programs/television/basic-config.nix which has 98aed44
+      # https://github.com/nix-community/home-manager/blob/release-25.05/tests/modules/programs/television/basic-config.nix still uses the wrong place for user channels
+    };
+  };
+
   #  programs.doom-emacs = {
   #    enable = true;
   #    doomPrivateDir = "${rootPath}/home/misc/doom.d";
