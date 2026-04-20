@@ -35,8 +35,11 @@ in
 	  hostname = "eu.nixbuild.net";
 	  user = "root";
 	  extraOptions = {
+	    "Include" = "${config.sops.secrets."ssh/secret_env".path}";
 	    "PubkeyAcceptedKeyTypes" = "ssh-ed25519";
 	    "IPQoS" = "throughput";
+	    # Rather no Debug3 here as that leaks secrets, still could use -vvv command line option when needed
+	    "LogLevel" = "Debug1";
 	  };
           serverAliveInterval = 60;
 	  identitiesOnly = true;

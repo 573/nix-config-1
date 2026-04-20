@@ -131,7 +131,14 @@
   # This will generate a new key if the key specified above does not exist
   #sops.age.generateKey = true;
   # This is the actual specification of the secrets.
-  sops.secrets."ssh/secret_env" = {
-    owner = config.users.users."nixos".name;
+  sops.secrets = {
+  "ssh/secret_env" = {
+    owner = config.users.users."root".name;
+    mode = "0600";
+  };
+  "nixbuild/my_nixbuild_key" = {
+    owner = config.users.users."root".name;
+    mode = "0600";
+  };
   };
 }

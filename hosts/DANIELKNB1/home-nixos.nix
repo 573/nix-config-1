@@ -38,7 +38,11 @@ in
         enable = true;
 	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
       };
-    };
+      # FIXME WIP currently restructuring the nixbuild infra I use hm / nixos, this is DRY candidate
+      shell.shellAliases = {
+        nixbuild-shell = "sudo ${lib.getExe pkgs.rlwrap} ssh nixbuild shell";
+      };
+ };
 
     development = {
       nix.nixos.enable = true;

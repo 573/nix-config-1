@@ -29,6 +29,7 @@ in
   in mkIf cfg.enable {
     # use root's .ssh here as nix-daemon runs with root permissions
     # The Include does add a line SetEnv SIGNING_KEY within Host block
+    # Files included or referred to here need 0600 umask
     programs.ssh.extraConfig = ''
     Host nixbuild
         HostName eu.nixbuild.net
@@ -37,8 +38,9 @@ in
         ServerAliveInterval 60
         IPQoS throughput
         IdentitiesOnly yes
-        IdentityFile ${homedir}/.ssh/my-nixbuild-key
-        Include ${config.sops.secrets."ssh/secret_env".path} 
+        IdentityFile ${config.sops.secrets."nixbuild/my_nixbuild_key".path}
+        LogLevel Debug1
+        Include ${config.sops.secrets."ssh/secret_env".path}
     '';
 
 #    programs.ssh.knownHosts = {
@@ -56,15 +58,16 @@ in
       };
       buildMachines = [
         {
-          hostName = "eu.nixbuild.net";
-          systems = [ "aarch64-linux" "armv7l-linux" "x86_64-linux" ];
+	  # see man nix.conf (/machines), can use ssh match block's host here instead full hostname
+          hostName = "nixbuild";
+          systems = [ "x86_64-linux" "aarch64-linux" "armv7l-linux" ];
           maxJobs = 100;
           supportedFeatures = [
             "benchmark"
             "big-parallel"
           ];
 	  sshUser = "root";
-	  sshKey = "${homedir}/.ssh/my-nixbuild-key";
+	  sshKey = config.sops.secrets."nixbuild/my_nixbuild_key".path;
 	  publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
 	  speedFactor = 2;
 	}
