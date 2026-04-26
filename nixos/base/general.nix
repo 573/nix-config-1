@@ -74,6 +74,13 @@ in
         shellAliases = mkForce { };
       };
 
+#error:
+#       Failed assertions:
+#       - nixos profile: xdg.portal: since you installed Home Manager via its NixOS module and
+#       'home-manager.useUserPackages' is enabled, you need to add
+
+       environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
+
       home-manager = {
         inherit (commonConfig.homeManager.baseConfig)
           backupFileExtension

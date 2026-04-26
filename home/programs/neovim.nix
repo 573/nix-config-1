@@ -1054,7 +1054,8 @@ let
 in
 {
 
-  imports = [ inputs.nixvim.homeManagerModules.nixvim ];
+  #  using inputs.nixvim.homeModules.nixvim, for a Home Manager installation
+  imports = [ inputs.nixvim.homeModules.nixvim ];
 
   ###### interface
 
@@ -1109,20 +1110,73 @@ in
   ###### implementation
 
   # FIXME add nvim-lsp as in https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
-  config = mkIf cfg.enable (mkMerge [
+  config = mkIf cfg.enable
     {
       # minimal nvim
       custom.programs.neovim.minimalPackage = makeNixvimWithModule {
+        # pkgs: The nixpkgs to use (defaults to the nixpkgs pointed at by the Nixvim flake)
         #inherit pkgs;
+	# module: The nix module definition used to extend Nixvim. This is useful to pass additional module machinery like options or imports.
         module =
           { helpers, ... }: # import ./config; # import the module directly
           {
-            enableMan = false;
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L298
+            plugins = {
+              inherit
+                fzf-lua
+                mini
+                which-key
+                comment
+                lsp
+                cmp
+                cmp-buffer # m
+                trouble
+                cmp_luasnip
+                cmp-path # m
+                cmp-look # m
+                luasnip
+                gitsigns
+                telescope
+                dap
+                ;
+            };
 
-#            colorschemes.catppuccin.enable = true;
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L315
+            /*extraPlugins = builtins.attrValues {
+              inherit (pkgs.vimPlugins)
+                neoterm
+                #nnn-vim
+                faster-nvim
+                one-small-step-for-vimkind
+		nvim-hlslens
+                #   symbol-usage-nvim
+                ;
+	      # https://nix-community.github.io/nixvim/user-guide/faq.html?highlight=plugins#how-do-i-use-a-plugin-not-implemented-in-nixvim
+              symbol-usage-nvim = pkgs.vimUtils.buildVimPlugin {
+                name = "symbol-usage-nvim";
+                src = inputs.symbol-usage-nvim;
+              };
 
-            inherit extraConfigLuaPre;
+	      eyes-wide-bright = pkgs.vimUtils.buildVimPlugin {
+	        name = "eyes-wide-bright";
+		src = inputs.eyes-wide-bright;
+	      };
+            };*/
 
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L365
+	    ###opts = {};
+
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L385
+            ###inherit keymaps;
+
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L452
+	    #globals.mapleader = "";
+
+            # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/output.nix#L83
+	    # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#extraconfigluapre
+            ###inherit extraConfigLuaPre;
+
+            # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L464
             # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
             extraConfigLua = ''
               	            -- alacritty (+ tmux + neovim) workaround
@@ -1134,6 +1188,7 @@ in
               		    --     * https://www.reddit.com/r/neovim/comments/uuh8xw/noob_vimkeymapset_vs_vimapinvim_set_keymap_key/
                                   --     * https://www.reddit.com/r/neovim/comments/xilic1/comment/ip3saw1/
                                   --     * or just using <BAR> as see https://www.reddit.com/r/neovim/comments/yd6ne9/comment/itq9ocx/
+				   -- FIXME use keymaps see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L406
               		    vim.api.nvim_set_keymap('n', '<f2>', ':set paste!<cr>i', { noremap = true, silent = true })
               		    -- TODO vim.notify("paste toggled")
               		    --      potentially add message about toggle state https://www.reddit.com/r/neovim/comments/vbf609/comment/id5tbuz/
@@ -1181,76 +1236,40 @@ vim.api.nvim_set_keymap('n', '<Leader>l', '<Cmd>noh<CR>', kopts)
                             	    }
                             	    '';
 
-            extraPlugins = builtins.attrValues {
-              inherit (pkgs.vimPlugins)
-                neoterm
-                #nnn-vim
-                faster-nvim
-                one-small-step-for-vimkind
-		nvim-hlslens
-                #   symbol-usage-nvim
-                ;
-	      # https://nix-community.github.io/nixvim/user-guide/faq.html?highlight=plugins#how-do-i-use-a-plugin-not-implemented-in-nixvim
-              symbol-usage-nvim = pkgs.vimUtils.buildVimPlugin {
-                name = "symbol-usage-nvim";
-                src = inputs.symbol-usage-nvim;
-              };
+            # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/doc.nix#L3
+            # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#enableman
+            enableMan = false;
 
-	      eyes-wide-bright = pkgs.vimUtils.buildVimPlugin {
-	        name = "eyes-wide-bright";
-		src = inputs.eyes-wide-bright;
-	      };
-            };
+            # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L41
+	    # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgspkgs
+            #nixpkgs.pkgs = pkgs;
 
-            inherit keymaps;
-
-            nixpkgs.pkgs = pkgs;
-
+            # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L133 (via
+	    # https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgsoverlays)
             # Override neovim-unwrapped with one from a flake input
             # Using `stdenv.hostPlatform` to access `system`
-            nixpkgs.overlays = [
+ /*           nixpkgs.overlays = [
               (final: prev: {
                 #neovim-unwrapped =
                 #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
 
                 vimPlugins = prev.vimPlugins // {
-                  /*
                     faster-nvim = final.vimUtils.buildVimPlugin {
                       name = "faster-nvim";
                       src = inputs.faster-nvim;
                     };
-                  */
                 };
               })
             ];
-
-            plugins = {
-              inherit
-                fzf-lua
-                mini
-                which-key
-                comment
-                lsp
-                cmp
-                cmp-buffer # m
-                trouble
-                cmp_luasnip
-                cmp-path # m
-                cmp-look # m
-                luasnip
-                gitsigns
-                telescope
-                #yazi
-                dap
-
-                ;
-            };
+	    */
+            # END of https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/default.nix
+	    # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html
+	    # END of module = ...
           };
-        # You can use `extraSpecialArgs` to pass additional arguments to your module files
-        extraSpecialArgs = {
-          # inherit (inputs) foo;
-        };
+        # extraSpecialArgs: Extra arguments to pass to the modules when using functions. Can be self in a flake, for example.
+        extraSpecialArgs = { };
 
+	# END of makeNixvimWithModule ...
       };
 
       home.packages =
@@ -1264,88 +1283,31 @@ vim.api.nvim_set_keymap('n', '<Leader>l', '<Cmd>noh<CR>', kopts)
           #  makeWrapper ${minimalPackage.outPath}/bin/nvim $out/bin/vi --argv0 nvim
           #'')
 
-          (pkgs.symlinkJoin {
-            name = lib.getName minimalPackage;
-            paths = [ minimalPackage ];
+	  minimalPackage
 
-            nativeBuildInputs = [
-              pkgs.makeWrapper
-            ];
+#          (pkgs.symlinkJoin {
+#            name = lib.getName minimalPackage;
+#            paths = [ minimalPackage ];
 
-            postBuild = ''
-              makeWrapper $out/bin/nvim $out/bin/vi \
-                --argv0 nvim
-            '';
-          })
+#            nativeBuildInputs = [
+#              pkgs.makeWrapper
+#            ];
+
+#            postBuild = ''
+#              makeWrapper $out/bin/nvim $out/bin/vi \
+#                --argv0 nvim
+#            '';
+#          })
         ];
 
-      home.sessionVariables = {
-        EDITOR = lib.mkDefault "vi";
-      };
+      #home.sessionVariables = {
+      #  EDITOR = lib.mkDefault "vi";
+      #};
 
-      custom.programs.shell.shellAliases = {
-        f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
-      };
-    }
+      #programs.nixvim.enable = true;
 
-    /*
-      (mkIf (!cfg.lightWeight) {
-            # full nvim
-            custom.programs.neovim.finalPackage = config.programs.nixvim.build.package;
-
-            programs.nixvim = lib.mkForce {
-              enable = true;
-
-              enableMan = false;
-
-              colorschemes.gruvbox.enable = true;
-
-              extraPlugins =
-                builtins.attrValues
-                  {
-                    inherit (pkgs.vimPlugins)
-                      #nnn-vim
-                      neoterm
-                      ;
-                  }
-                ++ [
-                  (pluggo "faster-nvim")
-                ];
-
-              inherit keymaps;
-
-              nixpkgs.pkgs = pkgs;
-
-              # Override neovim-unwrapped with one from a flake input
-              # Using `stdenv.hostPlatform` to access `system`
-              nixpkgs.overlays = [
-                (
-                  final: prev: {
-                    #neovim-unwrapped =
-                    #  inputs.neovim-nightly-overlay.packages.${final.stdenv.hostPlatform.system}.default;
-                  }
-                )
-              ];
-
-              plugins = {
-                inherit
-                  fzf-lua
-                  mini
-                  which-key
-                  comment
-                  lsp
-                  cmp
-                  cmp-buffer# m
-                  #cmp-emoji
-                  cmp-nvim-lsp
-                  cmp-path# m
-                  cmp_luasnip
-                  cmp-look# m
-      	    #yazi
-                  ;
-              };
-            };
-          })
-    */
-  ]);
+      #custom.programs.shell.shellAliases = {
+#  f2clip = ''vi '+execute "normal ggVG\"+y"' +wq'';
+      #};
+    };
 }

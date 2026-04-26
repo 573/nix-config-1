@@ -10,7 +10,8 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "https://channels.nixos.org/nixos-25.05/nixexprs.tar.xz";
+    nixpkgs.url = "https://channels.nixos.org/nixos-25.11/nixexprs.tar.xz";
+    nixos-2505.url = "https://channels.nixos.org/nixos-25.05/nixexprs.tar.xz";
     nixos-2405.url = "https://channels.nixos.org/nixos-24.05/nixexprs.tar.xz";
     nixos-2305.url = "https://channels.nixos.org/nixos-23.05/nixexprs.tar.xz";
     # nixpkgs-unstable is cached (also nixos-unstable). Those are basically "the latest snapshot of master to have everything built and cached".
@@ -34,7 +35,7 @@
     # https://github.com/nix-community/NixOS-WSL/discussions/735
     nixos-wsl = {
       # until https://github.com/nix-community/NixOS-WSL/issues/397
-      url = "github:nix-community/nixos-wsl/release-25.05";
+      url = "github:nix-community/nixos-wsl/release-25.11";
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
@@ -52,9 +53,13 @@
       url = "github:nix-community/home-manager/release-22.11";
       inputs.nixpkgs.follows = "nixos-2211";
     };
+    home-manager-2505 = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixos-2505";
+    };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -133,7 +138,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       # - nixpkgs master branch
       # - home-managers master branch overridden aforementioneds nixpkgs (that is currently nixos-unstable)
       # - nix-formatter-packs master branch overridden aforementioneds nixpkgs (that is currently release-22.11)
-      url = "github:nix-community/nix-on-droid";
+      url = "github:nix-community/nix-on-droid/prerelease-25.11";
       inputs.home-manager.follows = "home-manager"; # I'm overriding master@de3758e31a3a1bc79d569f5deb5dac39791bf9b6 (Sep 23, 2022) here
       inputs.nixpkgs.follows = "nixpkgs"; # I'm overriding master@9c64b91d14268cf20ea07ea7930479a75325af9f (Sep 24, 2022) here
       inputs.nix-formatter-pack.follows = "nix-formatter-pack";
@@ -482,8 +487,13 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       flake = false;
     };
 
-    nixvim = {
+    nixvim-2505 = {
       url = "github:nix-community/nixvim/nixos-25.05";
+      inputs.nixpkgs.follows = "nixos-2505";
+    };
+
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
