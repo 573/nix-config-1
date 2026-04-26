@@ -73,7 +73,7 @@ in
         yazi.enable = true;
         #xplr.enable = true;
         neovim = {
-          enable = true;
+#          enable = true;
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
         };

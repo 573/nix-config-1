@@ -29,7 +29,7 @@ in
     programs = {
       #hledger.enable = true;
       #tex.enable = true;
-      zellij.enable = true;
+#      zellij.enable = true;
       nixbuild.enable = true;
       #alacritty.enable = true;
       neovim = {

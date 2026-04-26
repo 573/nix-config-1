@@ -31,7 +31,7 @@ in
       #sops-nix.enable = true;
 #      hledger.enable = true;
 #      tex.enable = true;
-      zellij.enable = true;
+#      zellij.enable = true;
 #      nixbuild.enable = true;
 #      alacritty.enable = true;
       neovim = {

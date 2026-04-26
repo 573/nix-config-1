@@ -76,6 +76,7 @@ in
             "/home/${config.wsl.defaultUser}";
       };
       sharedModules = homeModules;
+      # explanation: https://discourse.nixos.org/t/home-manager-useuserpackages-useglobalpkgs-settings/34506
       useGlobalPkgs = true; # disables options nixpkgs.*
       useUserPackages = true;
     };
