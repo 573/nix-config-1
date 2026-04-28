@@ -42,7 +42,7 @@ in
           "--specials"
           "--hard-links"
           "--whole-file"
-          "--delete"
+#          "--delete"  # bad idea without also enforcing backups
           "--cvs-exclude"
           "--prune-empty-dirs"
           "--compress"
