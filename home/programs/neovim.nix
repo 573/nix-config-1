@@ -27,26 +27,50 @@ let
 
     autoEnableSources = true;
     settings = {
+      # see https://stackoverflow.com/a/74714258 and https://stackoverflow.com/a/74730907
+      completion = {
+        completeopt = "menu,menuone,noinsert,noselect";
+        keyword_length = 3;
+      };
       sources = [
         # alternative would only be not enable cmp and using C-x C-o - probably not how it is supposed to work,
         # see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
         # and here under lsp = ...
         { name = "nvim_lsp"; }
+        { name = "nvim_lsp_document_symbol"; }
         { name = "path"; }
         { name = "buffer"; }
+        { name = "omni"; }
+        { name = "rg"; }
+        { name = "cmdline"; }
+        { name = "cmdline-history"; }
+        { name = "nvim-lsp-signature-help"; }
+        { name = "treesitter"; }
       ];
       mapping = {
         "<C-Space>" = "cmp.mapping.complete()";
         "<C-d>" = "cmp.mapping.scroll_docs(-4)";
         "<C-e>" = "cmp.mapping.close()";
         "<C-f>" = "cmp.mapping.scroll_docs(4)";
-        "<CR>" = "cmp.mapping.confirm({ select = true })";
+        # see https://stackoverflow.com/a/74714258
+        "<CR>" = "cmp.mapping.confirm({ select = false })";
         "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
         "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
       };
     };
 
   };
+
+  cmp-cmdline.enable = true;
+  cmp-cmdline-history.enable = true;
+  cmp-nvim-lsp-signature-help.enable = true;
+  cmp-treesitter.enable = true;
+  cmp-omni.enable = true;
+  cmp-nvim-lsp.enable = true;
+  cmp-nvim-lsp-document-symbol.enable = true;
+  cmp-buffer.enable = true;
+  cmp-path.enable = true;
+  cmp-rg.enable = true;
 
   lsp-format = {
     enable = true;
@@ -222,15 +246,30 @@ let
         --	end
       '';
 
-    onAttach = ''
-      -- https://github.com/neovim/neovim/issues/33142#issue-2957264231
-      client.server_capabilities.completionProvider.triggerCharacters = vim.split("qwertyuiopasdfghjklzxcvbnm. ", "")
+    # This would be useful only for very minimal completion, i.e., only builtin lsp completion
+    # Also, in combination with cmp-nvim-lsp / cmp at least, C-x C-o does not really trigger: Only
+    # using just and only vim.lsp.completion.* without cmp.
+    # search machine: vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true }) and cmp
+    # search machine: vim.lsp.completion.enable vs nvim-cmp is it compatible
+    # search machine: c-x c-o not working when cmp plugin active
+    # https://github.com/neovim/nvim-lspconfig/wiki/Autocompletion/217feffc675a17d8ab95259ed9d4c6d62e1cd2e1#autocompletion-not-built-in-vs-completion-built-in
+    # https://github.com/hrsh7th/cmp-nvim-lsp/blob/5af77f54de1b16c34b23cba810150689a3a90312/README.md?plain=1#L9
+    # https://martinopilia.com/posts/2024/10/27/vim-config-update.html
+    # https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
+    # tl;dr while it is possible to use vim.lsp.completion next to cmp see , it might create issues
+    # due to incompatibilities
+    /*
+      onAttach = ''
+        -- https://github.com/neovim/neovim/issues/33142#issue-2957264231
+        -- remove this next line soon - only for debugging purposes inserted
+        -- client.server_capabilities.completionProvider.triggerCharacters = vim.split("qwertyuiopasdfghjklzxcvbnm. ", "")
 
-      -- see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
-      if client:supports_method('textDocument/completion') then
-        vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
-      end
-    '';
+        -- see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
+        if client:supports_method('textDocument/completion') then
+          vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
+        end
+      '';
+    */
 
     servers = {
       #ltex.enable = true;
@@ -489,6 +528,7 @@ in
 
     programs.nixvim = {
       enable = true;
+
       # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L298
       plugins = {
         inherit
@@ -499,6 +539,16 @@ in
           trouble
           telescope
           cmp
+          cmp-nvim-lsp
+          cmp-nvim-lsp-document-symbol
+          cmp-buffer
+          cmp-path
+          cmp-rg
+          cmp-omni
+          cmp-cmdline
+          cmp-cmdline-history
+          cmp-nvim-lsp-signature-help
+          cmp-treesitter
           no-neck-pain
           nvim-autopairs
           nvim-lightbulb
@@ -526,21 +576,7 @@ in
 
       # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L464
       # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
-      extraConfigLua = ''
-        require('faster').setup()
-
-        vim.g.clipboard = {
-          name = 'OSC 52',
-          copy = {                                                     
-            ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-          ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-          },
-        paste = {
-           ['+'] = require('vim.ui.clipboard.osc52').paste('+'), 
-            ['*'] = require('vim.ui.clipboard.osc52').paste('*'),                                                  
-          },                                                       
-        }
-      '';
+      #extraConfigLua = '''';
 
       # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/doc.nix#L3
       # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#enableman
@@ -558,6 +594,15 @@ in
       # https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgsoverlays)
       # Override neovim-unwrapped with one from a flake input
       # Using `stdenv.hostPlatform` to access `system`
+
+      # TODO https://nix-community.github.io/nixvim/25.11/plugins/gitlinker/index.html?highlight=osc5#pluginsgitlinkersettings
+      # https://nix-community.github.io/nixvim/25.11/clipboard/index.html?highlight=clipboar#clipboardregister
+      # https://nix-community.github.io/nixvim/25.11/clipboard/providers/index.html?highlight=clipboar#clipboardproviders
+      # and see :h clipboard and :h clipboard-osc52
+      # TODO https://jvns.ca/til/vim-osc52/
+      globals = {
+        clipboard = "osc52";
+      };
     };
 
     # see also viAlias, see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/output.nix#L19
