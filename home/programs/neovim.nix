@@ -72,6 +72,57 @@ let
   cmp-path.enable = true;
   cmp-rg.enable = true;
 
+  gitsigns = {
+    enable = true;
+    settings = {
+      current_line_blame = false;
+      current_line_blame_opts = {
+        virt_text = true;
+        virt_text_pos = "eol";
+      };
+      signcolumn = true;
+      signs = {
+        add = {
+          text = "│";
+        };
+        change = {
+          text = "│";
+        };
+        changedelete = {
+          text = "~";
+        };
+        delete = {
+          text = "_";
+        };
+        topdelete = {
+          text = "‾";
+        };
+        untracked = {
+          text = "┆";
+        };
+      };
+      watch_gitdir = {
+        follow_files = true;
+      };
+      status_formatter = ''
+        function(status)
+          local added, changed, removed = status.added, status.changed, status.removed
+          local status_txt = {}
+          if added and added > 0 then
+            table.insert(status_txt, '+' .. added)
+          end
+          if changed and changed > 0 then
+            table.insert(status_txt, '~' .. changed)
+          end
+          if removed and removed > 0 then
+            table.insert(status_txt, '-' .. removed)
+          end
+          return table.concat(status_txt, ' ')
+        end
+      '';
+    };
+  };
+
   lsp-format = {
     enable = true;
   };
@@ -549,6 +600,7 @@ in
           cmp-cmdline-history
           cmp-nvim-lsp-signature-help
           cmp-treesitter
+          gitsigns
           no-neck-pain
           nvim-autopairs
           nvim-lightbulb
