@@ -194,11 +194,14 @@ in
             nixfmt-rfc-style
             ;
 
-# see https://jvns.ca/til/vim-osc52/
-/*
-	    pbcopy = #!/bin/bash
-printf "\033]52;c;%s\007" "$(base64 | tr -d '\n')"
-*/
+          # see https://jvns.ca/til/vim-osc52/
+          pbcopy = pkgs.writeShellApplication {
+            name = "pbcopy";
+            runtimeInputs = [ pkgs.coreutils ];
+            text = ''
+              printf "\033]52;c;%s\007" "$(base64 | tr -d '\n')"
+            '';
+          };
 
           #inherit (unstable)
           # eza
