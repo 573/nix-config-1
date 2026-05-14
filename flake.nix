@@ -982,7 +982,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
 
           cachixDeployOutput = builder: name: module: {
-            ${module.pkgs.hostPlatform.system}."cachix-deploy-spec-${name}" = cachixSpecBuilder module.pkgs {
+            ${module.pkgs.stdenv.hostPlatform.system}."cachix-deploy-spec-${name}" = cachixSpecBuilder module.pkgs {
               agents.${name} = builder module;
             };
           };

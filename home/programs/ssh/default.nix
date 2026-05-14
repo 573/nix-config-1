@@ -121,15 +121,16 @@ in
 
       # all info is here https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Multiplexing
       ssh = {
-        inherit (cfg) controlMaster;
-
         enable = true;
 
-        compression = true;
-        serverAliveInterval = 30;
-        hashKnownHosts = true;
-        controlPath = "~/.ssh/socket-%C";
-        controlPersist = "10m";
+        matchBlocks."*" = {
+          controlPersist = "10m";
+          controlPath = "~/.ssh/socket-%C";
+          inherit (cfg) controlMaster;
+          hashKnownHosts = true;
+          serverAliveInterval = 30;
+          compression = true;
+        };
 
         includes = [ "~/.ssh/config.d/*" ];
         extraConfig = ''
