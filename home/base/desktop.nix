@@ -413,15 +413,16 @@ in
           mediathekview
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
+	  lxsession
           ;
         inherit (pkgs.xorg)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
           #xorg.xset
           xev
           ;
-        inherit (pkgs.lxde)
-          lxsession
-          ;
+        #inherit (pkgs.lxde)
+        #  lxsession
+        #  ;
       }
     );
 
