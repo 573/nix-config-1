@@ -168,7 +168,13 @@ in
         maim
         xdotool
         xclip
-        keepassxc
+	# on archlinux not working anymore as wpa_supplicant on archlinux that
+	# is used with netctl brings its own pcsclite package thus breaking
+	# either wpa_supplicant (pacman) or keepassxc yubikey (nix)
+	# maybe numtide/system-manager will solve that problem (also use 
+	# home-manager option then)
+	# for now will use pacman managed keepassxc
+        #keepassxc
         arandr
         xterm
         # TODO https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/ https://wiki.hyprland.org/Nix/Hyprland-on-other-distros/ https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8 https://wiki.archlinux.org/title/Display_manager
