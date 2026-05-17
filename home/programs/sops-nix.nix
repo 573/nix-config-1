@@ -90,7 +90,7 @@ in
         # just uncomment following line and comment lines after that then
         #"syncthing/id".key = "syncthing/id";
         #"syncthing/passwordFile" = { };
-        #"ssh/secret_env" = {};
+        "ssh/secret_env" = {};
 	"syncthing_maizie_cert" = { };
 	"syncthing_maizie_key"  = { };
 	#"syncthing_ts_cert" = { };
