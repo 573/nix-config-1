@@ -161,11 +161,11 @@ in
       };
     */
 
-  # FIXME careful changing that, Workaround: nix run --impure github:nix-community/nixGL -- AusweisApp
-  nixGL = {
-    packages = inputs.nixGL.packages;#import inputs.nixGL { inherit pkgs; }; # 
-    defaultWrapper = "mesa";
-  };
+    # FIXME careful changing that, Workaround: nix run --impure github:nix-community/nixGL -- AusweisApp
+    targets.genericLinux.nixGL = {
+      packages = inputs.nixGL.packages; # import inputs.nixGL { inherit pkgs; }; #
+      defaultWrapper = "mesa";
+    };
 
     programs.firefox = lib.optionalAttrs (!config.custom.base.general.wsl) {
       # stick to that (has all the links as well) https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/1
@@ -186,7 +186,7 @@ in
             oextension = shortId: uuid: {
               name = uuid;
               value = {
-	        # manual work see https://github.com/zotero/zotero-connectors/tags (https://gist.github.com/rponte/fdc0724dd984088606b0?permalink_comment_id=3666911#gistcomment-3666911): curl -s GET https://api.github.com/repos/zotero/zotero-connectors/tags | jq -r '.[].name' | head -n1
+                # manual work see https://github.com/zotero/zotero-connectors/tags (https://gist.github.com/rponte/fdc0724dd984088606b0?permalink_comment_id=3666911#gistcomment-3666911): curl -s GET https://api.github.com/repos/zotero/zotero-connectors/tags | jq -r '.[].name' | head -n1
                 install_url = "https://download.zotero.org/connector/firefox/release/Zotero_Connector-5.0.193.xpi";
                 installation_mode = "normal_installed";
               };
@@ -205,11 +205,11 @@ in
             (extension "sourcegraph-for-firefox" "sourcegraph-for-firefox@sourcegraph.com")
             (extension "linkding-extension" "{61a05c39-ad45-4086-946f-32adb0a40a9d}")
             # (extension "hackertab-dev" "{f8793186-e9da-4332-aa1e-dc3d9f7bb04c}") # nice but too distracting, use https://now.hackertab.dev/
-	    (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
-	    (oextension "zotero-connector" "zotero@chnm.gmu.edu")
-	    (extension "ghosttext" "ghosttext@bfred.it")
-	    (extension "youtube-subscription-groups" "danabok16@gmail.com")
-	    (extension "keepassxc-browser" "keepassxc-browser@keepassxc.org")
+            (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
+            (oextension "zotero-connector" "zotero@chnm.gmu.edu")
+            (extension "ghosttext" "ghosttext@bfred.it")
+            (extension "youtube-subscription-groups" "danabok16@gmail.com")
+            (extension "keepassxc-browser" "keepassxc-browser@keepassxc.org")
           ];
         # To add additional extensions, https://github.com/tupakkatapa/mozid
       };
@@ -330,23 +330,43 @@ in
               "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
 
               # TODO have to stop cargo-culting about these, clarify what works more
-	      #  i.e., https://discourse.nixos.org/t/nixos-firefox-configuration-with-policies-preferences-extensions-search-engines-and-cookie-exceptions/73747 
-	      #  might or might not get applied in about:config even though the settings make sense probably
-	      #  potentially also cc there are about some more sources:
-	      #  https://forum.level1techs.com/t/browser-hardening-privacy-anti-fingerprint-and-anti-telemetry-guide/198039
-	      #  https://forums.informaction.com/viewtopic.php?t=26365
-	      # consider https://www.waterfox.com/
-	     "trailhead.firstrun.didSeeAboutWelcome" = lock-false;
-	      "toolkit.telemetry.pioneer-new-studies-available" = lock-false;
+              #  i.e., https://discourse.nixos.org/t/nixos-firefox-configuration-with-policies-preferences-extensions-search-engines-and-cookie-exceptions/73747
+              #  might or might not get applied in about:config even though the settings make sense probably
+              #  potentially also cc there are about some more sources:
+              #  https://forum.level1techs.com/t/browser-hardening-privacy-anti-fingerprint-and-anti-telemetry-guide/198039
+              #  https://forums.informaction.com/viewtopic.php?t=26365
+              # consider https://www.waterfox.com/
+              "trailhead.firstrun.didSeeAboutWelcome" = lock-false;
+              "toolkit.telemetry.pioneer-new-studies-available" = lock-false;
 
-
-	      "browser.ai.control.default" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.linkPreviewKeyPoints" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.pdfjsAltText" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.sidebarChatbot" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.smartTabGroups" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.smartWindow" = { Value = "blocked"; Status = "locked"; };
-"browser.ai.control.translations" = { Value = "blocked"; Status = "locked"; };
+              "browser.ai.control.default" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.linkPreviewKeyPoints" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.pdfjsAltText" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.sidebarChatbot" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.smartTabGroups" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.smartWindow" = {
+                Value = "blocked";
+                Status = "locked";
+              };
+              "browser.ai.control.translations" = {
+                Value = "blocked";
+                Status = "locked";
+              };
             };
         };
       };
@@ -413,7 +433,7 @@ in
           mediathekview
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
-	  lxsession
+          lxsession
           ;
         inherit (pkgs.xorg)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc

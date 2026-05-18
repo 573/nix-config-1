@@ -115,7 +115,10 @@ in
       # https://www.google.com/search?q=+id_ed25519+keychain
       keychain = {
         enable = true;
-        agents = [ "ssh" ];
+        # deprecated, i.e., fixed by https://github.com/danielrobbins/keychain/commit/17f2961174f23047a789075a350a08cde9625364
+        # historically (https://www.funtoo.org/Funtoo:Keychain#Specifying_Agents) meant:
+        # The additional --agents ssh option tells keychain just to manage ssh-agent, and ignore gpg-agent even if it is available.
+        #agents = [ "ssh" ];
         keys = [ ];
       };
 
@@ -126,13 +129,29 @@ in
         matchBlocks."*" = {
           controlPersist = "10m";
           controlPath = "~/.ssh/socket-%C";
-          inherit (cfg) controlMaster;
+          #inherit (cfg) controlMaster;
           hashKnownHosts = true;
           serverAliveInterval = 30;
           compression = true;
+
+          # see https://github.com/nix-community/home-manager/blob/d1686dc7d36cbd1234cb226ad6ef97e882716acb/modules/programs/ssh.nix#L651
+          # default values copied here
+          forwardAgent = false;
+          addKeysToAgent = "no";
+          #compression = false;
+          #serverAliveInterval = 0;
+          serverAliveCountMax = 3;
+          #hashKnownHosts = false;
+          userKnownHostsFile = "~/.ssh/known_hosts";
+          controlMaster = "no";
+          #controlPath = "~/.ssh/master-%r@%n:%p";
+          #controlPersist = "no";
         };
 
+        enableDefaultConfig = false;
+
         includes = [ "~/.ssh/config.d/*" ];
+
         extraConfig = ''
           CheckHostIP yes
           ConnectTimeout 60

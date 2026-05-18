@@ -259,7 +259,18 @@ let
     };
   };
 
-  lspconfig.enable = true;
+  # reason:
+  # evaluation warning: nixos profile: Nixvim (plugins.web-devicons): This plugin was enabled automatically because the following plugins are enabled.
+  #                  This behaviour is deprecated. Please explicitly define `plugins.web-devicons.enable` or alternatively
+  #                  enable `plugins.mini.enable` with `plugins.mini.modules.icons` and `plugins.mini.mockDevIcons`, or
+  #                  `plugins.mini-icons.enable` with `plugins.mini-icons.mockDevIcons`.
+  #                  plugins.telescope
+  #                  plugins.trouble
+  #                  plugins.fzf-lua
+  web-devicons.enable = true;
+
+  # deprecated via lsp below, see "Note" at https://nix-community.github.io/nixvim/25.11/plugins/lspconfig/index.html#lspconfig
+  #lspconfig.enable = true;
 
   lsp = {
     enable = true;
@@ -585,7 +596,6 @@ in
         inherit
           fzf-lua
           which-key
-          lspconfig
           lsp
           trouble
           telescope
@@ -607,6 +617,7 @@ in
           faster
           lsp-format
           nvim-bqf
+          web-devicons
           ;
       };
 
