@@ -3,7 +3,7 @@
   lib,
   pkgs,
   homeDir,
-  nixos-2405,
+  #nixos-2405,
   inputs,
   ...
 }:
@@ -70,18 +70,18 @@ in
 
       neovim = {
         enable = true;
-	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixOnDroidConfigurations.sams.options.home-manager.config.type.getSubOptions [ ]'';
+      #	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixOnDroidConfigurations.sams.options.home-manager.config.type.getSubOptions [ ]'';
       };
     };
  
     # FIXME still needs the android app
-    services.tailscale.enable = true;
+    #services.tailscale.enable = true;
   };
 
-  services.restic.backups.localbackup = {
+  #services.restic.backups.localbackup = {
     
-    dailySnapshotsToKeep = 2;
-  };
+  #  dailySnapshotsToKeep = 2;
+  #};
 
   home = {
     # for compat with ../../home/programs/nixbuild.nix

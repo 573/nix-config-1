@@ -101,7 +101,7 @@ in
           enableBashIntegration = true;
         };
         bat = {
-          enable = true;
+          #enable = true;
           #package = unstable.bat;
           extraPackages = with pkgs.bat-extras; [
             batpipe
@@ -145,20 +145,20 @@ in
             #           makeWrapper ${inputs.nixvim.packages."${system}".default}/bin/nvim $out/bin/nix-nvim
             #           '')
             #nixvim-configured
-            bc
+            #bc
             file
             # httpie   # build for aarch64-linux times out, https://github.com/573/nix-config-1/actions/runs/3744580521/jobs/6358117765#step:5:7429
             #iotop
             jq
-            mmv-go
+            #mmv-go
             nmap
-            ncdu
+            #ncdu
             #nload # network traffic monitor
             #pwgen
             #ripgrep # build broken on aarch64-linux, https://github.com/573/nix-config-1/actions/runs/6309380420/job/17129186691, also build unmaintained currently
-            silver-searcher
+            #silver-searcher
             tree
-            wget
+            #wget
             yq-go
 
             gzip
@@ -177,7 +177,7 @@ in
             #actionlint
             #powerline-rs
 
-            gist
+            #gist
             fd
             sd
             #pv
@@ -190,7 +190,7 @@ in
             #            zellij
             #viddy
             #zoxide # rather home module
-            qrencode
+            #qrencode
             nixfmt
             ;
 
@@ -272,7 +272,6 @@ in
 
     (mkIf (!cfg.minimal) {
       custom = {
-        misc.util-bins.enable = true;
 
         # see ./home/programs
         programs = {
@@ -299,6 +298,7 @@ in
     })
 
     (mkIf (!cfg.lightWeight && !cfg.wsl) {
+      custom.misc.util-bins.enable = true;
       custom.programs = {
         tmux.enable = true;
         emacs-configured.enable = true;
