@@ -69,8 +69,8 @@ in
         #};
         htop.enable = true;
         nix-index.enable = true;
-        helix.enable = true;
-        yazi.enable = true;
+        #helix.enable = true;
+        #yazi.enable = true;
         #xplr.enable = true;
         neovim = {
           #          enable = true;
@@ -191,7 +191,7 @@ in
             #viddy
             #zoxide # rather home module
             qrencode
-            nixfmt-rfc-style
+            nixfmt
             ;
 
           # see https://jvns.ca/til/vim-osc52/
@@ -228,7 +228,7 @@ in
           SHELL = "bash";
           # TODO how does that interfere with same attr in neovim.nix
           #EDITOR = "vi";
-          VISUAL = config.home.sessionVariables.EDITOR;
+          # VISUAL = config.home.sessionVariables.EDITOR;
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html

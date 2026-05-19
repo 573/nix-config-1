@@ -12,7 +12,13 @@ let
   commonConfig = callPackage ./common-config.nix { };
   fileList = callPackage ./file-list.nix { };
   script = callPackage ./script { };
-  wrapProgram = callPackage ./wrap-program.nix { };
+  # ?? wrap-program rather with explicit arch to avoid
+  # error: Package ‘intel-gmmlib-22.8.2’ in /nix/store/a5aidy9jhg4zgkglc3w49klammcp62wy-source/pkgs/by-name/in/intel-gmmlib/package.nix:31 is not available on the requested hostPlatform:
+  #       hostPlatform.system = "aarch64-linux
+  # maybe not: See https://discourse.nixos.org/t/confusing-home-manager-behavior-around-targets-genericlinux-gpu-enable/76883
+  wrapProgram = callPackage ./wrap-program.nix {
+    #pkgs = pkgs.legacyPackages."x86_64-linux";
+  };
 in
 
 {

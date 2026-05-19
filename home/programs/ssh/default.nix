@@ -129,7 +129,8 @@ in
         matchBlocks."*" = {
           controlPersist = "10m";
           controlPath = "~/.ssh/socket-%C";
-          #inherit (cfg) controlMaster;
+	  # default in nixpkgs until 25.11 was controlMaster no, I take it from options atop
+          inherit (cfg) controlMaster;
           hashKnownHosts = true;
           serverAliveInterval = 30;
           compression = true;
@@ -138,33 +139,29 @@ in
           # default values copied here
           forwardAgent = false;
           addKeysToAgent = "no";
-          #compression = false;
-          #serverAliveInterval = 0;
-          serverAliveCountMax = 3;
-          #hashKnownHosts = false;
           userKnownHostsFile = "~/.ssh/known_hosts";
-          controlMaster = "no";
-          #controlPath = "~/.ssh/master-%r@%n:%p";
-          #controlPersist = "no";
+	  forwardX11Trusted = true;
+	  identitiesOnly = true;
+	  sendEnv = ["LANG" "LC_*"];
         };
-
-        enableDefaultConfig = false;
 
         includes = [ "~/.ssh/config.d/*" ];
 
         extraConfig = ''
-          CheckHostIP yes
+ 	  # Specifies the timeout (in seconds) used when connecting to the SSH server, instead of using the default system TCP timeout.
           ConnectTimeout 60
+	  # ssh-keysign is disabled by default and can only be enabled in the global client configuration file /etc/ssh/ssh_config by setting EnableSSHKeysign to “yes”.
           EnableSSHKeysign yes
+	  # Specifies whether ssh should terminate the connection if it cannot set up all requested dynamic, tunnel, local, and remote port forwardings.
           ExitOnForwardFailure yes
-          ForwardX11Trusted yes
-          IdentitiesOnly yes
+	  # This option can be used if the home directory is shared across machines. In this case localhost will refer to a different machine on each of the machines and the user will get many warnings about changed host keys.
           NoHostAuthenticationForLocalhost yes
           Protocol 2
           PubKeyAuthentication yes
-          SendEnv LANG LC_*
-          ServerAliveCountMax 30
         '';
+
+	# Extra SSH configuration options that take precedence over any host specific configuration.
+	#extraOptionOverrides = {};
       };
     };
 

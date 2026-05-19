@@ -27,6 +27,12 @@ let
     ;
 in
 {
+
+build.activation.zz_fix_proot = ''
+    echo "overwriting proot-static.new with old (and working) proot executable"
+    cp -v /data/data/com.termux.nix/files/usr/bin/proot-static /data/data/com.termux.nix/files/usr/bin/.proot-static.new
+  '';
+
   # FIXME: Move sshd config to nix-on-droid
   # DONE It is practical that this way all the files are still accessible
   build.activation.sshd = ''

@@ -38,8 +38,7 @@ in
       #tex.enable = true;
       #hledger.enable = true;
       #zellij.enable = true;
-
-
+      sops-nix.enable = true;
 
       shell = {
       envExtra = lib.mkBefore ''

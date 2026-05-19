@@ -163,6 +163,8 @@ in
 
     # FIXME careful changing that, Workaround: nix run --impure github:nix-community/nixGL -- AusweisApp
     targets.genericLinux.nixGL = {
+      # enable = true;
+      # gpu.enable = true;
       packages = inputs.nixGL.packages; # import inputs.nixGL { inherit pkgs; }; #
       defaultWrapper = "mesa";
     };

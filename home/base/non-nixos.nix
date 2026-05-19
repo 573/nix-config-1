@@ -80,6 +80,11 @@ in
         ;
     };
 
-    targets.genericLinux.enable = true;
+    # WARN llm used https://share.google/aimode/E27wUYAUTYr2Bk2NT
+    # maybe not: See https://discourse.nixos.org/t/confusing-home-manager-behavior-around-targets-genericlinux-gpu-enable/76883
+    # WARN  error: Package ‘intel-gmmlib-22.8.2’ in /nix/store/smgpp7s35v1zr9bdfn786j0afyhk1b9d-source/pkgs/by-name/in/intel-gmmlib/package.nix:31 is not available on the requested hostPlatform:
+     targets.genericLinux = lib.mkIf pkgs.stdenv.isx86_64 {
+       enable = true;
+    };
   };
 }

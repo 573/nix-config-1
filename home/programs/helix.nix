@@ -61,7 +61,7 @@ in
           # language servers / formatters
           nil
           nixd
-          nixfmt-rfc-style
+          nixfmt
           taplo
           lua-language-server
           shellcheck

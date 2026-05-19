@@ -41,14 +41,18 @@ in
         IdentityFile ${config.sops.secrets."nixbuild/my_nixbuild_key".path}
         LogLevel Debug1
         Include ${config.sops.secrets."ssh/secret_env".path}
+	# see "I received a warning from ssh that directed me to this page. What should I do?"
+	# in https://www.openssh.org/pq.html
+        IgnoreUnknown WarnWeakCrypto
+        WarnWeakCrypto no-pq-kex
     '';
 
-#    programs.ssh.knownHosts = {
-#      nixbuild = {
-#        hostNames = [ "eu.nixbuild.net" ];
-#        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
-#      };
-#    };
+    programs.ssh.knownHosts = {
+  nixbuild = {
+    extraHostNames = [ "eu.nixbuild.net" "88.99.66.151" ];
+    publicKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
+  };
+};
 
     nix = {
       distributedBuilds = true;
@@ -58,8 +62,9 @@ in
       };
       buildMachines = [
         {
-	  # see man nix.conf (/machines), can use ssh match block's host here instead full hostname
-          hostName = "nixbuild";
+	  # TODO see man nix.conf (/machines), can use ssh match block's host here instead full hostname, 
+	  # but tests on NixOS-WSL needed
+          hostName = "eu.nixbuild.net";
           systems = [ "x86_64-linux" "aarch64-linux" "armv7l-linux" ];
           maxJobs = 100;
           supportedFeatures = [
