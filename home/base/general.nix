@@ -227,8 +227,8 @@ in
           PAGER = lib.getExe pkgs.less;
           SHELL = "bash";
           # TODO how does that interfere with same attr in neovim.nix
-          #EDITOR = "vi";
-          # VISUAL = config.home.sessionVariables.EDITOR;
+          EDITOR = "nvim";
+          VISUAL = "nvim"; #config.home.sessionVariables.EDITOR;
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html

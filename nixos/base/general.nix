@@ -102,6 +102,7 @@ in
       ];
 
       # Select internationalisation properties.
+      # see https://github.com/NixOS/nixpkgs/blob/43b7138226a3e7207c6a23dfb72c6604117a2b0f/doc/release-notes/rl-2505.section.md?plain=1#L467
       i18n.defaultLocale = "en_US.UTF-8";
 
       i18n.extraLocaleSettings = {

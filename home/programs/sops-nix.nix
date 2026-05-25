@@ -91,6 +91,7 @@ in
         #"syncthing/id".key = "syncthing/id";
         #"syncthing/passwordFile" = { };
         "ssh/secret_env" = {};
+        "ssh/my-nixbuild-key" = {};
 	"syncthing_maizie_cert" = { };
 	"syncthing_maizie_key"  = { };
 	#"syncthing_ts_cert" = { };

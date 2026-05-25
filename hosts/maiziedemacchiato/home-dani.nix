@@ -239,11 +239,11 @@ in
       #"${config.home.homeDirectory}/projects/sedo/devops-scripts/bin"
     ];
 
-    sessionVariables = {
-      # see: https://github.com/NixOS/nixpkgs/issues/38991#issuecomment-400657551
-      LOCALE_ARCHIVE_2_11 = "/usr/bin/locale/locale-archive";
-      LOCALE_ARCHIVE_2_27 = mkDefault "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
-    };
+    #sessionVariables = {
+    #  # see: https://github.com/NixOS/nixpkgs/issues/38991#issuecomment-400657551
+    #  LOCALE_ARCHIVE_2_11 = mkDefault "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
+    #  LOCALE_ARCHIVE_2_27 = mkDefault "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
+    #};
   };
 
   # not started as of release-23.05

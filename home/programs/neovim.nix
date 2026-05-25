@@ -648,6 +648,12 @@ in
       # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/output.nix#L19
       # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#vialias
       viAlias = true;
+      vimAlias = true;
+
+      env = {
+        EDITOR = "nvim";
+	VISUAL = "nvim";
+      };
 
       # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L41
       # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgspkgs
@@ -671,7 +677,8 @@ in
     # see also viAlias, see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/output.nix#L19
     # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#vialias
     home.sessionVariables = {
-      EDITOR = lib.mkDefault "vi";
+      EDITOR = lib.mkDefault "nvim";
+      VISUAL = lib.mkDefault "nvim";
     };
   };
 }

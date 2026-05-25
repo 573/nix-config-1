@@ -69,6 +69,7 @@ in
           trusted-public-keys
           ;
 
+        # TODO could as well use https://home-manager-options.extranix.com/?query=nix.buildMachines&release=release-25.11 here
         builders = concatStringsSep ";" cfg.builders;
         builders-use-substitutes = mkIf (cfg.builders != [ ]) true;
         trusted-users = [ config.home.username ];

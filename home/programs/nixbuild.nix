@@ -12,7 +12,9 @@ let
     mkMerge
     ;
 
-  nixbuild-builder = lib.optionalString config.custom.base.non-nixos.enable "ssh-ng://root@eu.nixbuild.net aarch64-linux,armv7l-linux,x86_64-linux ${config.home.homeDirectory}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
+  nixbuild-builder = lib.optionalString config.custom.base.non-nixos.enable ''
+    ssh-ng://root@eu.nixbuild.net aarch64-linux,armv7l-linux,x86_64-linux ${config.sops.secrets."ssh/my-nixbuild-key".path} 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K
+    '';
 
   cfg = config.custom.programs.nixbuild;
 in
@@ -40,10 +42,13 @@ in
 	    "IPQoS" = "throughput";
 	    # Rather no Debug3 here as that leaks secrets, still could use -vvv command line option when needed
 	    "LogLevel" = "Debug1";
+	    "IgnoreUnknown" = "WarnWeakCrypto";
+            "WarnWeakCrypto" = "no-pq-kex";
 	  };
           serverAliveInterval = 60;
 	  identitiesOnly = true;
-          identityFile = "${config.home.homeDirectory}/.ssh/my-nixbuild-key";
+          identityFile = "${config.sops.secrets."ssh/my-nixbuild-key".path}";
+	  hashKnownHosts = true;
 	  #setEnv = {
 	  #  # builtins.readFile would put the secret into store
 	  # Also not what to do, rather use ssh -F config-loc with https://github.com/Mic92/sops-nix?tab=readme-ov-file#templates
