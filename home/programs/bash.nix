@@ -1,7 +1,8 @@
-{ config, lib, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   inherit (lib)
+    mkAfter
     mkBefore
     mkEnableOption
     mkIf
@@ -56,13 +57,54 @@ in
 		bind Space:magic-space
       '';
 
-      bashrcExtra = ''
+      bashrcExtra = lib.mkMerge [
+''
       # DONE add https://github.com/magicmonty/bash-git-prompt to flake or make module 
       #if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
         GIT_PROMPT_ONLY_IN_REPO=1
 	source "${inputs.bash-git-prompt}/gitprompt.sh"
       #fi
-      '';
+
+      # see https://junegunn.github.io/fzf/tips/ripgrep-integration/#8-handle-multiple-selections
+	    # ripgrep->fzf->vim [QUERY], vim install assumed
+rfv() (
+  RELOAD='reload:${lib.getExe' pkgs.ripgrep "rg"} --column --color=always --smart-case {q} || :'
+  # shellcheck disable=SC2016
+  OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
+            vim {1} +{2}     # No selection. Open the current line in Vim.
+          else
+            vim +cw -q {+f}  # Build quickfix list for the selected items.
+          fi'
+  ${lib.getExe' pkgs.fzf "fzf"} --disabled --ansi --multi \
+      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+      --bind "enter:become:$OPENER" \
+      --bind "ctrl-o:execute:$OPENER" \
+      --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
+      --delimiter : \
+      --preview 'cat {2} {1}' \
+      --preview-window '~4,+{2}+4/3,<80(up)' \
+      --query "$*"
+)
+      ''
+      # https://fzf-obc.readthedocs.io/en/1.3.0/installation/#add-fzf-obc-to-your-bashrc
+      # Make sure that fzf-obc is always the last completion script loaded in your profile
+    (mkAfter ''
+    # from here: https://medium.com/@dvieitest/enhance-your-terminal-workflow-with-fzf-custom-completions-cc0e462cc483
+#      _fzf_complete_docker() {
+#    ARGS="$@"
+#    if [[ "$ARGS" == "docker exec"* ]]; then
+#      _fzf_complete --preview 'docker container logs {1} | ${lib.getExe' pkgs.coreutils "tail"}' -- "$@" < <(
+#        docker container ls --format "table {{ .ID }}\t{{ .Image }}\t{{ .Names }}" | ${lib.getExe' pkgs.gawk "awk"} 'NR>1 {print $0}'
+#      )
+#    fi
+#}
+
+#_fzf_complete_docker_post() {
+#  ${lib.getExe' pkgs.gawk "awk"} '{print $1}'
+#}
+
+     source ${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh
+'')]; 
     };
 
   };
