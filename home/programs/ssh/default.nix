@@ -126,10 +126,12 @@ in
       ssh = {
         enable = true;
 
+        enableDefaultConfig = false;
+
         matchBlocks."*" = {
           controlPersist = "10m";
           controlPath = "~/.ssh/socket-%C";
-	  # default in nixpkgs until 25.11 was controlMaster no, I take it from options atop
+          # default in nixpkgs until 25.11 was controlMaster no, I take it from options atop
           inherit (cfg) controlMaster;
           hashKnownHosts = true;
           serverAliveInterval = 30;
@@ -140,28 +142,31 @@ in
           forwardAgent = false;
           addKeysToAgent = "no";
           userKnownHostsFile = "~/.ssh/known_hosts";
-	  forwardX11Trusted = true;
-	  identitiesOnly = true;
-	  sendEnv = ["LANG" "LC_*"];
+          forwardX11Trusted = true;
+          identitiesOnly = true;
+          sendEnv = [
+            "LANG"
+            "LC_*"
+          ];
         };
 
         includes = [ "~/.ssh/config.d/*" ];
 
-        extraConfig = ''
- 	  # Specifies the timeout (in seconds) used when connecting to the SSH server, instead of using the default system TCP timeout.
-          ConnectTimeout 60
-	  # ssh-keysign is disabled by default and can only be enabled in the global client configuration file /etc/ssh/ssh_config by setting EnableSSHKeysign to “yes”.
-          EnableSSHKeysign yes
-	  # Specifies whether ssh should terminate the connection if it cannot set up all requested dynamic, tunnel, local, and remote port forwardings.
-          ExitOnForwardFailure yes
-	  # This option can be used if the home directory is shared across machines. In this case localhost will refer to a different machine on each of the machines and the user will get many warnings about changed host keys.
-          NoHostAuthenticationForLocalhost yes
-          Protocol 2
-          PubKeyAuthentication yes
-        '';
+        extraConfig = lib.concatLines [
+          # Specifies the timeout (in seconds) used when connecting to the SSH server, instead of using the default system TCP timeout
+          "ConnectTimeout 60"
+          # ssh-keysign is disabled by default and can only be enabled in the global client configuration file /etc/ssh/ssh_config by setting EnableSSHKeysign to “yes”
+          "EnableSSHKeysign yes"
+          # Specifies whether ssh should terminate the connection if it cannot set up all requested dynamic, tunnel, local, and remote port forwardings
+          "ExitOnForwardFailure yes"
+          # This option can be used if the home directory is shared across machines. In this case localhost will refer to a different machine on each of the machines and the user will get many warnings about changed host keys
+          "NoHostAuthenticationForLocalhost yes"
+          "Protocol 2"
+          "PubKeyAuthentication yes"
+        ];
 
-	# Extra SSH configuration options that take precedence over any host specific configuration.
-	#extraOptionOverrides = {};
+        # Extra SSH configuration options that take precedence over any host specific configuration.
+        #extraOptionOverrides = {};
       };
     };
 
