@@ -219,7 +219,8 @@ let
   faster = {
     enable = true;
 
-    settings = {
+    /*settings = {
+      # WARN deactivates lsp, if configured wrong
       behaviours = {
         bigfile = {
           extra_patterns = [
@@ -257,6 +258,7 @@ let
         };
       };
     };
+    */
   };
 
   # reason:
@@ -270,7 +272,8 @@ let
   web-devicons.enable = true;
 
   # deprecated via lsp below, see "Note" at https://nix-community.github.io/nixvim/25.11/plugins/lspconfig/index.html#lspconfig
-  #lspconfig.enable = true;
+  # but on 25.11 no Lsp server is found without it, so left it enabled.
+  lspconfig.enable = true;
 
   lsp = {
     enable = true;
@@ -597,6 +600,7 @@ in
           fzf-lua
           which-key
           lsp
+	  lspconfig
           trouble
           telescope
           cmp
