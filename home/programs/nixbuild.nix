@@ -91,7 +91,7 @@ in
 
     {
 
-      nix.buildMachines.nixbuild = {
+      nix.buildMachines = [{
         hostName = "eu.nixbuild.net";
         maxJobs = 100;
         protocol = "ssh-ng";
@@ -108,7 +108,8 @@ in
           "armv7l-linux"
           "x86_64-linux"
         ];
-      };
+      }
+      ];
 
       #      nix.buildMachines = [ "eu.nixbuild.net" ];
 
