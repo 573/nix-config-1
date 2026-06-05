@@ -74,32 +74,32 @@ in
       validateSopsFiles = false;
       defaultSopsFile = "${config.home.homeDirectory}/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
       age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
- 
+
       # see https://github.com/Mic92/sops-nix/issues/498
       #templates."nixbuild-sshconfig".content = ''${config.sops.placeholder."signing_key/secret_key"}'';
 
       # see https://discourse.nixos.org/t/sops-nix-secrets-yaml-is-not-valid-and-key-cannot-be-found/68071/5
       # also (not tested as it seems to imply --impure as well) https://github.com/Mic92/sops-nix/issues/287#issuecomment-1764207071
       secrets = {
-        "paperless/admin_password" = {};
-        "paperless/secret_key" = {};
-        "paperless/db_password" = {};
+        "paperless/admin_password" = { };
+        "paperless/secret_key" = { };
+        "paperless/db_password" = { };
         # TODO to provoke the error where key leaking is demonstrated, i.e.,
         # secrets.yaml in store as opposed to the recipe spec
         # /nix/store/hash-secrets.yaml
         # just uncomment following line and comment lines after that then
         #"syncthing/id".key = "syncthing/id";
         #"syncthing/passwordFile" = { };
-        "ssh/secret_env" = {};
-        "ssh/my-nixbuild-key" = {};
-	"syncthing_maizie_cert" = { };
-	"syncthing_maizie_key"  = { };
-	#"syncthing_ts_cert" = { };
-	#"syncthing_ts_key"  = { };
-	# seems needed on nixos 
-	#"ssh/secret_env" = {
-	#  key = "ssh/secret_env";
-	#};
+        "nixbuild/secret_env" = { };
+        "nixbuild/my_nixbuild_key" = { };
+        #"syncthing_maizie_cert" = { };
+        #"syncthing_maizie_key"  = { };
+        #"syncthing_ts_cert" = { };
+        #"syncthing_ts_key"  = { };
+        # seems needed on nixos
+        #"ssh/secret_env" = {
+        #  key = "ssh/secret_env";
+        #};
       };
       #  sopsFile = ...;
       #};

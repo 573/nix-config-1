@@ -29,12 +29,11 @@ in
     programs = {
       #hledger.enable = true;
       #tex.enable = true;
-#      zellij.enable = true;
-      nixbuild.enable = true;
+      #      zellij.enable = true;
       #alacritty.enable = true;
       neovim = {
         enable = true;
-	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.nixos.options.home-manager.users.type.getSubOptions [ ]'';
+        nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.nixos.options.home-manager.users.type.getSubOptions [ ]'';
       };
     };
 
@@ -55,15 +54,6 @@ in
   # see https://github.com/wezterm/wezterm/issues/2826#issuecomment-1426557160
   programs.wezterm.enableBashIntegration = true;
 
-  #  programs.doom-emacs = {
-  #    enable = true;
-  #    doomPrivateDir = "${rootPath}/home/misc/doom.d";
-  #  };
-
-  # https://discourse.nixos.org/t/whats-the-difference-between-extraargs-and-specialargs-for-lib-eval-config-nix/5281/2
-  #  disabledModules = [ "programs/password-store.nix" ];
-  # hyprland has no module in home-manager@release-23.05
-
   # DONT anymore, this hack isn't needed anymore since https://github.com/nix-community/home-manager/blob/release-23.11/modules/services/window-managers/hyprland.nix
   #imports = [
   #  (args@{ config, lib, pkgs, ... }:
@@ -73,13 +63,8 @@ in
   #  )
   #];
 
-  home.file.".mob".text = ''
-    MOB_TIMER_USER="Daniel"
-    MOB_DONE_SQUASH="squash-wip"
-  '';
-
   home.packages = attrValues {
-    #with pkgs; [   
+    #with pkgs; [
     inherit (pkgs)
       #alejandra
       shellharden
@@ -126,7 +111,7 @@ in
       nix-prefetch
       hadolint
       hurl
-      android-studio
+      #      android-studio
       ;
 
     inherit (pkgs.python3Packages)

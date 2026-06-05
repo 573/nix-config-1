@@ -34,6 +34,8 @@ in
 
   config = mkIf cfg.enable {
 
+    # FIXME see https://search.nixos.org/options?channel=25.11&query=programs.ssh.knownHosts#show=option%253Aprograms.ssh.knownHosts,
+    #  but declare in nixos/programs/nixbuild.nix
     services.openssh = {
       inherit (cfg) forwardX11;
       enable = true;

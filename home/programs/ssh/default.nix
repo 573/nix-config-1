@@ -141,16 +141,37 @@ in
           # default values copied here
           forwardAgent = false;
           addKeysToAgent = "no";
-          userKnownHostsFile = "~/.ssh/known_hosts";
+          #          userKnownHostsFile = "~/.ssh/known_hosts";
           forwardX11Trusted = true;
           identitiesOnly = true;
+          # FIXME issue with gitolite, see https://stackoverflow.com/a/2510548
           sendEnv = [
             "LANG"
             "LC_*"
           ];
         };
 
-        includes = [ "~/.ssh/config.d/*" ];
+	matchBlocks."nixbuild-shell" = {
+            hostname  = "eu.nixbuild.net";
+            user = "root";
+	    extraOptions = {
+            "LogLevel" = "Debug1";
+            "IgnoreUnknown" = "WarnWeakCrypto";
+            "WarnWeakCrypto" = "no-pq-kex";
+            "PubKeyAcceptedKeyTypes" = "ssh-ed25519";
+            "IPQoS" = "throughput";
+	    };
+            serverAliveInterval = 60;
+            identitiesOnly = true;
+            identityFile = "/home/nixos/.ssh/id_ed25519";
+	};
+
+        # WARNING might break ssh nixbuild setup again
+        # UPDATE seemed to work, build reads /etc/ssh/ssh_config
+        includes = [
+          "~/.ssh/config.d/*"
+        #  "/etc/ssh/ssh_config"
+        ];
 
         extraConfig = lib.concatLines [
           # Specifies the timeout (in seconds) used when connecting to the SSH server, instead of using the default system TCP timeout

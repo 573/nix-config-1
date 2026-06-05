@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  #unstable,
+  inputs,
   ...
 }:
 
@@ -78,6 +78,32 @@ let
         realpath $(which -a $1)
       }
 
+      # see https://junegunn.github.io/fzf/tips/ripgrep-integration/#8-handle-multiple-selections
+      # ripgrep->fzf->vim [QUERY], vim install assumed
+      rfv() (
+	  RELOAD='reload:${lib.getExe' pkgs.ripgrep "rg"} --column --color=always --smart-case {q} || :'
+	  # shellcheck disable=SC2016
+	  OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
+		    vim {1} +{2}     # No selection. Open the current line in Vim.
+		  else
+		    vim +cw -q {+f}  # Build quickfix list for the selected items.
+		  fi'
+	  ${lib.getExe' pkgs.fzf "fzf"} --disabled --ansi --multi \
+	      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+	      --bind "enter:become:$OPENER" \
+	      --bind "ctrl-o:execute:$OPENER" \
+	      --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
+	      --delimiter : \
+	      --preview 'cat {2} {1}' \
+	      --preview-window '~4,+{2}+4/3,<80(up)' \
+	      --query "$*"
+      )
+
+      GIT_PROMPT_ONLY_IN_REPO=1
+      source "${inputs.bash-git-prompt}/gitprompt.sh"
+
+      source ${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh
+
       ${pkgs.ncurses}/bin/tabs -4 # set tab width to 4 spaces
     ''
 
@@ -113,7 +139,8 @@ let
       rm = "rm -iv";
       ln = "ln -iv";
 
-      cat = "${pkgs.bat}/bin/bat --color=always --paging=never --style=plain";
+      # WARNING do not use, as it brings errors all the time, i.e., when using cat in a pipe, i.e., cat file-with-base64 | [...] | base64 -d, I always forget to use the unaliased, aka \cat, version and loose hours debugging
+      #cat = "${pkgs.bat}/bin/bat --color=always --paging=never --style=plain";
 
       # FIXME python dependency doesn't build on n-o-d prerelease-25.11
       #ytmp3 = ''${pkgs.yt-dlp}/bin/yt-dlp -x --continue --add-metadata --embed-thumbnail --audio-format mp3 --audio-quality 0 --metadata-from-title="%(artist)s - %(title)s" --prefer-ffmpeg -o "%(title)s.%(ext)s"'';

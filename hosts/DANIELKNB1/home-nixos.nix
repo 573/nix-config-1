@@ -27,20 +27,13 @@ in
     };
 
     programs = {
-      # DONT, rather via nixos module
-      #sops-nix.enable = true;
 #      hledger.enable = true;
 #      tex.enable = true;
 #      zellij.enable = true;
-#      nixbuild.enable = true;
 #      alacritty.enable = true;
       neovim = {
         enable = true;
 	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
-      };
-      # FIXME WIP currently restructuring the nixbuild infra I use hm / nixos, this is DRY candidate
-      shell.shellAliases = {
-        nixbuild-shell = "sudo ${lib.getExe pkgs.rlwrap} ssh nixbuild shell";
       };
  };
 
@@ -60,39 +53,6 @@ in
 
   # see https://github.com/wezterm/wezterm/issues/2826#issuecomment-1426557160
   programs.wezterm.enableBashIntegration = true;
-
-  programs.television = { 
-    # will try it again, when on 25.11+
-    #enable = true;
-    enableBashIntegration = true;
-    channels = {
-      # wait until https://github.com/nix-community/home-manager/blob/release-25.11/tests/modules/programs/television/basic-config.nix which has 98aed44
-      # https://github.com/nix-community/home-manager/blob/release-25.05/tests/modules/programs/television/basic-config.nix still uses the wrong place for user channels
-    };
-  };
-
-  #  programs.doom-emacs = {
-  #    enable = true;
-  #    doomPrivateDir = "${rootPath}/home/misc/doom.d";
-  #  };
-
-  # https://discourse.nixos.org/t/whats-the-difference-between-extraargs-and-specialargs-for-lib-eval-config-nix/5281/2
-  #  disabledModules = [ "programs/password-store.nix" ];
-  # hyprland has no module in home-manager@release-23.05
-
-  # DONT anymore, this hack isn't needed anymore since https://github.com/nix-community/home-manager/blob/release-23.11/modules/services/window-managers/hyprland.nix
-  #imports = [
-  #  (args@{ config, lib, pkgs, ... }:
-  #    # Pattern: home-manager@master follows nixpkgs@nixpkgs-unstable
-  #    import "${inputs.latest-home-manager.outPath}/modules/services/window-managers/hyprland.nix"
-  #      (args // { pkgs = inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}; })
-  #  )
-  #];
-
-  home.file.".mob".text = ''
-    MOB_TIMER_USER="Daniel"
-    MOB_DONE_SQUASH="squash-wip"
-  '';
 
   home.packages = attrValues {
     #with pkgs; [   
@@ -142,7 +102,7 @@ in
       nix-prefetch
       hadolint
       hurl
-      android-studio
+#      android-studio
       ;
 
     inherit (pkgs.python3Packages)

@@ -132,7 +132,8 @@ in
             trusted-public-keys
             ;
 
-          trusted-users = [ "root" ] ++ optional (!cfg.wsl) "dani" ++ optional cfg.wsl "nixos";
+           # see https://github.com/NixOS/nixpkgs/blob/25f538306313eae3927264466c70d7001dcea1df/nixos/modules/config/nix.nix#L290
+          trusted-users = lib.mkAfter [ "@wheel" ];
         };
 
         inherit (commonConfig.nix)

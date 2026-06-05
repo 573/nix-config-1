@@ -27,7 +27,7 @@ let
     if isLinux && isAarch64 then
       "${config.home.homeDirectory}/.ssh/my-nixbuild-key"
     else
-      "${config.sops.secrets."ssh/my-nixbuild-key".path}";
+      "${config.sops.secrets."nixbuild/my_nixbuild_key".path}";
 
   cfg = config.custom.programs.nixbuild;
 in
@@ -61,7 +61,7 @@ in
                 if isLinux && isAarch64 then
                   "${config.home.homeDirectory}/.ssh/secret_env"
                 else
-                  "${config.sops.secrets."ssh/secret_env".path}";
+                  "${config.sops.secrets."nixbuild/secret_env".path}";
               "PubkeyAcceptedKeyTypes" = "ssh-ed25519";
               "IPQoS" = "throughput";
               # Rather no Debug3 here as that leaks secrets, still could use -vvv command line option when needed
@@ -91,8 +91,39 @@ in
 
     {
 
+      programs.ssh = {
+        matchBlocks = {
+	  nixbuild = {
+            hostname = "eu.nixbuild.net";
+            user = "root";
+            extraOptions =
+	    {
+              "Include" =
+                let
+                  inherit (pkgs.stdenv) isLinux isAarch64;
+                in
+                if isLinux && isAarch64 then
+                  "${config.home.homeDirectory}/.ssh/secret_env"
+                else
+                  "${config.sops.secrets."nixbuild/secret_env".path}";
+              "PubkeyAcceptedKeyTypes" = "ssh-ed25519";
+              "IPQoS" = "throughput";
+              # Rather no Debug3 here as that leaks secrets, still could use -vvv command line option when needed
+              "LogLevel" = "Debug1";
+              "IgnoreUnknown" = "WarnWeakCrypto";
+              "WarnWeakCrypto" = "no-pq-kex";
+            };
+            serverAliveInterval = 60;
+            identitiesOnly = true;
+            identityFile = my_key;
+            hashKnownHosts = true;
+	  };
+	};
+      };
+
       nix.buildMachines = [{
-        hostName = "eu.nixbuild.net";
+        #hostName = "eu.nixbuild.net";
+        hostName = "nixbuild";
         maxJobs = 100;
         protocol = "ssh-ng";
         publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
@@ -111,16 +142,18 @@ in
       }
       ];
 
-      #      nix.buildMachines = [ "eu.nixbuild.net" ];
-
-      home.packages = builtins.attrValues {
-        inherit (pkgs)
-          rlwrap
-          ;
+      nix.settings = {
+        builders-use-substitutes = true;
       };
 
+      nix.extraOptions = lib.concatLines [
+        "builders = @/home/nixos/.config/nix/machines"
+      ];
+
+      #      nix.buildMachines = [ "eu.nixbuild.net" ];
+
       custom.programs.shell.shellAliases = {
-        nixbuild-shell = "nix run nixpkgs#rlwrap ssh nixbuild shell";
+        nixbuild-shell = "${lib.getExe pkgs.rlwrap} ssh nixbuild shell";
       };
 
     }
