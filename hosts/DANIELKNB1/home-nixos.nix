@@ -27,15 +27,16 @@ in
     };
 
     programs = {
-#      hledger.enable = true;
-#      tex.enable = true;
-#      zellij.enable = true;
-#      alacritty.enable = true;
+      #      hledger.enable = true;
+      #      tex.enable = true;
+      #      zellij.enable = true;
+      #      alacritty.enable = true;
+      nixbuild.enable = true;
       neovim = {
         enable = true;
-	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+        nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
       };
- };
+    };
 
     development = {
       nix.nixos.enable = true;
@@ -55,7 +56,7 @@ in
   programs.wezterm.enableBashIntegration = true;
 
   home.packages = attrValues {
-    #with pkgs; [   
+    #with pkgs; [
     inherit (pkgs)
       #alejandra
       shellharden
@@ -102,7 +103,7 @@ in
       nix-prefetch
       hadolint
       hurl
-#      android-studio
+      #      android-studio
       ;
 
     inherit (pkgs.python3Packages)

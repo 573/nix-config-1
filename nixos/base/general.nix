@@ -74,12 +74,15 @@ in
         shellAliases = mkForce { };
       };
 
-#error:
-#       Failed assertions:
-#       - nixos profile: xdg.portal: since you installed Home Manager via its NixOS module and
-#       'home-manager.useUserPackages' is enabled, you need to add
+      #error:
+      #       Failed assertions:
+      #       - nixos profile: xdg.portal: since you installed Home Manager via its NixOS module and
+      #       'home-manager.useUserPackages' is enabled, you need to add
 
-       environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
+      environment.pathsToLink = [
+        "/share/applications"
+        "/share/xdg-desktop-portal"
+      ];
 
       home-manager = {
         inherit (commonConfig.homeManager.baseConfig)
@@ -132,7 +135,7 @@ in
             trusted-public-keys
             ;
 
-           # see https://github.com/NixOS/nixpkgs/blob/25f538306313eae3927264466c70d7001dcea1df/nixos/modules/config/nix.nix#L290
+          # see https://github.com/NixOS/nixpkgs/blob/25f538306313eae3927264466c70d7001dcea1df/nixos/modules/config/nix.nix#L290
           trusted-users = lib.mkAfter [ "@wheel" ];
         };
 
@@ -154,6 +157,15 @@ in
         # FIXME this should go in host configuration.nix as each host
         # can be bootstrapped on a different version
         stateVersion = "24.11";
+      };
+
+      # reason: https://discourse.nixos.org/t/how-to-completely-disable-coredump/77335
+      systemd.coredump = {
+        enable = true; # If false, systemd will not handle dumps, making the next bit useless
+        extraConfig = ''
+          Storage=none
+          ProcessSizeMax=0
+        '';
       };
 
       time.timeZone = "Europe/Berlin";

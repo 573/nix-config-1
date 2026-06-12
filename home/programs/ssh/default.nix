@@ -151,26 +151,11 @@ in
           ];
         };
 
-	matchBlocks."nixbuild-shell" = {
-            hostname  = "eu.nixbuild.net";
-            user = "root";
-	    extraOptions = {
-            "LogLevel" = "Debug1";
-            "IgnoreUnknown" = "WarnWeakCrypto";
-            "WarnWeakCrypto" = "no-pq-kex";
-            "PubKeyAcceptedKeyTypes" = "ssh-ed25519";
-            "IPQoS" = "throughput";
-	    };
-            serverAliveInterval = 60;
-            identitiesOnly = true;
-            identityFile = "/home/nixos/.ssh/id_ed25519";
-	};
-
         # WARNING might break ssh nixbuild setup again
         # UPDATE seemed to work, build reads /etc/ssh/ssh_config
         includes = [
           "~/.ssh/config.d/*"
-        #  "/etc/ssh/ssh_config"
+          #  "/etc/ssh/ssh_config"
         ];
 
         extraConfig = lib.concatLines [

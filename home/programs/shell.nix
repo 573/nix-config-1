@@ -99,6 +99,25 @@ let
 	      --query "$*"
       )
 
+      # I have a global ssh config for nixbuild that uses an include pointing
+      # to a file readable by root aka the nix-daemon only.
+      # Thus when using non-root ssh config without -F ssh parameter this
+      # include aka file is always tried to be parsed which fails due to
+      # permission situation.
+      # See, i.e., https://www.cyberciti.biz/faq/tell-ssh-to-exclude-ignore-config-file/
+      # Include /dev/null or /dev/zero also won't work, thus I simply use a
+      # shell function that automates the -F ~/.ssh/config setting.
+      ssh-do () {
+        local server
+	local arguments="$@"
+	server=$(${lib.getExe' pkgs.gnugrep "grep"} -E '^Host ' ~/.ssh/config ~/.ssh/config.d/morehosts | ${lib.getExe' pkgs.gawk "awk"} '{print $2}' | ${lib.getExe pkgs.fzf})
+	if [[ -n $server ]]; then
+	  echo Running: ${lib.getExe' pkgs.openssh "ssh"} -F ~/.ssh/config "$server" "$arguments"
+	  echo "  only hostnames supported, for ssh options passing run the raw command"
+	  ${lib.getExe' pkgs.openssh "ssh"} -F ~/.ssh/config "$server" "$arguments" 
+	fi
+      }
+
       GIT_PROMPT_ONLY_IN_REPO=1
       source "${inputs.bash-git-prompt}/gitprompt.sh"
 

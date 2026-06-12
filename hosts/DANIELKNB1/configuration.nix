@@ -140,13 +140,15 @@
       owner = config.users.users."root".name;
       mode = "0600";
       # makes a symlink to the secret itself
-      path = "/root/.ssh/id_ed25519";
+      #path = "/root/.ssh/id_ed25519";
     };
     "nixbuild/my_nixbuild_shell_key" = {
+      # TODO needs the specific owner for now hardcoded but should rather
+      #  home.username or such, i.e., via config
       owner = config.users.users."nixos".name;
       mode = "0600";
       # makes a symlink to the secret itself
-      path = "/home/nixos/.ssh/id_ed25519";
+      #path = "/home/nixos/.ssh/id_ed25519";
     };
   };
 }

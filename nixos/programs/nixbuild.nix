@@ -40,40 +40,36 @@ in
       # use root's .ssh here as nix-daemon runs with root permissions
       # The Include does add a line SetEnv SIGNING_KEY within Host block
       # Files included or referred to here need 0600 umask
-      programs.ssh = {
-        extraConfig =
-          lib.concatStringsSep "\n    " [
-            "Host nixbuild"
-            "HostName eu.nixbuild.net"
-            "User root"
-            "PubKeyAcceptedKeyTypes ssh-ed25519"
-            "ServerAliveInterval 60"
-            "IPQoS throughput"
-            "IdentitiesOnly yes"
-            "LogLevel Debug1"
-            "IgnoreUnknown WarnWeakCrypto"
-            "WarnWeakCrypto no-pq-kex"
-            "IdentityFile /root/.ssh/id_ed25519"
-            "Include ${config.sops.secrets."nixbuild/secret_env".path}"
-          ];
-      };
+      # DONT /etc/ssh/ssh_config should not be used as the Include will be attempted to be parsed at least
+      # downstream aka user ssh except I put -F ~/.ssh/config then everytime or override GIT_SSH_COMMAND
+      # which seems more cumbersome then just creating a ~/.ssh/config aka /root/.ssh/config to be used
+      # by nix-daemon for the time being
+      # /etc/ssh/ssh_config should really only contain common as in non-disputable stuff that doesn't
+      # break valid user configs or makes the latter harder to maintain
+      # programs.ssh.[...]
 
-      programs.bash.shellAliases = {
-        # After contemplating it for a while it does not make much sense to try and use nixbuild shell without
-        #  sudo even if that is a code smell.
-        #  One might duplicate the secrets needed against eu.nixbuild.net for the non-root user as well but
-        #  then IDK if that is worth it.
-        #  Long story short, see i.e., https://wiki.nixos.org/wiki/Distributed_build#Setting_up_SSH, for why
-        #  on the NixOS deployment (i.e., multi user), the ssh configuration plus secrets need to be accessible
-        #  by root.
-	# 
-	# The problem and probably a simple Host shell-on-nixbuild entry in global ssh_config would now 
-	#  work too, that there was a remnant id_ed25519.pub file next to the private id_ed25519 that belonged
-	#  to another older private IdentityFile latter which
-	#  wasn't logged somehow even with -vvvvvv on nix build, I caught it when running plain
-	#  rlwrap ssh -F ~/.ssh/config nixbuild-shell shell
-        nixbuild-shell = "${lib.getExe pkgs.rlwrap} ssh -F ~/.ssh/config nixbuild-shell shell";
-      };
+      #programs.bash.shellAliases = {
+      # After contemplating it for a while it does not make much sense to try and use nixbuild shell without
+      #  sudo even if that is a code smell.
+      #  One might duplicate the secrets needed against eu.nixbuild.net for the non-root user as well but
+      #  then IDK if that is worth it.
+      #  Long story short, see i.e., https://wiki.nixos.org/wiki/Distributed_build#Setting_up_SSH, for why
+      #  on the NixOS deployment (i.e., multi user), the ssh configuration plus secrets need to be accessible
+      #  by root.
+      #
+      # The problem and probably a simple Host shell-on-nixbuild entry in global ssh_config would now
+      #  work too, that there was a remnant id_ed25519.pub file next to the private id_ed25519 that belonged
+      #  to another older private IdentityFile latter which
+      #  wasn't logged somehow even with -vvvvvv on nix build, I caught it when running plain
+      #  rlwrap ssh -F ~/.ssh/config nixbuild-shell shell
+      #nixbuild-shell = "${lib.getExe pkgs.rlwrap} ssh -F ~/.ssh/config nixbuild-shell shell";
+      # since using ~/.ssh/config this is simpler
+      # DONT [also] this rather blongs entirely in home nixbuild.nix as the ssh stuff is configured there anyways see
+      # comments there also why it belongs in the home module rather than in the nixos module. The use of the
+      # ssh config nixbuild-shell host entry here isn't very transparent, a strong argument to put that config
+      # entirely there close to the other ssh configuration related to nixbuild
+      #nixbuild-shell = "${lib.getExe pkgs.rlwrap} ssh nixbuild-shell shell";
+      #};
 
       programs.ssh = {
         knownHosts = {
@@ -116,6 +112,8 @@ in
               "big-parallel"
             ];
             sshUser = "root";
+            # concerns nix-daemon so yes, root permissions
+            # TODO now nixos sops-nix should work here too, i.e., [...].path = "/root/.ssh/id_ed25519"; not needed
             sshKey = "/root/.ssh/id_ed25519";
             publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
             speedFactor = 2;
