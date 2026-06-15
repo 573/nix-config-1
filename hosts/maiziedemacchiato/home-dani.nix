@@ -65,9 +65,9 @@ in
 
       #zellij.enable = true;
 
-      alacritty.enable = true;
+      #alacritty.enable = true;
 
-      mpv.enable = true;
+      #mpv.enable = true;
 
       nixbuild.enable = true;
 
@@ -81,43 +81,7 @@ in
     };
   };
 
-  systemd.user.sessionVariables.STNODEFAULTFOLDER = "true";
-  # https://mipmip.github.io/home-manager-option-search/?query=syncthing
-  #home.sessionVariables.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
-  # https://wrycode.com/reproducible-syncthing-deployments/
-  # If accidentally config.xml etc. are removed while systemctl --user stop syncthing was not yet run, IDK
-  # was able to recover syncthing only be setting enable = false rebuild then remove config.xml, cert.pem and key.pem then enable = true rebuild
-  services.syncthing = {
-    # FIXME when journal error fixed back to true
-    enable = true;
-    #tray.enable = true;
-    # passwordFile might assume gui.user to be set as well, or it is for curl REST access only
-    # currently seems to have an issue with guiAddress as well - syncthing-init.service always fails
-    #passwordFile = ''${config.sops.secrets."syncthing/passwordFile".path}'';
-    key = ''${config.sops.secrets."syncthing_maizie_key".path}'';
-    cert = ''${config.sops.secrets."syncthing_maizie_cert".path}'';
-    # https://docs.syncthing.net/users/syncthing.html#cmdoption-home
-    settings = {
-      #gui = {
-      #  user = "test";
-      #};
-      options = {
-        natEnabled = false;
-        globalAnnounceEnabled = false;
-        localAnnounceEnabled = false;
-        urAccepted = -1;
-        relaysEnabled = false;
-      };
-      devices = {
-        Phone.name = "Phone";
-        Phone.id = "A3G3H6Q-RF3GJOT-AXXJSNJ-ZZCC2WW-3R55I3Y-XR5EJD7-S6RQAXT-FI6HWA2";
-        "Newer Laptop".name = "Newer Laptop";
-        "Newer Laptop".id = "FDBTMR3-XQDMU6L-AJF6WBP-WC65GPB-ZS67G4Q-7KWG3LY-2JGOSL7-Z4QUJQF";
-        Samsung.name = "Samsung";
-        Samsung.id = "KTQ3YZD-722APNB-ONOELMK-3WYUV44-75VXJYC-IFTQ43G-HDS7BZ2-X2BWWQW";
-      };
-    };
-  };
+
 
   #xsession = {
   #  enable = true;
@@ -168,12 +132,12 @@ in
         maim
         xdotool
         xclip
-	# on archlinux not working anymore as wpa_supplicant on archlinux that
-	# is used with netctl brings its own pcsclite package thus breaking
-	# either wpa_supplicant (pacman) or keepassxc yubikey (nix)
-	# maybe numtide/system-manager will solve that problem (also use 
-	# home-manager option then)
-	# for now will use pacman managed keepassxc
+        # on archlinux not working anymore as wpa_supplicant on archlinux that
+        # is used with netctl brings its own pcsclite package thus breaking
+        # either wpa_supplicant (pacman) or keepassxc yubikey (nix)
+        # maybe numtide/system-manager will solve that problem (also use
+        # home-manager option then)
+        # for now will use pacman managed keepassxc
         #keepassxc
         arandr
         xterm
@@ -203,12 +167,12 @@ in
         #spotify-player
         #gtt
         notepad-next
-	reader
+        reader
         ;
 
       inherit (nixos-unstable)
         tutanota-desktop
-	;
+        ;
 
       inherit (unstable)
         tesseract
@@ -275,6 +239,8 @@ in
       systemctl start --user xss-lock
     '';
   };
+
+#  nix.package = pkgs.nixVersions.nix_2_33;
 
   # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
   #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";

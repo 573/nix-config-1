@@ -60,7 +60,8 @@ in
         default = null;
         internal = true;
         description = ''
-          Package in home.packages.
+          #
+                    Package in home.packages.
         '';
       };
       listOfPkgs = mkOption {
@@ -69,11 +70,12 @@ in
         default = null;
         internal = true;
         description = ''
-                    list of Extra packages available to Emacs.
-          	  nix eval --json .#nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.emacs-no-el.listOfPkgs  --json
-          	  nix build ...
-          	   0.0 MiB DL] building emacs-packages-deps
-          	  nix derivation show ...
+                              list of Extra packages available to Emacs.
+                    	 nix eval --json .#nixosConfigurations.DANIELKNB1.config.home-manager.users  .nixos.custom.programs.emacs-configured.listOfPkgs --json
+          		   or [...].#homeConfigurations."dani@maiziedemacchiato".config.[...]
+                    	  nix build ...
+                    	   0.0 MiB DL] building emacs-packages-deps
+                    	  nix derivation show ...
         '';
       };
     };
@@ -116,7 +118,7 @@ in
           # See https://github.com/nix-community/emacs-overlay/blob/50e5f56/repos/elpa/elpa-generated.nix
           inherit (epkgs.elpaPackages)
             jinx # u
-            cape # u
+            ####cape # u
             corfu # u
             denote
             denote-org
@@ -151,11 +153,17 @@ in
             name = "default.el";
             # meaning el-file may contain @out@ etc. references to drv
             src = "${rootPath}/home/misc/emacs-gui.el";
-	    substitutions = [
-	      "--subst-var-by" "out" ''${builtins.placeholder "out"}''
-	      "--subst-var-by" "scowl" pkgs.scowl
-	      "--subst-var-by" "hunspellDicts_de_DE" pkgs.hunspellDicts.de_DE 
-	    ];
+            substitutions = [
+              "--subst-var-by"
+              "out"
+              "${builtins.placeholder "out"}"
+              "--subst-var-by"
+              "scowl"
+              pkgs.scowl
+              "--subst-var-by"
+              "hunspellDicts_de_DE"
+              pkgs.hunspellDicts.de_DE
+            ];
             #inherit (pkgs) scowl;
             #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
           };
@@ -176,8 +184,7 @@ in
       );
 
       custom.programs.shell.shellAliases =
-        { }
-        // optionalAttrs (isLinux && isAarch64) { emacs-no-el = "emacs-no-el -nw"; };
+        { } // optionalAttrs (isLinux && isAarch64) { emacs-no-el = "emacs-no-el -nw"; };
 
       programs.info.enable = true;
 
@@ -186,16 +193,87 @@ in
           hunspell
           aspell
           enchant
-	  ripgrep
+          ripgrep
           ;
 
         inherit (pkgs.hunspellDicts)
           en_US
           de_DE
           ;
-        inherit (config.custom.programs.emacs-configured)
-          homePackage
-          ;
+        #inherit (config.custom.programs.emacs-configured)
+        #  homePackage
+        #  ;
+      };
+
+      programs.emacs = {
+        enable = true;
+        package = inputs.unstable.legacyPackages.x86_64-linux.emacs;
+        extraPackages = # a function, parameter epkgs corresponds to https://search.nixos.org/packages?channel=26.05&query=emacsPackages.
+          epkgs:
+          builtins.attrValues {
+            inherit (epkgs)
+              moe-theme
+              bind-key
+              use-package
+              which-key
+              emacs
+              gcmh
+              org
+              #denote-silo # is only 0.2.0 https://search.nixos.org/packages?channel=26.05&query=emacsPackages.denote-silo
+              magit
+	      # melpa
+              el-fly-indent-mode
+              deadgrep
+              denote-silo # should be 0.3.0
+              doom-modeline
+              doom-themes
+              nyan-mode
+              org-cliplink
+              pink-bliss-uwu-theme
+	      # elpa
+              jinx
+              cape 
+              corfu
+              denote
+              denote-org
+              ;
+
+              # Following need emacs-overlay
+            # See https://github.com/nix-community/emacs-overlay/blob/bdb0c5b/repos/melpa/recipes-archive-melpa.json
+            #inherit (epkgs.melpaPackages)
+              #ac-ispell # https://elpa.gnu.org/packages/orderless.html, use case: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
+            #  ;
+
+            # See https://github.com/nix-community/emacs-overlay/blob/50e5f56/repos/elpa/elpa-generated.nix
+            #inherit (epkgs.elpaPackages) # vetted, i.e., less frequently updated than melpaPackages 
+              #;
+          };
+        # ;
+        #};
+
+        extraConfig =
+          builtins.readFile
+            (pkgs.substitute {
+              name = "default.el";
+              # meaning el-file may contain @out@ etc. references to drv
+              src = "${rootPath}/home/misc/emacs-gui.el";
+              substitutions = [
+                "--subst-var-by"
+                "out"
+                "${builtins.placeholder "out"}"
+                "--subst-var-by"
+                "scowl"
+                pkgs.scowl
+                "--subst-var-by"
+                "hunspellDicts_de_DE"
+                pkgs.hunspellDicts.de_DE
+              ];
+              #inherit (pkgs) scowl;
+              #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
+            }).outPath;
+
+        # homePackage was only needed on ni
+        #package = config.custom.programs.emacs-configured.finalPackage;
       };
     };
 }

@@ -100,14 +100,6 @@ in
           #package = unstable.zoxide;
           enableBashIntegration = true;
         };
-        bat = {
-          #enable = true;
-          #package = unstable.bat;
-          extraPackages = with pkgs.bat-extras; [
-            batpipe
-            batman
-          ];
-        };
         eza = {
           enable = true;
           enableBashIntegration = true;
@@ -300,7 +292,7 @@ in
     (mkIf (!cfg.lightWeight && !cfg.wsl) {
       custom.misc.util-bins.enable = true;
       custom.programs = {
-        tmux.enable = true;
+        #tmux.enable = true;
         emacs-configured.enable = true;
         #helix.enable = true;
         #yazi.enable = true;

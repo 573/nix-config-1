@@ -106,9 +106,9 @@ in
       # TODO if applies see https://github.com/Mic92/sops-nix/blob/f77d4cfa075c3de66fc9976b80e0c4fc69e2c139/README.md?plain=1#L851
       # for ~/.sops/secrets/secrets.yaml template see https://github.com/Tarow/nix-config/blob/abf0d8560594475661a0b80fd47d477cbc8a459f/secrets/secrets.yaml
       # FIXME https://github.com/search?q=repo%3Agetsops%2Fsops%20sops%20metadata%20not%20found&type=issues&p=2 I guess solution was along the lines of https://github.com/getsops/sops/issues/856#issuecomment-821153667
-    } // lib.optionalAttrs ("${config.home.username}" == "root") {
-      defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
     }
-;
+    // lib.optionalAttrs ("${config.home.username}" == "root") {
+      defaultSopsFile = "/home/nixos/.sops/secrets/secrets.yaml"; # "${homeDir}/.sops/secrets/secrets.yaml";
+    };
   };
 }

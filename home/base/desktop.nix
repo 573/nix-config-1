@@ -306,7 +306,9 @@ in
       };
       # https://home-manager-options.extranix.com/?query=firefox
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/firefox/wrapper.nix
-      package = pkgs.wrapFirefox inputs.firefox.packages.${system}.firefox-nightly-bin.unwrapped {
+      # pkgs.wrapFirefox from here https://ryantm.github.io/nixpkgs/builders/packages/firefox/
+      package = 
+      pkgs.wrapFirefox inputs.firefox.packages.${system}.firefox-nightly-bin.unwrapped {
         # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
         extraPolicies = {
           DisableTelemetry = true;
@@ -369,9 +371,10 @@ in
                 Value = "blocked";
                 Status = "locked";
               };
-            };
-        };
-      };
+            }; # Preferences
+        }; # extraPolicies
+      }; # package
+
     };
 
     # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
@@ -414,15 +417,15 @@ in
         # only install these if not on nixos-wsl
         chrome = config.lib.nixGL.wrap chrome;
         ausweisapp = config.lib.nixGL.wrap ausweisapp;
-        vlc = config.lib.nixGL.wrap vlc;
+        #vlc = config.lib.nixGL.wrap vlc;
         wezterm = config.lib.nixGL.wrap wezterm;
-        kitty = config.lib.nixGL.wrap kitty;
-        emacs = config.lib.nixGL.wrap emacs;
+        #kitty = config.lib.nixGL.wrap kitty;
+#        emacs = config.lib.nixGL.wrap emacs;
 
         inherit (pkgs)
           pavucontrol
           pdftk
-          csvkit
+          #csvkit
           qpdfview
           # https://wiki.archlinux.de/title/Openbox, https://unix.stackexchange.com/a/32217/102072
           obconf
@@ -431,8 +434,8 @@ in
           # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
           #xsecurelock # lxdm not shown
           xscreensaver
-          droidcam # host-install v4l2loopback
-          mediathekview
+        #  droidcam # host-install v4l2loopback
+         # mediathekview
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
           lxsession

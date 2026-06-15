@@ -72,13 +72,15 @@ in
         # TODO could as well use https://home-manager-options.extranix.com/?query=nix.buildMachines&release=release-25.11 here
         builders = concatStringsSep ";" cfg.builders;
         builders-use-substitutes = mkIf (cfg.builders != [ ]) true;
-        trusted-users = [ config.home.username ];
+        trusted-users = [ config.home.username "root" ];
+	#sandbox = false;
       };
 
       inherit (commonConfig.nix)
-        package
         registry
         ;
+
+      package = pkgs.nixVersions.nix_2_32;
     };
 
     # WARN llm used https://share.google/aimode/E27wUYAUTYr2Bk2NT
