@@ -20,13 +20,14 @@ in
     base = {
       desktop = {
         enable = true;
-	laptop = true;
+        laptop = true;
       };
 
     };
 
     programs = {
       nixbuild.enable = true;
+      neovim.enable = true;
     };
 
     development = {
@@ -34,17 +35,9 @@ in
     };
   };
 
-  programs = {
-    alacritty.enable = true;
-
-    wezterm = {
-      enable = true;
-      enableBashIntegration = true;
-    };
-  };
 
   home.packages = attrValues {
-    #with pkgs; [   
+    #with pkgs; [
     inherit (pkgs)
       shellharden
       shfmt

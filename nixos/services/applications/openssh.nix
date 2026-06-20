@@ -37,11 +37,13 @@ in
     # FIXME see https://search.nixos.org/options?channel=25.11&query=programs.ssh.knownHosts#show=option%253Aprograms.ssh.knownHosts,
     #  but declare in nixos/programs/nixbuild.nix
     services.openssh = {
-      inherit (cfg) forwardX11;
+      settings = {
+        PermitRootLogin = mkIf (!cfg.rootLogin) "no";
+        X11Forwarding = cfg.forwardX11;
+        PasswordAuthentication = false;
+      };
       enable = true;
       openFirewall = true;
-      permitRootLogin = mkIf (!cfg.rootLogin) "no";
-      passwordAuthentication = false;
       extraConfig = "MaxAuthTries 3";
     };
 

@@ -221,7 +221,7 @@ in
               org
               #denote-silo # is only 0.2.0 https://search.nixos.org/packages?channel=26.05&query=emacsPackages.denote-silo
               magit
-	      # melpa
+              # melpa
               el-fly-indent-mode
               deadgrep
               denote-silo # should be 0.3.0
@@ -230,48 +230,49 @@ in
               nyan-mode
               org-cliplink
               pink-bliss-uwu-theme
-	      # elpa
+              # elpa
               jinx
-              cape 
+              cape
               corfu
               denote
               denote-org
               ;
 
-              # Following need emacs-overlay
+            # Following need emacs-overlay
             # See https://github.com/nix-community/emacs-overlay/blob/bdb0c5b/repos/melpa/recipes-archive-melpa.json
             #inherit (epkgs.melpaPackages)
-              #ac-ispell # https://elpa.gnu.org/packages/orderless.html, use case: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
+            #ac-ispell # https://elpa.gnu.org/packages/orderless.html, use case: https://blog.binchen.org/posts/autocomplete-with-a-dictionary-with-hippie-expand.html
             #  ;
 
             # See https://github.com/nix-community/emacs-overlay/blob/50e5f56/repos/elpa/elpa-generated.nix
-            #inherit (epkgs.elpaPackages) # vetted, i.e., less frequently updated than melpaPackages 
-              #;
+            #inherit (epkgs.elpaPackages) # vetted, i.e., less frequently updated than melpaPackages
+            #;
           };
         # ;
         #};
 
-        extraConfig =
-          builtins.readFile
-            (pkgs.substitute {
-              name = "default.el";
-              # meaning el-file may contain @out@ etc. references to drv
-              src = "${rootPath}/home/misc/emacs-gui.el";
-              substitutions = [
-                "--subst-var-by"
-                "out"
-                "${builtins.placeholder "out"}"
-                "--subst-var-by"
-                "scowl"
-                pkgs.scowl
-                "--subst-var-by"
-                "hunspellDicts_de_DE"
-                pkgs.hunspellDicts.de_DE
-              ];
-              #inherit (pkgs) scowl;
-              #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
-            }).outPath;
-
+        /*
+          extraConfig =
+                 builtins.readFile
+                   (pkgs.substitute {
+                     name = "default.el";
+                     # meaning el-file may contain @out@ etc. references to drv
+                     src = "${rootPath}/home/misc/emacs-gui.el";
+                     substitutions = [
+                       "--subst-var-by"
+                       "out"
+                       "${builtins.placeholder "out"}"
+                       "--subst-var-by"
+                       "scowl"
+                       pkgs.scowl
+                       "--subst-var-by"
+                       "hunspellDicts_de_DE"
+                       pkgs.hunspellDicts.de_DE
+                     ];
+                     #inherit (pkgs) scowl;
+                     #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
+                   }).outPath;
+        */
         # homePackage was only needed on ni
         #package = config.custom.programs.emacs-configured.finalPackage;
       };

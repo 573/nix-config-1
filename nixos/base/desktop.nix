@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (lib)
@@ -20,13 +25,14 @@ in
     custom.base.desktop = {
       enable = mkEnableOption "basic desktop config";
 
-      enableXserver = mkEnableOption "xserver config" // { default = true; };
+      enableXserver = mkEnableOption "xserver config" // {
+        default = true;
+      };
 
       laptop = mkEnableOption "services and config for battery, network, backlight";
     };
 
   };
-
 
   ###### implementation
 
@@ -54,7 +60,7 @@ in
         enableDefaultPackages = true;
         enableGhostscriptFonts = true;
         fontDir.enable = true;
-	fontconfig.enable = true;
+        fontconfig.enable = true;
         fontconfig.defaultFonts.monospace = [ "UbuntuMono Nerd Font" ];
 
         # fc-list for font names
@@ -75,25 +81,25 @@ in
         xserver = mkIf cfg.enableXserver {
           enable = true;
 
-  # Enable the XFCE Desktop Environment.
-  displayManager.lightdm.enable = true;
-  desktopManager.xfce.enable = true;
+          # Enable the XFCE Desktop Environment.
+          displayManager.lightdm.enable = true;
+          desktopManager.xfce.enable = true;
 
-  # Configure keymap in X11
-  xkb = {
-    layout = "us";
-    variant = "intl";
-  };
+          # Configure keymap in X11
+          xkb = {
+            layout = "us";
+            variant = "intl";
+          };
         };
 
       };
 
-  # Configure console keymap
-  console.keyMap = "us-acentos";
+      # Configure console keymap
+      console.keyMap = "us-acentos";
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-  
+      # Enable CUPS to print documents.
+      services.printing.enable = true;
+
       xdg = {
         autostart.enable = true;
         icons.enable = true;
@@ -103,52 +109,52 @@ in
       };
     }
 
-    (mkIf cfg.laptop
-      {
-        hardware.bluetooth = {
+    (mkIf cfg.laptop {
+      hardware.bluetooth = {
+        enable = true;
+        disabledPlugins = [ "sap" ];
+        # fix error logs on boot
+        settings.General.Experimental = true;
+      };
+
+      networking.networkmanager = {
+        enable = true;
+        plugins = mkForce [ ]; # FIXME: disabled because openconnect is not substitutable currently
+      };
+
+      programs.light.enable = true;
+
+      services = {
+        blueman.enable = true;
+
+        libinput = mkIf cfg.enableXserver {
           enable = true;
-          disabledPlugins = [ "sap" ];
-          # fix error logs on boot
-          settings.General.Experimental = true;
-        };
-
-        networking.networkmanager = {
-          enable = true;
-          plugins = mkForce [ ]; # FIXME: disabled because openconnect is not substitutable currently
-        };
-
-        programs.light.enable = true;
-
-        services = {
-          blueman.enable = true;
-
-          libinput = mkIf cfg.enableXserver {
-            enable = true;
-            touchpad = {
-              accelProfile = "flat";
-              additionalOptions = ''
-                Option "TappingButtonMap" "lmr"
-              '';
-            };
+          touchpad = {
+            accelProfile = "flat";
+            additionalOptions = ''
+              Option "TappingButtonMap" "lmr"
+            '';
           };
-
-          logind.extraConfig = ''
-            HandlePowerKey=ignore
-          '';
-
-          # for bluetooth support
-          #25.05 pulseaudio.package = pkgs.pulseaudioFull;
-
-          tlp.enable = true;
-
-          upower.enable = true;
         };
 
-        users.users.dani.extraGroups = [ "networkmanager" "video" ];
-      }
-    )
+        logind.settings.Login = {
+          HandlePowerKey = "ignore";
+        };
+
+        # for bluetooth support
+        #25.05 pulseaudio.package = pkgs.pulseaudioFull;
+
+        tlp.enable = true;
+
+        upower.enable = true;
+      };
+
+      users.users.dani.extraGroups = [
+        "networkmanager"
+        "video"
+      ];
+    })
 
   ]);
 
 }
-
