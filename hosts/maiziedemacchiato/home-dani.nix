@@ -81,7 +81,12 @@ in
     };
   };
 
+  programs.keepassxc.enable = true;
 
+  programs.yazi = {
+    enable = true;
+    enableBashIntegration = true;
+  };
 
   #xsession = {
   #  enable = true;
