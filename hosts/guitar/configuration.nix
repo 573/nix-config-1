@@ -56,6 +56,8 @@
     Issue \e[0;32mcat /etc/issue\e[0m to show these messages again
   '';
 
+  nix.settings.auto-optimise-store = true;
+
   environment = {
     systemPackages = with pkgs; [
       drawing

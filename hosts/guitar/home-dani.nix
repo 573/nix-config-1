@@ -35,7 +35,6 @@ in
     };
   };
 
-
   home.packages = attrValues {
     #with pkgs; [
     inherit (pkgs)
@@ -48,5 +47,8 @@ in
       pcmanfm
       ;
   };
+
+  programs.element-desktop.enable = true;
+
   xdg.enable = true;
 }

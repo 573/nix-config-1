@@ -207,7 +207,7 @@ in
 
       programs.emacs = {
         enable = true;
-        package = inputs.unstable.legacyPackages.x86_64-linux.emacs;
+        package = emacs; # inputs.unstable.legacyPackages.x86_64-linux.emacs;
         extraPackages = # a function, parameter epkgs corresponds to https://search.nixos.org/packages?channel=26.05&query=emacsPackages.
           epkgs:
           builtins.attrValues {
@@ -251,7 +251,6 @@ in
         # ;
         #};
 
-        /*
           extraConfig =
                  builtins.readFile
                    (pkgs.substitute {
@@ -272,7 +271,7 @@ in
                      #inherit (pkgs) scowl;
                      #hunspellDicts_de_DE = pkgs.hunspellDicts.de_DE;
                    }).outPath;
-        */
+        
         # homePackage was only needed on ni
         #package = config.custom.programs.emacs-configured.finalPackage;
       };

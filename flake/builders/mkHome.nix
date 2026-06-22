@@ -46,8 +46,8 @@ inputs.home-manager.lib.homeManagerConfiguration {
       if isLinux && isAarch64 then
         inputs.emacs-overlay-cached.packages.${system}.emacs-unstable-nox
       else
-        inputs.nixpkgs.legacyPackages.${system}.emacs;
-        #inputs.emacs-overlay.packages.${system}.emacs-unstable;
+        #inputs.nixpkgs.legacyPackages.${system}.emacs;
+        inputs.emacs-overlay.packages.${system}.emacs-git;
 
     emacsWithPackagesFromUsePackage =
       if isLinux && isAarch64 then
