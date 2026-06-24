@@ -45,10 +45,15 @@ in
       difftastic
       nix-prefetch
       pcmanfm
+      wl-clipboard
       ;
   };
 
-  programs.element-desktop.enable = true;
+  programs = {
+    element-desktop.enable = true;
+    keepassxc.enable = true;
+    chromium.enable = true;
+  };
 
   xdg.enable = true;
 }

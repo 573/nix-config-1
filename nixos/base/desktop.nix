@@ -49,13 +49,6 @@ in
 
       custom.system.boot.mode = "efi";
 
-      environment.systemPackages = with pkgs; [
-        exfat
-        ntfs3g
-
-        jmtpfs # use like jmtpfs /mnt
-      ];
-
       fonts = {
         enableDefaultPackages = true;
         enableGhostscriptFonts = true;
@@ -80,10 +73,26 @@ in
 
         xserver = mkIf cfg.enableXserver {
           enable = true;
+          desktopManager = {
+            xterm.enable = false;
+            xfce = {
+              enable = true;
+              noDesktop = true;
+              enableXfwm = false;
+            };
+          };
+          windowManager.i3 = {
+            enable = true;
+            extraPackages = with pkgs; [
+              dmenu
+              i3status
+              i3lock
+            ];
+          };
 
           # Enable the XFCE Desktop Environment.
-          displayManager.lightdm.enable = true;
-          desktopManager.xfce.enable = true;
+          #          displayManager.lightdm.enable = true;
+          #          desktopManager.xfce.enable = true;
 
           # Configure keymap in X11
           xkb = {
@@ -91,7 +100,59 @@ in
             variant = "intl";
           };
         };
+      };
 
+      services.displayManager.defaultSession = "xfce";
+
+      programs.thunar.enable = lib.mkForce false;
+
+      environment = {
+        xfce.excludePackages = with pkgs.xfce; [
+          parole
+          ristretto
+          xfce4-terminal
+          xfce4-dict
+        ];
+        systemPackages = with pkgs; [
+          exfat
+          ntfs3g
+
+          jmtpfs # use like jmtpfs /mnt
+          #drawing
+          #font-manager
+          #gimp-with-plugins
+          #inkscape-with-extensions
+          #libqalculate
+          orca
+          pavucontrol
+          #qalculate-gtk
+          wmctrl
+          xclip
+          #xcolor
+          xdo
+          xdotool
+          xfce.catfish
+          xfce.gigolo
+          #xfce.orage
+          #xfce.xfburn
+          xfce.xfce4-appfinder
+          xfce.xfce4-clipman-plugin
+          xfce.xfce4-cpugraph-plugin
+          xfce.xfce4-dict
+          xfce.xfce4-fsguard-plugin
+          xfce.xfce4-genmon-plugin
+          xfce.xfce4-netload-plugin
+          xfce.xfce4-panel
+          xfce.xfce4-pulseaudio-plugin
+          xfce.xfce4-systemload-plugin
+          xfce.xfce4-weather-plugin
+          xfce.xfce4-whiskermenu-plugin
+          xfce.xfce4-xkb-plugin
+          xfce.xfdashboard
+          xorg.xev
+          xsel
+          xtitle
+        ];
       };
 
       # Configure console keymap
