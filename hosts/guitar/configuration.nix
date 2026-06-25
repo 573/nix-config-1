@@ -58,9 +58,16 @@
 
   nix.settings.auto-optimise-store = true;
 
+  services.xserver.xkb = {
+    layout = lib.mkForce "de";
+    variant = lib.mkForce "";
+  };
 
   system.stateVersion = lib.mkForce "25.05"; # Did you read the comment?
 
+  # to have i3 use qutebrowser as default browser
+  # manually add `bindsym $mod+b exec $BROWSER` to ~/.config/i3/config as well
+  environment.sessionVariables.BROWSER = "${lib.getExe pkgs.qutebrowser}";
   /*
     error:
        Failed assertions:

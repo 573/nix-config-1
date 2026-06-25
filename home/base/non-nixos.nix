@@ -41,8 +41,8 @@ in
 
       builders = mkOption {
         type = types.listOf types.str;
-	# DONE Make configurable the other way around in nixbuild dependent on this builders here, explainer https://gist.github.com/573/1ff0527f8b42b0123dc3a13bc523f487
-        default = [];# ++ optional config.custom.programs.nixbuild.enable "ssh://root@eu.nixbuild.net aarch64-linux,armv7l-linux /home/${config.home.username}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
+        # DONE Make configurable the other way around in nixbuild dependent on this builders here, explainer https://gist.github.com/573/1ff0527f8b42b0123dc3a13bc523f487
+        default = [ ]; # ++ optional config.custom.programs.nixbuild.enable "ssh://root@eu.nixbuild.net aarch64-linux,armv7l-linux /home/${config.home.username}/.ssh/my-nixbuild-key 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";
         description = "Nix remote builders.";
       };
     };
@@ -72,8 +72,8 @@ in
         # TODO could as well use https://home-manager-options.extranix.com/?query=nix.buildMachines&release=release-25.11 here
         builders = concatStringsSep ";" cfg.builders;
         builders-use-substitutes = mkIf (cfg.builders != [ ]) true;
-        trusted-users = [ config.home.username "root" ];
-	#sandbox = false;
+        #trusted-users = [ config.home.username "root" ];
+        #sandbox = false;
       };
 
       inherit (commonConfig.nix)
@@ -86,8 +86,8 @@ in
     # WARN llm used https://share.google/aimode/E27wUYAUTYr2Bk2NT
     # maybe not: See https://discourse.nixos.org/t/confusing-home-manager-behavior-around-targets-genericlinux-gpu-enable/76883
     # WARN  error: Package ‘intel-gmmlib-22.8.2’ in /nix/store/smgpp7s35v1zr9bdfn786j0afyhk1b9d-source/pkgs/by-name/in/intel-gmmlib/package.nix:31 is not available on the requested hostPlatform:
-     targets.genericLinux = lib.mkIf pkgs.stdenv.isx86_64 {
-       enable = true;
+    targets.genericLinux = lib.mkIf pkgs.stdenv.isx86_64 {
+      enable = true;
     };
   };
 }

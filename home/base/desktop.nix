@@ -8,7 +8,7 @@
   inputs,
   system,
   ...
-}:
+}@args:
 
 let
   inherit (lib)
@@ -307,8 +307,7 @@ in
       # https://home-manager-options.extranix.com/?query=firefox
       # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/firefox/wrapper.nix
       # pkgs.wrapFirefox from here https://ryantm.github.io/nixpkgs/builders/packages/firefox/
-      package = 
-      pkgs.wrapFirefox inputs.firefox.packages.${system}.firefox-nightly-bin.unwrapped {
+      package = pkgs.wrapFirefox inputs.firefox.packages.${system}.firefox-nightly-bin.unwrapped {
         # as in https://discourse.nixos.org/t/combining-best-of-system-firefox-and-home-manager-firefox-settings/37721
         extraPolicies = {
           DisableTelemetry = true;
@@ -420,7 +419,7 @@ in
         #vlc = config.lib.nixGL.wrap vlc;
         wezterm = config.lib.nixGL.wrap wezterm;
         #kitty = config.lib.nixGL.wrap kitty;
-#        emacs = config.lib.nixGL.wrap emacs;
+        #        emacs = config.lib.nixGL.wrap emacs;
 
         inherit (pkgs)
           pavucontrol
@@ -434,8 +433,8 @@ in
           # FIXME do https://github.com/google/xsecurelock/issues/102#issuecomment-621432204 see https://bnikolic.co.uk/nix-cheatsheet.html#orgb5bd923
           #xsecurelock # lxdm not shown
           xscreensaver
-        #  droidcam # host-install v4l2loopback
-         # mediathekview
+          #  droidcam # host-install v4l2loopback
+          # mediathekview
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
           lxsession
@@ -453,10 +452,15 @@ in
 
     # FIXME NixOS only: https://search.nixos.org/options?type=packages&query=services.xserver.xkb
     # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl
-    home.file.".Xkbmap".text = ''
-      -model pc104 -layout us -variant altgr-intl
-    '';
-
+    home.file =
+      let
+        onNixos = builtins.hasAttr "osConfig" args;
+      in
+      lib.optionalAttrs (!onNixos) {
+        "Xkbmap".text = ''
+          -model pc104 -layout us -variant altgr-intl
+        '';
+      };
   };
 
 }

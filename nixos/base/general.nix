@@ -136,7 +136,9 @@ in
             ;
 
           # see https://github.com/NixOS/nixpkgs/blob/25f538306313eae3927264466c70d7001dcea1df/nixos/modules/config/nix.nix#L290
-          trusted-users = lib.mkAfter [ "@wheel" ];
+          # FIXME after recent discussions on discourse it appears to be still more reasonable to just use sudo
+          # see https://discourse.nixos.org/raw/78481
+          #trusted-users = lib.mkAfter [ "@wheel" ];
         };
 
         inherit (commonConfig.nix)
@@ -167,6 +169,11 @@ in
           ProcessSizeMax=0
         '';
       };
+
+      # https://discourse.nixos.org/raw/76636
+      systemd.package = pkgs.systemd.override { withUserDb = false; };
+
+      services.userdbd.enable = lib.mkForce false;
 
       time.timeZone = "Europe/Berlin";
 
