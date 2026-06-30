@@ -184,6 +184,8 @@ in
             #zoxide # rather home module
             #qrencode
             nixfmt
+
+	    sendme
             ;
 
           # see https://jvns.ca/til/vim-osc52/

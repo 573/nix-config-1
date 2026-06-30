@@ -37,6 +37,14 @@
     ''
   ];
 
+  services.libinput = {
+    enable = true;
+    touchpad = {
+      disableWhileTyping = false;
+      scrollMethod = "twofinger";
+    };
+  };
+
   services.getty.helpLine = ''
     \e[0;93mReset password now, please !\e[0m
 
