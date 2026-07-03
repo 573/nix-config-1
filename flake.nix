@@ -77,7 +77,8 @@
     #  url = "github:SEIAROTg/quadlet-nix";
     #};
 
-    nps.url = "github:Tarow/nix-podman-stacks";
+    # TODO upgrade my flake to 26.05
+    nps.url = "github:Tarow/nix-podman-stacks/v0.7.0";
 
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
