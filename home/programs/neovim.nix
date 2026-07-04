@@ -72,6 +72,15 @@ let
   cmp-path.enable = true;
   cmp-rg.enable = true;
 
+  conform-nvim = {
+    enable = true;
+    settings = {
+      formatters_by_ft = {
+        nix = [ "nixfmt" ];
+      };
+    };
+  };
+
   gitsigns = {
     enable = true;
     settings = {
@@ -219,45 +228,46 @@ let
   faster = {
     enable = true;
 
-    /*settings = {
-      # WARN deactivates lsp, if configured wrong
-      behaviours = {
-        bigfile = {
-          extra_patterns = [
-            {
-              filesize = 1.1;
-              pattern = "*.md";
-            }
-            {
-              pattern = "*.log";
-            }
-          ];
-          features_disabled = [
-            "lsp"
-            "treesitter"
-          ];
-          filesize = 2;
-          on = true;
-          pattern = "*";
+    /*
+      settings = {
+        # WARN deactivates lsp, if configured wrong
+        behaviours = {
+          bigfile = {
+            extra_patterns = [
+              {
+                filesize = 1.1;
+                pattern = "*.md";
+              }
+              {
+                pattern = "*.log";
+              }
+            ];
+            features_disabled = [
+              "lsp"
+              "treesitter"
+            ];
+            filesize = 2;
+            on = true;
+            pattern = "*";
+          };
+          fastmacro = {
+            features_disabled = [
+              "lualine"
+            ];
+            on = true;
+          };
         };
-        fastmacro = {
-          features_disabled = [
-            "lualine"
-          ];
-          on = true;
+        features = {
+          lsp = {
+            defer = false;
+            on = true;
+          };
+          treesitter = {
+            defer = false;
+            on = true;
+          };
         };
       };
-      features = {
-        lsp = {
-          defer = false;
-          on = true;
-        };
-        treesitter = {
-          defer = false;
-          on = true;
-        };
-      };
-    };
     */
   };
 
@@ -600,7 +610,7 @@ in
           fzf-lua
           which-key
           lsp
-	  lspconfig
+          lspconfig
           trouble
           telescope
           cmp
@@ -614,6 +624,7 @@ in
           cmp-cmdline-history
           cmp-nvim-lsp-signature-help
           cmp-treesitter
+          conform-nvim
           gitsigns
           no-neck-pain
           nvim-autopairs
@@ -624,6 +635,9 @@ in
           web-devicons
           ;
       };
+
+      # https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/modules/output.nix#L53
+      extraPackages = [ inputs.nixfmt-rs.packages.${pkgs.system}.default ];
 
       # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L315
       #	extraPlugins = builtins.attrValues {};
@@ -656,7 +670,7 @@ in
 
       env = {
         EDITOR = "nvim";
-	VISUAL = "nvim";
+        VISUAL = "nvim";
       };
 
       # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L41

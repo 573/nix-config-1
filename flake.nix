@@ -73,6 +73,8 @@
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
+    nixfmt-rs.url = "github:Mic92/nixfmt-rs";
+
     #quadlet-nix = {
     #  url = "github:SEIAROTg/quadlet-nix";
     #};
@@ -566,7 +568,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
             };
             nixpkgs-fmt = {
               enable = true;
-              package = inputs.unstable.legacyPackages.${system}.nixfmt-rfc-style;
+              package = inputs.nixfmt-rs.packages.${system}.default; # inputs.unstable.legacyPackages.${system}.nixfmt-rs;
             };
             #shellcheck.enable = true;
             shfmt = {
