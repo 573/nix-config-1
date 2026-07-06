@@ -25,6 +25,13 @@ let
     writeScriptBin
     runtimeShell
     ;
+  # different approach here: https://pmiddend.github.io/posts/nixgl-on-ubuntu
+  ausweisapp = config.lib.custom.wrapProgram {
+    name = "ausweisapp";
+    source = pkgs.ausweisapp;
+    path = "/bin/AusweisApp";
+    #   fixGL = true;
+  };
 in
 /**
   Attribute `system` here is determined that way (`inherit (pkgs.stdenv.hostPlatform) system;`) to make later use of parameter `[inputs]` here in this file (./../../home/base/desktop.nix), which is a deviation from the orinal author's intent (there an overlay is used to determine derivations from inputs, the intention of which is fine to narrow down `system` use to flake-related nix files I guess).
@@ -51,7 +58,7 @@ in
     programs = {
       sops-nix.enable = true;
 
-      nix-podman-stacks.enable = true;
+      # nix-podman-stacks.enable = true;
 
       shell.initExtra = ''
         #. ${config.home.homeDirectory}/.aliases.sh
@@ -202,6 +209,7 @@ in
       # see: https://discourse.nixos.org/t/latest-update-breaks-nerdfonts-declared-in-home-manager/57244/8
       nerdfonts = pkgs.nerd-fonts.ubuntu-mono; # TODO nerd-fonts.monaspace
 
+      ausweisapp = config.lib.nixGL.wrap ausweisapp;
     };
 
     sessionPath = [
@@ -245,7 +253,7 @@ in
     '';
   };
 
-#  nix.package = pkgs.nixVersions.nix_2_33;
+  #  nix.package = pkgs.nixVersions.nix_2_33;
 
   # https://github.com/google/xsecurelock/issues/102#issuecomment-621432204
   #home.sessionVariables.XSECURELOCK_PAM_SERVICE = "lxdm";
@@ -274,25 +282,207 @@ in
     }
   ];
 
-  /*
-    services.podman = {
-          enable = true;
-          enableTypeChecks = true; # Probably not required but seems better to enable
+  # https://github.com/Tarow/nix-podman-stacks/blob/22fba5ab55fdbd1a6c0e7d8985c9a2983204bc3d/modules/extension.nix#L294
+  # https://github.com/Tarow/nix-podman-stacks/blob/main/modules/paperless/default.nix
+  services.podman = {
+    enable = true;
+    settings.containers.network.dns_bind_port = 1153;
+  };
 
-          containers.wallos = {
-            image = "bellamy/wallos:4.3.0";
+  systemd.user.sockets.podman = {
+    Install.WantedBy = [ "sockets.target" ];
+    Socket = {
+      SocketMode = "0660";
+      ListenStream = "/run/user/1000/podman/podman.sock";
+    };
+  };
+  systemd.user.services.podman = {
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Delegate = true;
+      Type = "exec";
+      KillMode = "process";
+      Environment = [ "LOGGING=--log-level=info" ];
+      ExecStart = "${lib.getExe pkgs.podman} $LOGGING system service";
+    };
+  };
 
-            #volumes = [
-            #  "./db:/var/www/html/db"
-            #  "./logos:/var/www/html/images/uploads/logos"
-            #];
+  services.podman.containers =
+    let
+      name = "paperless";
+      dbName = "${name}-db";
+      brokerName = "${name}-broker";
+      socketProxy = "docker-socket-proxy";
+      gotenbergName = "${name}-gotenberg";
+      tikaName = "${name}-tika";
 
-            ports = [
-              "127.0.0.1:8080:80/tcp"
-            ];
+      storage = "${config.home.homeDirectory}/stacks/${name}";
+
+      category = "General";
+      description = "Document Management System";
+      displayName = "Paperless-ngx";
+      # See <https://docs.paperless-ngx.com/administration/#create-superuser>
+      secretKeyFile = config.sops.secrets."paperless/secret_key".path;
+      db.passwordFile = config.sops.secrets."paperless/db_password".path;
+      hostIP4Address = "0.0.0.0"; # "0.0.0.0";
+      # TODO use uid
+      hostUid = 1000;
+      storageBaseDir = "${config.home.homeDirectory}/stacks";
+      # FIXME better place
+      externalStorageBaseDir = "/tmp";
+    in
+    {
+         /* ${socketProxy} = {
+          image = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2";
+
+          volumes = [ "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro" ];
+
+            extraConfig = {
+              Unit = {
+          Requires = ["podman.socket"];
+          };
           };
 
-          # analog https://github.com/Tarow/nix-podman-stacks/blob/81df9c882ab9ebb78ef76cfdc83bd70363edfa9f/modules/paperless/default.nix#L157
+          environment = {
+            CONTAINERS = 1;
+            SERVICES = 1;
+            TASKS = 1;
+            INFO = 1;
+            IMAGES = 1;
+            NETWORKS = 1;
+            VERSION = 1;
+            PING = 1;
+            EVENTS = 1;
+            CONFIGS = 1;
+            POST = 0;
+          };
+
+          ports = [ "2375:2375" ];
         };
+	*/
+
+      ${name} = {
+        image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15";
+
+        extraConfig = {
+          Unit = {
+            Requires = [
+              dbName
+              brokerName
+            ];
+            StartLimitIntervalSec = "120";
+            StartLimitBurst = 5;
+                Wants = [ "sops-nix.service" ];
+                After = [ "sops-nix.service" ];
+          };
+
+          Service = {
+            RestartSec = "5s";
+          };
+
+          #Container.UserNS = true;
+        };
+
+network = "paperless";
+
+        volumes = [
+          "${storage}/data:/usr/src/paperless/data"
+          "${storage}/media:/usr/src/paperless/media"
+          "${storage}/export:/usr/src/paperless/export"
+          "${storage}/consume:/usr/src/paperless/consume"
+          "${db.passwordFile}:${db.passwordFile}"
+          "${secretKeyFile}:${secretKeyFile}"
+          "${config.sops.secrets."paperless/admin_password".path}:${
+            config.sops.secrets."paperless/admin_password".path
+          }"
+        ];
+        environment = {
+          PAPERLESS_REDIS = "redis://${brokerName}:6379";
+          PAPERLESS_DBHOST = dbName;
+          USERMAP_UID = 0;
+          USERMAP_GID = 0;
+          PAPERLESS_TIME_ZONE = "Etc/UTC";
+          PAPERLESS_FILENAME_FORMAT = "{{created_year}}/{{correspondent}}/{{title}}";
+          #PAPERLESS_URL = config.services.podman.containers.${name}.traefik.serviceUrl;
+          PAPERLESS_DBUSER = "paperless";
+          PAPERLESS_DBPASS_FILE = db.passwordFile;
+          PAPERLESS_SECRET_KEY_FILE = secretKeyFile;
+          PAPERLESS_ADMIN_USER = "admin";
+          PAPERLESS_ADMIN_MAIL = "admin@example.com";
+          PAPERLESS_ADMIN_PASSWORD_FILE = config.sops.secrets."paperless/admin_password".path;
+
+          #PAPERLESS_TIKA_ENABLED = true;
+          #PAPERLESS_TIKA_ENDPOINT = "http://${tikaName}:9998";
+          #PAPERLESS_TIKA_GOTENBERG_ENDPOINT = "http://${gotenbergName}:3000";
+        };
+
+        ports = [ "8000:8000" ];
+
+      };
+
+      ${brokerName} = {
+        image = "docker.io/redis:8.0";
+	network = "paperless";
+	};
+
+      ${dbName} = {
+        image = "docker.io/postgres:16";
+        environment = {
+          POSTGRES_DB = "paperless";
+          POSTGRES_USER = "paperless";
+          #PGPASSFILE = db.passwordFile;
+          POSTGRES_PASSWORD_FILE = db.passwordFile;
+        };
+	network = "paperless";
+        volumes = [
+          "${db.passwordFile}:${db.passwordFile}"
+          "${storage}/db:/var/lib/postgresql/data"
+        ];
+        # https://github.com/Tarow/nix-podman-stacks/blob/22fba5ab55fdbd1a6c0e7d8985c9a2983204bc3d/modules/extension.nix#L163
+        #env.POSTGRES_PASSWORD = db.passwordFile;
+
+      };
+      /*
+            ${tikaName}.image = "docker.io/apache/tika:3.3.1.0";
+
+            ${gotenbergName} = {
+              image = "docker.io/gotenberg/gotenberg:8.34.0";
+              exec = "gotenberg --chromium-disable-javascript=true --chromium-allow-list=file:///tmp/.*";
+            };
+      */
+    };
+  
+    services.podman.networks.paperless = {
+          driver = "bridge";
+        };
+  
+  /*
+    # see https://github.com/nix-community/home-manager/pull/4801
+    services.podman.networks.caddy_routing = {
+      driver = "bridge";
+      subnet = "172.21.1.0/24";
+    };
+
+    services.podman.containers.caddy = {
+      image = "ghcr.io/n-hass/caddy-cloudflare:latest";
+      description = "Caddy web server";
+      environmentFile = [ "${homeDir}/caddy/.env" ];
+      network = [ "caddy_routing" ];
+      networkAlias = [ "caddy" ];
+      ports = [
+        "8080:82"
+        "8443:443"
+      ];
+      volumes = [
+        "${homeDir}/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+        "${homeDir}/caddy/config:/config"
+        "${homeDir}/caddy/data:/data"
+      ];
+      autoUpdate = "registry";
+      extraConfig.Service = {
+        TimeoutStopSec = 60;
+      };
+      addCapabilities = [ "NET_RAW" ];
+    };
   */
 }

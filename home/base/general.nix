@@ -295,7 +295,10 @@ in
       custom.misc.util-bins.enable = true;
       custom.programs = {
         #tmux.enable = true;
-        emacs-configured.enable = true;
+        # comment this out to enable:
+	# nix build --eval-store auto --store ssh-ng://root@eu.nixbuild.net -L -v --show-trace --impure .#nixosConfigurations.guitar.config.system.build.toplevel
+	# works then, tested it
+	emacs-configured.enable = true;
         #helix.enable = true;
         #yazi.enable = true;
       };

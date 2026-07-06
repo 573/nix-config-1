@@ -13,7 +13,7 @@ _:
   inputs,
   rootPath,
   ...
-}:
+}@args:
 let
   inherit (pkgs.stdenv) isLinux isAarch64;
   #inherit (inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.pkgs.nixVersions)
@@ -54,17 +54,17 @@ in
           inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.haskellPackages;
         ghc-nixpkgs-unstable =
           inputs.ghc-nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-                emacs =
-                  if isLinux && isAarch64 then
-                    inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
-                  else
-                    inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
+        emacs =
+          if isLinux && isAarch64 then
+            inputs.emacs-overlay-cached.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable-nox
+          else
+            inputs.emacs-overlay.packages.${pkgs.stdenv.hostPlatform.system}.emacs-unstable;
 
-                emacsWithPackagesFromUsePackage =
-                  if isLinux && isAarch64 then
-                    inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
-                  else
-                    inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
+        emacsWithPackagesFromUsePackage =
+          if isLinux && isAarch64 then
+            inputs.emacs-overlay-cached.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage
+          else
+            inputs.emacs-overlay.lib.${pkgs.stdenv.hostPlatform.system}.emacsWithPackagesFromUsePackage;
         homeDir =
           if isLinux && isAarch64 then
             # TODO figure out :p homeConfigurations."dani@maiziedemacchiato".config.home.homeDirectory
@@ -173,12 +173,23 @@ in
       nixpkgs-unfree.flake = inputs.nixpkgs-unfree;
       unstable.flake = inputs.unstable;
       nixos-2405.flake = inputs.nixos-2405;
+      nixos-config.flake = inputs.self;
     };
-    nixPath = [
-      "nixpkgs=flake:nixpkgs"
-      "unstable=flake:unstable"
-      "nixos-2405=flake:nixos-2405"
-      "nixpkgs-unfree=flake:nixpkgs-unfree"
-    ];
+    nixPath =
+      let
+        onNixos = builtins.hasAttr "osConfig" args;
+      in
+      [
+        "nixpkgs=flake:nixpkgs"
+        "unstable=flake:unstable"
+        "nixos-2405=flake:nixos-2405"
+        "nixpkgs-unfree=flake:nixpkgs-unfree"
+      ]
+      ++ (
+        # see https://discourse.nixos.org/t/recursive-error-when-setting-pkgs-path/78645
+        lib.optionals onNixos [
+          "nixos-config=${config.user.home}/.nix-config/configuration.nix"
+        ]
+      );
   };
 }
