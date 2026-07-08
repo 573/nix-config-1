@@ -25,11 +25,12 @@ let
   cmp = {
     enable = true;
 
+    
+
     autoEnableSources = true;
     settings = {
       # see https://stackoverflow.com/a/74714258 and https://stackoverflow.com/a/74730907
       completion = {
-        completeopt = "menu,menuone,noinsert,noselect";
         keyword_length = 3;
       };
       sources = [

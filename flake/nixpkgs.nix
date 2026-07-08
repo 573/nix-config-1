@@ -30,7 +30,7 @@ import pkgsSet {
           inherit (prev.stdenv.hostPlatform) system;
           inherit (prev.lib.attrsets) genAttrs;
           # inherit rootPath;
-          #unstable = inputs.unstable.legacyPackages.${system}; 
+          unstable = inputs.unstable.legacyPackages.${system}; 
           #import inputs.unstable { inherit config system; };
 
           #import inputs.nixos-2311 { inherit config system; }; #import inputs.ghc-nixpkgs-unstable { inherit config system; };
@@ -63,6 +63,9 @@ import pkgsSet {
               torch = prev.python3.pkgs.torch-bin;
             };
           */
+
+        # until upgrade to 26.05
+        inherit (unstable) docker;
 
           # TODO https://matrix.to/#/!RRerllqmbATpmbJgCn:nixos.org/$mP53sN976wEgmMCKeM5JWPABO1lh17x7ucXtgKp1cWY?via=nixos.org&via=matrix.org&via=tchncs.de https://nixpk.gs/pr-tracker.html?pr=239005 (https://discourse.nixos.org/t/a-nixpkgs-pr-tracker-with-pure-front-end/50096)
 

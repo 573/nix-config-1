@@ -5,7 +5,6 @@
 */
 { config
 , lib
-#, unstable
 ,  ...
 }:
 
@@ -43,7 +42,6 @@ in
       # see https://github.com/nix-community/NixOS-WSL/issues/578 and https://github.com/nix-community/NixOS-WSL/discussions/487
       docker = {
         enable = true;
-        #package = unstable.docker_25;
         #       enableNvidia = true;
 
         ###storageDriver = "overlay2";
