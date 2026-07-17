@@ -54,7 +54,14 @@ let
       	  ls -la $out
                 cp -v $src $out
     '';
-  }; 
+  };
+  #em = pkgs.substitute {
+  #  src = null;
+  # replacements = [
+  #   "--replace-warn"
+  # <string name="shared_user_label">Termux user</string>
+  #   ];
+  #}
 in
 pkgs.runCommand "my-package-test"
   {
@@ -65,25 +72,48 @@ pkgs.runCommand "my-package-test"
       inherit (pkgs)
         apktool
         apksigner
-	which
+        which
         ;
     };
   }
   ''
-    mkdir $out
-    cp -rv ${emacsapk}/*emacs-32.0.50-35-arm64-v8a.apk $out/emacs.apk
-    cp -rv ${termuxapk}/*com.termux_1022.apk $out/termux.apk
-    which keytool
-    echo $'\e[0;93m'"Run the next command manually pls, using defaults and store the password somewhere safe, i.e., by default in that nix file here sops-nix is used (/run/secrets/pwfile)"$'\e[0m'
-    echo $'\e[0;93m'"$(which keytool) -genkey -v -keystore /tmp/debug.keystore -alias emacsandroid -keyalg RSA -keysize 2048 -validity 10000"$'\e[0m'
-    pushd $out
-    # to only interact on the last question keytool poses, provide -dname
-    echo yes| keytool -genkey -dname "CN=Example, OU=IT, O=Company, L=City, S=State, C=Country" -noprompt -v -storepass signemacsnow -keypass signemacsnow -keystore debug.keystore -alias emacsandroid -keyalg RSA -keysize 2048 -validity 10000
-    apktool d emacs.apk 
-    # not working /run/secrets/emacsAndroid owned by group nixbld not found
-    #apksigner sign --ks-pass file:/run/secrets/emacsAndroid --ks /tmp/debug.keystore ./emacs.apk
-    apksigner sign --ks-pass pass:signemacsnow --ks debug.keystore ./emacs.apk
-    rm debug.keystore
-    pwd
-    ls -la
+        mkdir $out
+        cp -rv ${emacsapk}/*emacs-32.0.50-35-arm64-v8a.apk $out/emacs.apk
+        cp -rv ${termuxapk}/*com.termux_1022.apk $out/termux.apk
+        which keytool
+        echo $'\e[0;93m'"Put that in /data/data/org.gnu.emacs/files/.emacs.d/early-init.el (can use installed termux):"$'\e[0m'
+        echo $'\e[0;93m'"(setq touch-screen-display-keyboard t)"$'\e[0m'
+        echo $'\e[0;93m'"(when (string-equal system-type "android")"$'\e[0m'
+        echo $'\e[0;93m'"  ;; Add Termux binaries to PATH environment"$'\e[0m'
+        echo $'\e[0;93m'"  (let ((termuxpath "/data/data/com.termux/files/usr/bin"))"$'\e[0m'
+        echo $'\e[0;93m'"    (setenv "PATH" (concat termuxpath ":" (getenv "PATH")))"$'\e[0m'
+        echo $'\e[0;93m'"    (setq exec-path (append (list termuxpath) exec-path))))"$'\e[0m'
+        pushd $out
+        # to only interact on the last question keytool poses, provide -dname
+        echo yes| keytool -genkey -dname "CN=Example, OU=IT, O=Company, L=City, S=State, C=Country" -noprompt -v -storepass signemacsnow -keypass signemacsnow -keystore debug.keystore -alias emacsandroid -keyalg RSA -keysize 2048 -validity 10000
+        apktool d emacs.apk 
+        apktool d termux.apk 
+
+    #https://github.com/adept/full-fledged-hledger/compare/master...573:full-fledged-hledger:pushhere#diff-16cddcd6b987528aee0e3d6930f04e9413e1e349c66d385fdc93290af456800dR70
+        # funny thing emacs version above already contains <string name="shared_user_name">Emacs shared user</string> and
+        # android:sharedUserId="com.termux" android:sharedUserLabel="@string/shared_user_name as well and seems to work ootb like that
+        #a=$(cat ./termux/res/values/strings.xml | grep shared_user_label)
+        #echo $a
+        #substituteInPlace "./emacs/res/values/strings.xml" --replace-warn '</resources>' "$a</resources>"
+
+        cat ./emacs/AndroidManifest.xml | grep 'android:sharedUserId="com.termux" android:sharedUserLabel="@string/shared_user_name"'
+        cat ./termux/res/values/strings.xml | grep shared_user_label
+        # <string name="shared_user_label">Termux user</string>
+        cat ./emacs/res/values/strings.xml | grep shared_user_name
+        #<string name="shared_user_name">Emacs shared user</string>
+
+        # not working /run/secrets/emacsAndroid owned by group nixbld not found
+        #apksigner sign --ks-pass file:/run/secrets/emacsAndroid --ks /tmp/debug.keystore ./emacs.apk
+        apktool b emacs -o ./emacs-4-termux.apk
+        apktool b termux -o ./termux-4-emacs.apk
+        apksigner sign --ks-pass pass:signemacsnow --ks debug.keystore ./emacs-4-termux.apk
+        apksigner sign --ks-pass pass:signemacsnow --ks debug.keystore ./termux-4-emacs.apk
+        rm debug.keystore
+        pwd
+        ls -la
   ''
