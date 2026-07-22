@@ -114,8 +114,8 @@ in
               { name = "buffer"; }
               { name = "cmdline"; }
               { name = "cmdline-history"; }
-              { name = "nvim_lsp"; }
-              { name = "nvim_lsp_document_symbol"; }
+ #             { name = "nvim_lsp"; }
+ #             { name = "nvim_lsp_document_symbol"; }
               { name = "nvim-lsp-signature-help"; }
               { name = "omni"; }
               { name = "path"; }
@@ -139,8 +139,8 @@ in
         cmp-buffer.enable = true;
         cmp-cmdline.enable = true;
         cmp-cmdline-history.enable = true;
-        cmp-nvim-lsp.enable = true;
-        cmp-nvim-lsp-document-symbol.enable = true;
+#        cmp-nvim-lsp.enable = true;
+#        cmp-nvim-lsp-document-symbol.enable = true;
         cmp-nvim-lsp-signature-help.enable = true;
         cmp-omni.enable = true;
         cmp-path.enable = true;
@@ -156,7 +156,7 @@ in
           };
         };
 
-        faster.enable = true;
+#        faster.enable = true;
 
         # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
         fzf-lua = {

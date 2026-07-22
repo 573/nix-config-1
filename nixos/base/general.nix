@@ -164,10 +164,15 @@ in
       # reason: https://discourse.nixos.org/t/how-to-completely-disable-coredump/77335
       systemd.coredump = {
         enable = true; # If false, systemd will not handle dumps, making the next bit useless
-        extraConfig = ''
+        /*extraConfig = ''
           Storage=none
           ProcessSizeMax=0
-        '';
+        '';*/
+	# 26.05
+	settings.Coredump = {
+	  Storage = "none";
+	  ProcessSizeMax = 0;
+	};
       };
 
       # https://discourse.nixos.org/raw/76636

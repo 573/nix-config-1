@@ -10,7 +10,8 @@
     };
 
     ####### FIXME Start using https://github.com/cafkafk/rime here ##########
-    nixpkgs.url = "https://channels.nixos.org/nixos-25.11/nixexprs.tar.xz";
+    nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.xz";
+    nixos-2511.url = "https://channels.nixos.org/nixos-25.11/nixexprs.tar.xz";
     nixos-2505.url = "https://channels.nixos.org/nixos-25.05/nixexprs.tar.xz";
     nixos-2405.url = "https://channels.nixos.org/nixos-24.05/nixexprs.tar.xz";
     nixos-2305.url = "https://channels.nixos.org/nixos-23.05/nixexprs.tar.xz";
@@ -35,7 +36,7 @@
     # https://github.com/nix-community/NixOS-WSL/discussions/735
     nixos-wsl = {
       # until https://github.com/nix-community/NixOS-WSL/issues/397
-      url = "github:nix-community/nixos-wsl/release-25.11";
+      url = "github:nix-community/nixos-wsl/release-26.05";
       #url ="github:nix-community/nixos-wsl?ref=refs/tags/23.5.5.0";
       # pinning due to https://github.com/nix-community/NixOS-WSL/issues/470
       #url = "github:nix-community/nixos-wsl/0b90c1d982d443358b3f7b3a303405449a2bfe54";
@@ -58,8 +59,13 @@
       inputs.nixpkgs.follows = "nixos-2505";
     };
 
-    home-manager = {
+    home-manager-2511 = {
       url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixos-2511";
+    };
+
+    home-manager = {
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -495,8 +501,13 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs.follows = "nixos-2505";
     };
 
-    nixvim = {
+    nixvim-2511 = {
       url = "github:nix-community/nixvim/nixos-25.11";
+      inputs.nixpkgs.follows = "nixos-2511";
+    };
+
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

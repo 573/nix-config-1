@@ -31,7 +31,7 @@ in
       enable = true;
     };
 
-    environment.defaultPackages = [ pkgs.wslu ];
+#    environment.defaultPackages = [ pkgs.wslu ];
 
     custom.system.boot.enable = mkForce false;
 

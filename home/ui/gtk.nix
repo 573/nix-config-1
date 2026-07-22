@@ -80,6 +80,8 @@ in
           gtk-application-prefer-dark-theme=1
         '';
       };
+      # 26.05 warning
+      gtk4.theme = config.gtk.theme;
     };
 
     #programs.dconf.enable = true;
