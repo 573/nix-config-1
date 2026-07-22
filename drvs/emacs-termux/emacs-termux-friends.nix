@@ -1,5 +1,5 @@
 {
-  pkgs ? import <nixpkgs> { },
+  pkgs ? import <nixpkgs> { }
 }: # test: nix-build emacs-termux-friends.nix --builders ''
 let
   emacsapk = pkgs.stdenv.mkDerivation {
