@@ -86,9 +86,35 @@ in
       # keymaps = [];
 
       # https://nix-community.github.io/nixvim/lsp/index.html
+      # this replaces plugins.lsp here, TODO move config from there here
+
+      # https://github.com/nix-community/nixvim/discussions/4479
       lsp = {
         # https://nix-community.github.io/nixvim/lsp/keymaps/index.html
-        #keymaps = [];
+        keymaps = [
+          # from https://github.com/nix-community/nixvim/blob/85d64907a9c132ecf2e8ebe46d0ad842381516ec/modules/lsp/keymaps.nix#L44
+          {
+            key = "gd";
+            lspBufAction = "definition";
+          }
+          {
+            key = "gD";
+            lspBufAction = "references";
+          }
+          {
+            key = "gt";
+            lspBufAction = "type_definition";
+          }
+          {
+            key = "gi";
+            lspBufAction = "implementation";
+          }
+          {
+            key = "K";
+            lspBufAction = "hover";
+          }
+
+        ];
 
         # https://nix-community.github.io/nixvim/lsp/servers/index.html
         servers = {
