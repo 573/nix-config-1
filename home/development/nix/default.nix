@@ -79,7 +79,7 @@ in
 
       home.packages = [
         (buildWithDiff "nod-build"
-	  # FIXME sams / sams9 still hard coded here
+          # FIXME sams / sams9 still hard coded here
           "nix build --option experimental-features \"nix-command flakes pipe-operators\" --show-trace -vv \"${nixConfigDir}#nixOnDroidConfigurations.sams.activationPackage\" --impure"
           "/nix/var/nix/profiles/nix-on-droid"
         )
@@ -98,7 +98,8 @@ in
             buildCmd = "${
               buildWithDiff "n-rebuild-build"
                 # see https://github.com/maralorn/nix-output-monitor/issues/68 (https://github.com/Gerschtli/nix-config/commit/5d71277ac5079485830073f02d42d4b13ac05d8d)
-                "sudo nix build --builders '' --verbose \"${nixConfigDir}#nixosConfigurations.$(hostname).config.system.build.toplevel\""
+                # in case of errors first add --builders '' and remove eval-store to rule out
+                "sudo nix build -L --verbose  --show-trace --eval-store auto --store ssh-ng://root@eu.nixbuild.net \"${nixConfigDir}#nixosConfigurations.$(hostname).config.system.build.toplevel\""
                 "/nix/var/nix/profiles/system"
             }/bin/n-rebuild-build";
             _doNotClearPath = true;

@@ -128,36 +128,28 @@ in
                 hashKnownHosts = true;
               }
               // (lib.optionalAttrs (!onNixos) {
-	        
-                extraOptions =
-                  # lib.mkAfter{} not needed here bc "Include" is not set
-                  # in both of the branches here. It is either-or anyways.
-                  {
-                    "PubkeyAcceptedKeyTypes" = "ssh-ed25519";
-                    "IPQoS" = "throughput";
-                    "LogLevel" = "Debug1";
-                    "IgnoreUnknown" = "WarnWeakCrypto";
-                    "WarnWeakCrypto" = "no-pq-kex";
-                    "Include" =
-                      let
-                        inherit (pkgs.stdenv) isLinux isAarch64;
-                      in
-                      if isLinux && isAarch64 then
-                        "${config.home.homeDirectory}/.ssh/secret_env"
-                      else
-                        "${config.sops.secrets."nixbuild/secret_env".path}";
-                  };
+                PubkeyAcceptedKeyTypes = "ssh-ed25519";
+                IPQoS = "throughput";
+                LogLevel = "Debug1";
+                IgnoreUnknown = "WarnWeakCrypto";
+                WarnWeakCrypto = "no-pq-kex";
+                Include =
+                  let
+                    inherit (pkgs.stdenv) isLinux isAarch64;
+                  in
+                  if isLinux && isAarch64 then
+                    "${config.home.homeDirectory}/.ssh/secret_env"
+                  else
+                    "${config.sops.secrets."nixbuild/secret_env".path}";
               })
             )
             // (lib.optionalAttrs (onNixos && (config.home.username == "root")) {
-              extraOptions = {
-                "PubkeyAcceptedKeyTypes" = "ssh-ed25519";
-                "IPQoS" = "throughput";
-                "LogLevel" = "Debug1";
-                "IgnoreUnknown" = "WarnWeakCrypto";
-                "WarnWeakCrypto" = "no-pq-kex";
-                "Include" = "/run/secrets/nixbuild/secret_env";
-              };
+              PubkeyAcceptedKeyTypes = "ssh-ed25519";
+              IPQoS = "throughput";
+              LogLevel = "Debug1";
+              IgnoreUnknown = "WarnWeakCrypto";
+              WarnWeakCrypto = "no-pq-kex";
+              Include = "/run/secrets/nixbuild/secret_env";
             })
           );
         }
@@ -165,13 +157,11 @@ in
           "nixbuild-shell" = {
             hostname = "eu.nixbuild.net";
             user = "root";
-            extraOptions = {
-              "LogLevel" = "Debug1";
-              "IgnoreUnknown" = "WarnWeakCrypto";
-              "WarnWeakCrypto" = "no-pq-kex";
-              "PubKeyAcceptedKeyTypes" = "ssh-ed25519";
-              "IPQoS" = "throughput";
-            };
+            LogLevel = "Debug1";
+            IgnoreUnknown = "WarnWeakCrypto";
+            WarnWeakCrypto = "no-pq-kex";
+            PubKeyAcceptedKeyTypes = "ssh-ed25519";
+            IPQoS = "throughput";
             serverAliveInterval = 60;
             identitiesOnly = true;
             inherit identityFile;
