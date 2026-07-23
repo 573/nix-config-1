@@ -386,7 +386,7 @@ in
         keyboard-de = pkgs.writeShellApplication {
           name = "keyboard-de";
           runtimeInputs = [
-            pkgs.xorg.setxkbmap
+            pkgs.setxkbmap
             pkgs.runtimeShell
           ];
 
@@ -400,7 +400,7 @@ in
         keyboard-en = pkgs.writeShellApplication {
           name = "keyboard-en";
           runtimeInputs = [
-            pkgs.xorg.setxkbmap
+            pkgs.setxkbmap
             pkgs.runtimeShell
           ];
 

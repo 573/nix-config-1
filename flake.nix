@@ -508,7 +508,12 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     nixvim = {
       url = "github:nix-community/nixvim/nixos-26.05";
-      inputs.nixpkgs.follows = "nixpkgs";
+      /*
+      evaluation warning: nixos profile: The `home-manager.users.nixos.programs.nixvim.nixpkgs.source` default value has been affected by your flake input `follows`.
+                    Nixvim's inputs pin Nixpkgs to `a0374025a863d007d98e3297f6aa46cc3141c2f0`. Actual Nixpkgs is following `fd1462031fdee08f65fd0b4c6b64e22239a77870`.
+                    Please remove your `inputs.nixvim.inputs.nixpkgs.follows` or explicitly define `home-manager.users.nixos.programs.nixvim.nixpkgs.source` to suppress this warning.
+		    */
+      #inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ghciwatch = {

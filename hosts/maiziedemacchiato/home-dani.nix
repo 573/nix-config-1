@@ -196,7 +196,7 @@ in
         out
         ;
 
-      inherit (pkgs.xorg)
+      inherit (pkgs)
         libxcvt
         xrandr
         ;

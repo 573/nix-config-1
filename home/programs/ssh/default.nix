@@ -128,7 +128,7 @@ in
 
         enableDefaultConfig = false;
 
-        matchBlocks."*" = {
+        settings."*" = {
           controlPersist = "10m";
           controlPath = "~/.ssh/socket-%C";
           # default in nixpkgs until 25.11 was controlMaster no, I take it from options atop

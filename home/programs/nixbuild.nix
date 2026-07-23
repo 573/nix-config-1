@@ -19,7 +19,13 @@ let
       } 100 2 benchmark,big-parallel - c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K
     '';
   */
-
+  /*
+      evaluation warning: nixos profile: `programs.ssh.matchBlocks` defined in `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/ssh/default.nix' and `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/nixbuild.nix' is deprecated. Use `programs.ssh.settings`.
+    evaluation warning: nixos profile: `programs.ssh.matchBlocks.nixbuild-shell.extraOptions` defined in `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/ssh/default.nix' and `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/nixbuild.nix' is deprecated. Move these OpenSSH options to `programs.ssh.settings.nixbuild-shell` using upstream directive names.
+    evaluation warning: root profile: `programs.ssh.matchBlocks` defined in `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/ssh/default.nix' and `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/nixbuild.nix' is deprecated. Use `programs.ssh.settings`.
+    evaluation warning: root profile: `programs.ssh.matchBlocks.nixbuild.extraOptions` defined in `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/ssh/default.nix' and `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/nixbuild.nix' is deprecated. Move these OpenSSH options to `programs.ssh.settings.nixbuild` using upstream directive names.
+    evaluation warning: root profile: `programs.ssh.matchBlocks.nixbuild-shell.extraOptions` defined in `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/ssh/default.nix' and `/nix/store/d85ha9x4p056xjnf51fjl9r3wb1pqbl0-source/home/programs/nixbuild.nix' is deprecated. Move these OpenSSH options to `programs.ssh.settings.nixbuild-shell` using upstream directive names.
+  */
   identityFile =
     let
       inherit (pkgs.stdenv) isLinux isAarch64;
@@ -109,7 +115,7 @@ in
       # /root/.ssh/config (home.nix) favoured as opposed to /etc/ssh/ssh_config as latter
       # which leads to permissions worm hole.
       # secrets ought still to be handled different as sops-nix is not available on nix-on-droid.
-      programs.ssh.matchBlocks =
+      programs.ssh.settings =
         lib.optionalAttrs ((config.home.username == "root") || (!onNixos)) {
           nixbuild = lib.optionalAttrs ((config.home.username == "root") || (!onNixos)) (
             (
@@ -122,6 +128,7 @@ in
                 hashKnownHosts = true;
               }
               // (lib.optionalAttrs (!onNixos) {
+	        
                 extraOptions =
                   # lib.mkAfter{} not needed here bc "Include" is not set
                   # in both of the branches here. It is either-or anyways.

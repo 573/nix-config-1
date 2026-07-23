@@ -51,7 +51,7 @@ in
       (config.lib.custom.mkScript "kvm_display_handler_layout" ./kvm_display_handler_layout.sh (
         builtins.attrValues
         {
-          inherit (pkgs.xorg)
+          inherit (pkgs)
             xrandr
             ;
         }
@@ -60,7 +60,7 @@ in
       (config.lib.custom.mkScript "migrate_to_new_kvmswitch.sh" ./migrate_to_new_kvmswitch.sh (
         builtins.attrValues
         {
-          inherit (pkgs.xorg)
+          inherit (pkgs)
             xrandr
             ;
         }
