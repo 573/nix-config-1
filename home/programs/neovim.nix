@@ -89,38 +89,40 @@ in
       # this replaces plugins.lsp here, TODO move config from there here
 
       # https://github.com/nix-community/nixvim/discussions/4479
-      lsp = {
-        # https://nix-community.github.io/nixvim/lsp/keymaps/index.html
-        keymaps = [
-          # from https://github.com/nix-community/nixvim/blob/85d64907a9c132ecf2e8ebe46d0ad842381516ec/modules/lsp/keymaps.nix#L44
-          {
-            key = "gd";
-            lspBufAction = "definition";
-          }
-          {
-            key = "gD";
-            lspBufAction = "references";
-          }
-          {
-            key = "gt";
-            lspBufAction = "type_definition";
-          }
-          {
-            key = "gi";
-            lspBufAction = "implementation";
-          }
-          {
-            key = "K";
-            lspBufAction = "hover";
-          }
+      /*
+        lsp = {
+          # https://nix-community.github.io/nixvim/lsp/keymaps/index.html
+          keymaps = [
+            # from https://github.com/nix-community/nixvim/blob/85d64907a9c132ecf2e8ebe46d0ad842381516ec/modules/lsp/keymaps.nix#L44
+            {
+              key = "gd";
+              lspBufAction = "definition";
+            }
+            {
+              key = "gD";
+              lspBufAction = "references";
+            }
+            {
+              key = "gt";
+              lspBufAction = "type_definition";
+            }
+            {
+              key = "gi";
+              lspBufAction = "implementation";
+            }
+            {
+              key = "K";
+              lspBufAction = "hover";
+            }
 
-        ];
+          ];
 
-        # https://nix-community.github.io/nixvim/lsp/servers/index.html
-        servers = {
-          nixd.enable = true;
+          # https://nix-community.github.io/nixvim/lsp/servers/index.html
+          #servers = {
+          #  nixd.enable = true;
+          #};
         };
-      };
+      */
 
       # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L298
       plugins = {
@@ -225,7 +227,7 @@ in
         gitlinker.enable = true;
 
         gitsigns = {
-          #enable = true;
+          enable = true;
           settings = {
             current_line_blame = false;
             current_line_blame_opts = {
@@ -278,73 +280,27 @@ in
         lsp = {
           enable = true;
 
-          keymaps.diagnostic = {
-            "<leader>j" = "goto_next";
-            "<leader>k" = "goto_prev";
-          };
+          /*
+            keymaps.diagnostic = {
+              "<leader>j" = "goto_next";
+              "<leader>k" = "goto_prev";
+            };
 
-          keymaps.lspBuf = {
-            K = "hover";
-            gD = "references";
-            gd = "definition";
-            gi = "implementation";
-            gt = "type_definition";
-          };
-
+            keymaps.lspBuf = {
+              K = "hover";
+              gD = "references";
+              gd = "definition";
+              gi = "implementation";
+              gt = "type_definition";
+            };
+          */
           # see https://lazy.folke.io/spec/lazy_loading#%EF%B8%8F-lazy-key-mappings
           lazyLoad.settings.ft = [
             "nix"
             "java"
           ];
 
-          # see https://github.com/nix-community/nixvim/blob/b8f76bf5751835647538ef8784e4e6ee8deb8f95/modules/lsp/default.nix#L7
-          # via https://nix-community.github.io/nixvim/25.11/lsp/luaConfig.html#lspluaconfigpre
-          # got here https://github.com/nix-community/nixvim/discussions/3427#discussioncomment-13356384
-          luaConfig.pre =
-            let
-              java-debug = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug/server";
-              java-test = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test/server";
-            in
-            ''
-                     -- see https://vi.stackexchange.com/q/42707
-                     -- if client.name == "jdtls" then
-              --	end
-            '';
-
-          # This would be useful only for very minimal completion, i.e., only builtin lsp completion
-          # Also, in combination with cmp-nvim-lsp / cmp at least, C-x C-o does not really trigger: Only
-          # using just and only vim.lsp.completion.* without cmp.
-          # search machine: vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true }) and cmp
-          # search machine: vim.lsp.completion.enable vs nvim-cmp is it compatible
-          # search machine: c-x c-o not working when cmp plugin active
-          # https://github.com/neovim/nvim-lspconfig/wiki/Autocompletion/217feffc675a17d8ab95259ed9d4c6d62e1cd2e1#autocompletion-not-built-in-vs-completion-built-in
-          # https://github.com/hrsh7th/cmp-nvim-lsp/blob/5af77f54de1b16c34b23cba810150689a3a90312/README.md?plain=1#L9
-          # https://martinopilia.com/posts/2024/10/27/vim-config-update.html
-          # https://vonheikemen.github.io/devlog/tools/setup-nvim-lspconfig-plus-nvim-cmp/
-          # tl;dr while it is possible to use vim.lsp.completion next to cmp see , it might create issues
-          # due to incompatibilities
-          /*
-            onAttach = ''
-              -- https://github.com/neovim/neovim/issues/33142#issue-2957264231
-              -- remove this next line soon - only for debugging purposes inserted
-              -- client.server_capabilities.completionProvider.triggerCharacters = vim.split("qwertyuiopasdfghjklzxcvbnm. ", "")
-
-              -- see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
-              if client:supports_method('textDocument/completion') then
-                vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
-              end
-            '';
-          */
-
           servers = {
-            #ltex.enable = true;
-            #texlab.enable = true;
-            #lua_ls.enable = true;
-            yamlls = {
-              enable = true;
-              autostart = true;
-            };
-
             nixd = {
               # Nix LS
               enable = true; # FIXME re-enable when crashes on termux are fixed
@@ -388,24 +344,35 @@ in
           };
         };
 
-        # deprecated via lsp below, see "Note" at https://nix-community.github.io/nixvim/25.11/plugins/lspconfig/index.html#lspconfig
+        # see "Note" at https://nix-community.github.io/nixvim/25.11/plugins/lspconfig/index.html#lspconfig
         # but on 25.11 no Lsp server is found without it, so left it enabled.
-        lspconfig.enable = true;
+        #lspconfig.enable = true;
 
         lsp-format.enable = true;
+
+        lsp-lines = {
+          enable = true;
+        };
 
         lz-n = {
           enable = true;
 
           keymaps = [
             {
-              # TODO remove if colliding with telescope declaration here in the nix file
               action = config.lib.nixvim.mkRaw "function() require('telescope.builtin').find_files() end";
               key = "<leader>ff";
               options = {
                 desc = "Find files";
               };
               plugin = "telescope.nvim";
+            }
+            {
+              action = config.lib.nixvim.mkRaw "function() require('lsp_lines').toggle() end";
+              key = "<leader>l";
+              options = {
+                desc = "Toggle lsp_lines";
+              };
+              plugin = "lsp-lines";
             }
           ];
 
