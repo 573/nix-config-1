@@ -167,7 +167,8 @@ in
         #sane-backends # DONT bc simple-scan requires sane-backends which in turn requires udev rules to be in place for the scanner to be detected, so on non-nixos installations oof home-manager this simply cannot work. also a mix of non-nixos host provided sane-backends vs simple-scan will not work
         #ocrfeeder # import pdf dialog crashes, broken on NixOS-WSL as well
         ##pdfsandwich # archlinux rather, gscan2pdf, ocrmypdf
-        cuneiform
+        # TODO cuneiform build broken in 26.05
+	#cuneiform
         normcap
         ##gImageReader # archlinux rather
         gdb

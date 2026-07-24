@@ -80,7 +80,7 @@ in
         registry
         ;
 
-      package = pkgs.nixVersions.nix_2_32;
+      package = pkgs.nixVersions.nix_2_34;
     };
 
     # WARN llm used https://share.google/aimode/E27wUYAUTYr2Bk2NT

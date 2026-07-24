@@ -65,7 +65,8 @@ in
 
       home.packages = [
         (buildWithDiff "hm-build"
-          "nix build --option experimental-features \"nix-command flakes pipe-operators\" --builders '' --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
+          # in case of errors first add --builders '' and remove eval-store to rule out
+          "nix build -L --verbose  --show-trace --eval-store auto --store ssh-ng://root@eu.nixbuild.net --option experimental-features \"nix-command flakes pipe-operators\" --log-format internal-json --verbose \"${nixConfigDir}#homeConfigurations.\\\"$(whoami)@$(hostname)\\\".activationPackage\" |& nom --json"
           "${config.home.homeDirectory}/.local/state/nix/profiles/home-manager"
         )
       ];
