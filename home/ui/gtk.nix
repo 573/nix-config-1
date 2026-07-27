@@ -42,8 +42,9 @@ in
   config = mkIf cfg.enable {
     xdg.portal = {
       enable = true;
-      config.common.default = "*";
+      config.common.default = "gtk";
       extraPortals = [
+        pkgs.xdg-desktop-portal-xapp
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-gnome
       ];
@@ -56,7 +57,7 @@ in
     # https://discourse.nixos.org/t/different-cursor-theme-hovering-background-and-windows/62983
     gtk = {
       enable = true;
-      iconTheme = {
+      /*iconTheme = {
         name = "Papirus-Dark";
         package = pkgs.papirus-icon-theme;
       };
@@ -82,6 +83,7 @@ in
       };
       # 26.05 warning
       gtk4.theme = config.gtk.theme;
+      */
     };
 
     #programs.dconf.enable = true;

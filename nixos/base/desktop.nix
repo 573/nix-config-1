@@ -149,7 +149,7 @@ in
           xfce.xfce4-whiskermenu-plugin
           xfce.xfce4-xkb-plugin
           xfce.xfdashboard
-          xorg.xev
+          xev
           xsel
           xtitle
         ];

@@ -173,6 +173,10 @@ in
       # stick to that (has all the links as well) https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/1
       enable = true;
 
+      # 26.05+, analog home.stateVersion = "26.05";
+      configPath = "${config.xdg.configHome}/mozilla/firefox";
+
+
       # https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/17
       policies = {
         ExtensionSettings =

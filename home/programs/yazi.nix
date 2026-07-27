@@ -49,6 +49,9 @@ in
     programs.yazi = {
       enable = true;
 
+      # analog home.stateVersion = "26.05";
+      shellWrapperName = "y";
+
       # https://github.com/sxyazi/yazi/issues/1046
       # FIXME https://github.com/sxyazi/yazi/issues/1726 (in upstream main only, use https://yazi-rs.github.io/docs/installation#cache)
       # also tried as in: https://discourse.nixos.org/t/patching-src-fails-and-limiting-hunks-doesnt-work-either/54406
