@@ -82,11 +82,23 @@ in
           path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
 	    (os.getenv("HOME") .. "/.config/yazi/bookmark"),
         }
+
+	require("yafg"):setup({
+  toggle_mode_key = "alt-t",          -- fzf key to switch ripgrep/fzf mode (default: "ctrl-t")
+  editor = "nvim",                    -- Editor command (default: "hx")
+  args = { "--noplugin" },            -- Additional editor arguments (default: {})
+  file_arg_format = "+{row} {file}",  -- File argument format (default: "{file}:{row}:{col}")
+})
       '';
 
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
+	  {
+	  # https://github.com/XYenon/yafg.yazi#usage
+on  = [ "F" "G" ];
+run = "plugin yafg";
+}
 	  # https://github.com/sxyazi/yazi/discussions/2928
 	  {
 	    on = "s";

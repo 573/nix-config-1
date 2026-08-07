@@ -449,6 +449,7 @@ in
 	  ocrfeeder
 
 jmtpfs
+j
           ;
         inherit (pkgs)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
