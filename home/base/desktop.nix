@@ -385,6 +385,10 @@ in
 
     #    home.sessionVariables.XDG_DATA_DIRS = mkAfter [ "${missing-gsettings-schemas-fix}" ];
 
+    programs = {
+      skim.enable = true;
+    };
+
     home.packages = attrValues (
       {
         keyboard-de = pkgs.writeShellApplication {
@@ -442,6 +446,9 @@ in
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
           lxsession
+	  ocrfeeder
+
+jmtpfs
           ;
         inherit (pkgs.xorg)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc

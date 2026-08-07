@@ -183,9 +183,10 @@ in
         reader
         ;
 
-      inherit (nixos-unstable)
-        tutanota-desktop
-        ;
+# yubikey integration broken
+#      inherit (nixos-unstable)
+#        tutanota-desktop
+#        ;
 
       inherit (unstable)
         tesseract
