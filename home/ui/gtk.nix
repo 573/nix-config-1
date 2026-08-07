@@ -57,7 +57,8 @@ in
     # https://discourse.nixos.org/t/different-cursor-theme-hovering-background-and-windows/62983
     gtk = {
       enable = true;
-      /*iconTheme = {
+      # FIXME having this broke save files on almost any app, i.e., firefox, simple-scan etc. with nixos-26.05
+      /*iconTheme = 
         name = "Papirus-Dark";
         package = pkgs.papirus-icon-theme;
       };
