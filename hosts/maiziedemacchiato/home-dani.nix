@@ -76,6 +76,8 @@ in
 
       #mpv.enable = true;
 
+      yazi.enable = true;
+
       nixbuild.enable = true;
 
       neovim = {
@@ -90,10 +92,10 @@ in
 
   programs.keepassxc.enable = true;
 
-  programs.yazi = {
-    enable = true;
-    enableBashIntegration = true;
-  };
+  #programs.yazi = {
+  #  enable = true;
+  #  enableBashIntegration = true;
+  #};
 
   #xsession = {
   #  enable = true;

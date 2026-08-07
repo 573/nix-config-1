@@ -50,7 +50,7 @@ in
       enable = true;
 
       # analog home.stateVersion = "26.05";
-      shellWrapperName = "y";
+      shellWrapperName = lib.mkForce "y";
 
       # https://github.com/sxyazi/yazi/issues/1046
       # FIXME https://github.com/sxyazi/yazi/issues/1726 (in upstream main only, use https://yazi-rs.github.io/docs/installation#cache)
@@ -210,10 +210,14 @@ in
         inherit
           ouch
           git
+	  yafg
           ;
-        bat = inputs.yazi-plugin-bat;
+        #bat = inputs.yazi-plugin-bat;
         command = inputs.command-yazi;
         yamb = inputs.yamb-yazi;
+	# TODO
+	# https://codeberg.org/Hanker/augment-command.yazi#pager-pager
+	# https://devctrl.blog/posts/search-yazi-unifying-fzf-ripgrep-fd-and-zoxide-in-the-terminal/
       };
 
 #      theme = builtins.fromTOML (
@@ -222,6 +226,8 @@ in
 
       # https://yazi-rs.github.io/docs/resources
       # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1
+      # https://github.com/sxyazi/yazi/blob/f42a0df4df829b3c774e8f6dd03e10353269a23b/yazi-config/preset/yazi-default.toml#L109
+      # https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset
       settings = {
         log = {
           enabled = false;
@@ -289,29 +295,29 @@ in
               run = "pdf";
             } # ?
             {
-              name = "*/";
+              url = "*/";
               run = "folder";
               sync = true;
             }
-            {
+	    {
               mime = "text/*";
-              run = "bat";
+              run = "code";
             }
             {
               mime = "*/xml";
-              run = "bat";
+              run = "code";
             }
             {
               mime = "*/cs";
-              run = "bat";
+              run = "code";
             }
             {
               mime = "*/javascript";
-              run = "bat";
+              run = "code";
             }
             {
               mime = "*/x-wine-extension-ini";
-              run = "bat";
+              run = "code";
             }
           ];
 
@@ -346,26 +352,18 @@ in
               mime = "application/pdf";
               run = "pdf";
             }
-            {
-              name = "*.csv";
-              run = "bat";
-            }
-            {
-              name = "*.md";
-              run = "bat";
-            }
           ];
 
           prepend_fetchers = [
             {
-              id = "git";
-              name = "*";
+              url = "*";
               run = "git";
+	      group = "git";
             }
             {
-              id = "git";
-              name = "*/";
+              url = "*/";
               run = "git";
+	      group = "git";
             }
           ];
         };
@@ -388,7 +386,7 @@ in
           _7zz
           zathura
           poppler
-          bat
+          
           ripgrep-all
           ;
       }

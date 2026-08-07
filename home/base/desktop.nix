@@ -450,9 +450,9 @@ in
 
 jmtpfs
           ;
-        inherit (pkgs.xorg)
+        inherit (pkgs)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
-          #xorg.xset
+          #xset
           xev
           ;
         #inherit (pkgs.lxde)
