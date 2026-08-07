@@ -97,7 +97,7 @@ in
         #        "https://laut.cachix.org/"
         #        "https://anmonteiro.nix-cache.workers.dev"
         "https://573-bc.cachix.org"
-        "https://cache.garnix.io"
+        # "https://cache.garnix.io" # EOL, see https://garnix.io/blog/shutting-down/, self-host https://github.com/garnix-io/garnix-ci
         # normally implicitly added and not needed to write here but when reordering
         "https://cache.nixos.org/"
         #        "https://nix-on-droid.cachix.org/"
@@ -118,7 +118,7 @@ in
         #        "laut.cachix.org-1:0VdPZQIzKf4dbk8eHrZPjZc53y6DzdNsUt/VB6ju66g="
         #        "ocaml.nix-cache.com-1:/xI2h2+56rwFfKyyFVbkJSeGqSIYMC/Je+7XXqGKDIY="
         "573-bc.cachix.org-1:2XtNmCSdhLggQe4UTa4i3FSDIbYWx/m1gsBOxS6heJs="
-        "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+        # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="  # EOL
         # without explicitly adding this when using lib.mkForce I'll get
         # lots of build warnings that artifact is in cache.nixos.org but
         # is not signed by any of the keys in trusted-public-keys; consequentially

@@ -38,11 +38,13 @@ let
 
       nix.settings = {
         substituters = lib.mkForce [
-	  "https://cache.garnix.io"
+        "ssh://eu.nixbuild.net"
+	  #"https://cache.garnix.io"
 #          "https://gerschtli.cachix.org"
         ];
         trusted-public-keys = [
-	  "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+        "cache.corocoton-nixbuild.net-2:aiggtAc2pIcZXw3rMHBUhahHMiwUd8/YP/v9nek80jo="
+	  #"cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
 #          "gerschtli.cachix.org-1:dWJ/WiIA3W2tTornS/2agax+OI0yQF8ZA2SFjU56vZ0="
         ];
         experimental-features = [
