@@ -170,7 +170,7 @@ in
         #ocrfeeder # import pdf dialog crashes, broken on NixOS-WSL as well
         ##pdfsandwich # archlinux rather, gscan2pdf, ocrmypdf
         # TODO cuneiform build broken in 26.05
-	#cuneiform
+        #cuneiform
         normcap
         ##gImageReader # archlinux rather
         gdb
@@ -185,10 +185,10 @@ in
         reader
         ;
 
-# yubikey integration broken
-#      inherit (nixos-unstable)
-#        tutanota-desktop
-#        ;
+      # yubikey integration broken
+      #      inherit (nixos-unstable)
+      #        tutanota-desktop
+      #        ;
 
       inherit (unstable)
         tesseract
@@ -336,7 +336,8 @@ in
       externalStorageBaseDir = "/tmp";
     in
     {
-         /* ${socketProxy} = {
+      /*
+        ${socketProxy} = {
           image = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2";
 
           volumes = [ "/run/user/1000/podman/podman.sock:/var/run/docker.sock:ro" ];
@@ -363,7 +364,16 @@ in
 
           ports = [ "2375:2375" ];
         };
-	*/
+      */
+
+      photoprism = {
+        image = "ghcr.io/photoprism/photoprism:latest";
+        volumes = [
+          "${config.home.homeDirectory}/stacks/photoprism:/photoprism/storage"
+          "${config.home.homeDirectory}/stacks/photoprism/cache:/photoprism/cache"
+        ];
+        ports = [ "2342:2342" ];
+      };
 
       ${name} = {
         image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15";
@@ -376,8 +386,8 @@ in
             ];
             StartLimitIntervalSec = "120";
             StartLimitBurst = 5;
-                Wants = [ "sops-nix.service" ];
-                After = [ "sops-nix.service" ];
+            Wants = [ "sops-nix.service" ];
+            After = [ "sops-nix.service" ];
           };
 
           Service = {
@@ -387,7 +397,7 @@ in
           #Container.UserNS = true;
         };
 
-network = "paperless";
+        network = "paperless";
 
         volumes = [
           "${storage}/data:/usr/src/paperless/data"
@@ -426,8 +436,8 @@ network = "paperless";
 
       ${brokerName} = {
         image = "docker.io/redis:8.0";
-	network = "paperless";
-	};
+        network = "paperless";
+      };
 
       ${dbName} = {
         image = "docker.io/postgres:16";
@@ -437,7 +447,7 @@ network = "paperless";
           #PGPASSFILE = db.passwordFile;
           POSTGRES_PASSWORD_FILE = db.passwordFile;
         };
-	network = "paperless";
+        network = "paperless";
         volumes = [
           "${db.passwordFile}:${db.passwordFile}"
           "${storage}/db:/var/lib/postgresql/data"
@@ -455,11 +465,11 @@ network = "paperless";
             };
       */
     };
-  
-    services.podman.networks.paperless = {
-          driver = "bridge";
-        };
-  
+
+  services.podman.networks.paperless = {
+    driver = "bridge";
+  };
+
   /*
     # see https://github.com/nix-community/home-manager/pull/4801
     services.podman.networks.caddy_routing = {
