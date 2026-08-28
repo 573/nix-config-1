@@ -276,6 +276,39 @@ in
     ];
   };
 
+  services.espanso = {
+    enable = true;
+    configs = {
+
+      base = {
+        matches = [
+          {
+            trigger = ":now";
+            replace = "It's {{currentdate}} {{currenttime}}";
+          }
+        ];
+      };
+      global_vars = {
+        global_vars = [
+          {
+            name = "currentdate";
+            type = "date";
+            params = {
+              format = "%d-%m-%Y";
+            };
+          }
+          {
+            name = "currenttime";
+            type = "date";
+            params = {
+              format = "%R";
+            };
+          }
+        ];
+      };
+    };
+  };
+
   news.entries = [
     {
       time = "2025-11-15T14:04:00+00:00";
@@ -367,7 +400,17 @@ in
       */
 
       photoprism = {
-        image = "ghcr.io/photoprism/photoprism:latest";
+        image = "photoprism/photoprism:latest";
+
+autoUpdate = "local";
+        extraConfig = {
+          Service = {
+            Restart = "always";
+            StartLimitIntervalSec = "120";
+            StartLimitBurst = 5;
+          };
+        };
+
         volumes = [
           "${config.home.homeDirectory}/stacks/photoprism:/photoprism/storage"
           "${config.home.homeDirectory}/stacks/photoprism/cache:/photoprism/cache"
