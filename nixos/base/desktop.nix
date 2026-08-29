@@ -190,12 +190,6 @@ in
 
         libinput = mkIf cfg.enableXserver {
           enable = true;
-          touchpad = {
-            accelProfile = "flat";
-            additionalOptions = ''
-              Option "TappingButtonMap" "lmr"
-            '';
-          };
         };
 
         logind.settings.Login = {

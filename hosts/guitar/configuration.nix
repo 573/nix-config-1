@@ -40,8 +40,12 @@
   services.libinput = {
     enable = true;
     touchpad = {
-      disableWhileTyping = false;
-      scrollMethod = "twofinger";
+      disableWhileTyping = true;
+      scrollMethod = "edge";
+      naturalScrolling = true;
+      tapping = false;
+      accelSpeed = "0.5";
+      tappingDragLock = false;
     };
   };
 
