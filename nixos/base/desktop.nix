@@ -183,7 +183,9 @@ in
         plugins = mkForce [ ]; # FIXME: disabled because openconnect is not substitutable currently
       };
 
-      programs.light.enable = true;
+      # TODO gone since 26.05, see https://wiki.nixos.org/wiki/Backlight
+      # `brightnessctl` and `hardware.acpilight` offer replacements.
+#      programs.light.enable = true;
 
       services = {
         blueman.enable = true;
