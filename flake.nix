@@ -31,6 +31,7 @@
     nixos-2311.url = "github:NixOS/nixpkgs/nixos-23.11";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
 
     # FIXME broken, https://www.reddit.com/r/NixOS/comments/175w44g/broken_flake_sorta/
     # https://github.com/nix-community/NixOS-WSL/discussions/735
@@ -78,8 +79,11 @@
     };
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     nixfmt-rs.url = "github:Mic92/nixfmt-rs";
+    nixfmt-rs.inputs.nixpkgs.follows = "nixpkgs";
+    nixfmt-rs.inputs.treefmt-nix.follows = "treefmt-nix";
 
     #quadlet-nix = {
     #  url = "github:SEIAROTg/quadlet-nix";
@@ -87,6 +91,9 @@
 
     # TODO upgrade my flake to 26.05
     nps.url = "github:Tarow/nix-podman-stacks/v0.7.0";
+    nps.inputs.home-manager.follows = "home-manager";
+    nps.inputs.nixpkgs.follows = "nixpkgs";
+    nps.inputs.sops-nix.follows = "sops-nix";
 
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
@@ -94,6 +101,8 @@
       # otherwise derivation paths can mismatch (when using storageMode = "derivation"),
       # resulting in the rekeyed secrets not being found!
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
 
     # Firefox style
@@ -134,11 +143,16 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     catppuccin = {
       url = "github:catppuccin/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     devenv = {
       url = "github:cachix/devenv";
       inputs.nixpkgs.follows = "unstable";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixd.follows = "nixd";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
 
     nix-on-droid = {
@@ -173,6 +187,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     agenix-cli = {
       url = "github:cole-h/agenix-cli";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "flake-compat";
     };
     # TODO https://github.com/search?q=repo%3AGerschtli%2Fnix-config+%22+age+%22&type=code
     homeage = {
@@ -209,6 +224,8 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     # TODO https://github.com/nix-community/neovim-nightly-overlay/blob/89fdda1/flake.nix#L39
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
       #inputs.nixpkgs.follows = "unstable";
       #inputs.flake-parts.follows = "flake-parts";
       #inputs.hercules-ci-effects.follows = "hercules-ci-effects";
@@ -217,6 +234,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nmd.url = "git+https://git.sr.ht/~rycee/nmd?ref=master";
+    nmd.inputs.nixpkgs.follows = "nixpkgs";
 
     fenix = {
       url = "github:nix-community/fenix";
@@ -250,6 +268,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     ruby-nix = {
       url = "github:inscapist/ruby-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     bundix = {
@@ -303,6 +322,8 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       # tag shipped for stable yazi
       # tag nightly for unstable yazi
       url = "github:sxyazi/yazi?ref=refs/tags/shipped";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
       #inputs.nixpkgs.follows = "unstable";
     };
 
@@ -318,12 +339,14 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     nixGL = {
       url = "github:nix-community/nixGL";
+      inputs.nixpkgs.follows = "nixpkgs";
       # follows nixpkgs (master)
     #  inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # follows nixpkgs (master)
     nix-index-database.url = "github:Mic92/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
     "deferred-clipboard.nvim" = {
       flake = false;
@@ -362,6 +385,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     */
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay-cached = {
       # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
@@ -370,6 +394,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       # with the one before it works f148a612dbb4c29162fd61558ca10bc1b6fdc669
       # see https://github.com/nix-community/emacs-overlay/commits/master?since=2024-08-07&until=2024-08-07
       url = "github:nix-community/emacs-overlay/f148a612dbb4c29162fd61558ca10bc1b6fdc669";
+      inputs.nixpkgs.follows = "nixpkgs";
       #url = "github:nix-community/emacs-overlay/bbe883e60c65dd9254d010e98a1a8a654a26f9d8";
       #url = "github:nix-community/emacs-overlay/2308be4351ab8a152248a48baebf22649c83a487";
     };
@@ -401,9 +426,12 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     };
 
     impermanence.url = "github:nix-community/impermanence";
+    impermanence.inputs.home-manager.follows = "home-manager";
+    impermanence.inputs.nixpkgs.follows = "nixpkgs";
 
     talon = {
       url = "github:nix-community/talon-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
       #inputs.nixpkgs.follows = "unstable";
     };
 
@@ -414,11 +442,18 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     poetry2nix.url = "github:nix-community/poetry2nix";
     #      poetry2nix.inputs.flake-utils.follows = "flake-utils";
     poetry2nix.inputs.nixpkgs.follows = "unstable";
+    poetry2nix.inputs.treefmt-nix.follows = "treefmt-nix";
 
     jupyenv.url = "github:tweag/jupyenv?ref=refs/pull/524/head"; # "github:573/jupyenv-aarch64-experimental";
+    jupyenv.inputs.flake-compat.follows = "flake-compat";
+    jupyenv.inputs.nixpkgs.follows = "nixpkgs";
+    jupyenv.inputs.poetry2nix.follows = "poetry2nix";
+    jupyenv.inputs.rust-overlay.follows = "rust-overlay";
 
     nixpkgs-ruby = {
       url = "github:bobvanderlinden/nixpkgs-ruby";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.nixpkgs.follows = "nixpkgs";
       #   inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -428,9 +463,9 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixd = {
-      url = "github:nix-community/nixd?ref=2.0.2";
+      url = "github:nix-community/nixd?ref=2.9.2";
       #url = "github:nix-community/nixd";
-      inputs.nixpkgs.follows = "unstable";
+      inputs.nixpkgs.follows = "nixos-unstable";
       inputs.flake-parts.follows = "flake-parts";
     };
 
@@ -445,19 +480,24 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       # firefox as fresh as my unstable installed everytime I flake update unstable and do remind myself to also flake update firefox then
       # TODO note: this is only due to that firefox-nightlies seem to built anyway on my nix-powered arch at least where I'm forced to use sandbox false as long as I have not
       # fixed the sandbox issue I have there
-      inputs.nixpkgs.follows = "unstable";
+      inputs.nixpkgs.follows = "nixos-unstable";
+      inputs.flake-compat.follows = "flake-compat";
     };
 
     rust-dev-template = {
-      url = "github:the-nix-way/dev-templates/1117b469aa83bef9e29616b7c67d80b14beb2c14?dir=rust"; # reason for pin: error: flake input attribute 'nixpkgs' is a thunk while a string, Boolean, or integer is expected :: meaning the url is resolved to *.tar.gz thus ?/dir= uri would not work yet
+      url = "github:the-nix-way/dev-templates/1117b469aa83bef9e29616b7c67d80b14beb2c14?dir=rust";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay"; # reason for pin: error: flake input attribute 'nixpkgs' is a thunk while a string, Boolean, or integer is expected :: meaning the url is resolved to *.tar.gz thus ?/dir= uri would not work yet
     };
 
     clojure-dev-template = {
       url = "github:the-nix-way/dev-templates?dir=clojure";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ocaml-dev-template = {
       url = "github:the-nix-way/dev-templates?dir=ocaml";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     git-issue = {
@@ -483,13 +523,17 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     google-chrome = {
       url = "github:r-k-b/browser-previews";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ghc-wasm-meta.url = "gitlab:ghc/ghc-wasm-meta/master?host=gitlab.haskell.org";
+    ghc-wasm-meta.inputs.nixpkgs.follows = "nixpkgs";
 
     zig2nix.url = "github:Cloudef/zig2nix";
+    zig2nix.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-ld-rs.url = "github:Mic92/nix-ld";
+    nix-ld-rs.inputs.nixpkgs.follows = "nixpkgs";
 
     bookmarks-yazi = {
       url = "github:dedukun/bookmarks.yazi";
@@ -499,15 +543,19 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nixvim-2505 = {
       url = "github:nix-community/nixvim/nixos-25.05";
       inputs.nixpkgs.follows = "nixos-2505";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     nixvim-2511 = {
       url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixos-2511";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     nixvim = {
       url = "github:nix-community/nixvim/nixos-26.05";
+      inputs.flake-parts.follows = "flake-parts";
+      #inputs.nixpkgs.follows = "nixpkgs";
       /*
       evaluation warning: nixos profile: The `home-manager.users.nixos.programs.nixvim.nixpkgs.source` default value has been affected by your flake input `follows`.
                     Nixvim's inputs pin Nixpkgs to `a0374025a863d007d98e3297f6aa46cc3141c2f0`. Actual Nixpkgs is following `fd1462031fdee08f65fd0b4c6b64e22239a77870`.
@@ -518,6 +566,9 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     ghciwatch = {
       url = "github:MercuryTechnologies/ghciwatch";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
 
     nvim-dd = {
@@ -541,6 +592,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nix-inspect.url = "github:bluskript/nix-inspect";
+    nix-inspect.inputs.nixpkgs.follows = "nixpkgs";
 
     nixpkgs-unfree = {
       url = "github:numtide/nixpkgs-unfree";
