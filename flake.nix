@@ -385,7 +385,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     */
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.inputs.nixpkgs.follows = "nixos-unstable";
 
     emacs-overlay-cached = {
       # https://hydra.nix-community.org/eval/157894?filter=aarch64-linux.stable.emacs&compare=157534&full=
