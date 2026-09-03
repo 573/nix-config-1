@@ -176,7 +176,6 @@ in
       # 26.05+, analog home.stateVersion = "26.05";
       configPath = "${config.xdg.configHome}/mozilla/firefox";
 
-
       # https://discourse.nixos.org/t/declare-firefox-extensions-and-settings/36265/17
       policies = {
         ExtensionSettings =
@@ -387,6 +386,117 @@ in
 
     programs = {
       skim.enable = true;
+      ripgrep-all = {
+        enable = true;
+        custom_adapters = [
+          (
+            let
+              pptx2md = pkgs.python3Packages.buildPythonPackage (finalAttrs: {
+                pname = "pptx2md";
+                version = "2.0.6";
+                pyproject = true;
+
+                src = pkgs.fetchPypi {
+                  inherit (finalAttrs) pname version;
+                  hash = "sha256-KtwFLZ+14DGwdgiH7qkx58eMIIt7JECxBGijwodLTkQ=";
+                };
+
+                build-system = [
+                  pkgs.python3Packages.setuptools
+                  pkgs.python3Packages.setuptools-scm
+                ];
+
+                dependencies = with pkgs.python3Packages; [
+                  setuptools
+                  pillow
+                  numpy
+                  pydantic
+                  python-pptx
+                  rapidfuzz
+                  scipy
+                  tqdm
+                ];
+
+                nativeBuildInputs = [ pkgs.python3Packages.poetry-core ];
+
+                meta = {
+                  description = "nope";
+                  homepage = "https://github.com/ssine/pptx2md";
+                  license = lib.licenses.asl20;
+                };
+              });
+
+              pptx2mdscript = pkgs.writeShellApplication {
+                name = "pptx2mdscript";
+		 excludeShellChecks = [  "SC2048" "SC2086" ];
+                text = ''
+                  #! ${pkgs.runtimeShell}
+
+# exit on error or use of undeclared variable or pipe error:
+set -o errtrace -o errexit -o nounset -o pipefail
+# optionally debug output by supplying TRACE=1
+[[ "''${TRACE:-0}" == "1" ]] && set -o xtrace
+
+shopt -s inherit_errexit
+IFS=$'\n\t'
+PS4='+\t '
+
+error_handler() { echo "Error: In ''${BASH_SOURCE[0]} Line ''${1} exited with Status ''${2}"; }
+trap 'error_handler ''${LINENO} $?' ERR
+
+output_file="$(mktemp "''${TMPDIR:-/tmp}/tempXXXXXXXXXX.md")"
+  clean_up() {
+    rm "$output_file"
+  }
+  trap clean_up EXIT
+
+# Get the last argument
+for arg; do :; done
+# Check if the last argument is a single hyphen
+if [ "$arg" = "-" ]; then
+  input_file="$(mktemp "''${TMPDIR:-/tmp}/tempXXXXXXXXXX.pptx")"
+  clean_up() {
+    rm "$input_file"
+  }
+  trap clean_up EXIT
+  cat > "$input_file"
+
+  if [ $# -gt 1 ]; then
+    # Store all arguments in an array
+    args=("$@")
+    # Remove the last element from the array
+    unset "args[''${#args[@]}-1]"
+    pptx2md ''${args[*]} "$input_file" --output "$output_file" >/dev/null && \
+      cat --squeeze-blank "$output_file"
+  else
+    pptx2md "$input_file" --output "$output_file" >/dev/null &&
+      cat --squeeze-blank "$output_file"
+  fi
+else
+  pptx2md "$@" --output "$output_file" &&
+    cat --squeeze-blank "$output_file"
+fi
+                '';
+                runtimeInputs = [ pptx2md ];
+              };
+            in
+            {
+              args = [
+                "--disable-image"
+                "--disable-wmf"
+                "-"
+              ];
+              name = "pptx2md";
+              version = 1;
+              description = "Uses adaption of pptx2md to convert PPTX from STDIN to Markdown files";
+              extensions = [ "pptx" ];
+              mimetypes = [ "application/vnd.openxmlformats-officedocument.presentationml.presentation" ];
+              binary = "${pptx2mdscript}/bin/pptx2mdscript";
+              match_only_by_mime = false;
+            }
+          )
+        ];
+      };
     };
 
     home.packages = attrValues (
@@ -446,10 +556,10 @@ in
           xclip
           age-plugin-yubikey # arch: https://github.com/str4d/age-plugin-yubikey
           lxsession
-	  ocrfeeder
+          ocrfeeder
 
-jmtpfs
-j
+          jmtpfs
+          j
           ;
         inherit (pkgs)
           # https://gist.github.com/573/aa12e8fa8c98aeaf788c3687c3b658dc
