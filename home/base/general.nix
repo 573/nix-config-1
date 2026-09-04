@@ -125,6 +125,8 @@ in
 
         packages = attrValues {
           inherit (pkgs)
+	    pptx2md
+	    desed
             # TODO Put into home/programs/neovim ASAP
             # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-binary/39770/2
             #(inputs.nixvim.packages."${system}".default)
