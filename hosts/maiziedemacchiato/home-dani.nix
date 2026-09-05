@@ -398,6 +398,14 @@ in
           ports = [ "2375:2375" ];
         };
       */
+     fredy = {
+       image = "ghcr.io/orangecoding/fredy:master";
+        volumes = [
+          "${config.home.homeDirectory}/stacks/fredy_conf:/conf"
+          "${config.home.homeDirectory}/stacks/fredy_db:/db"
+        ];
+        ports = [ "9998:9998" ];
+     };
 
       photoprism = {
         image = "photoprism/photoprism:latest";
