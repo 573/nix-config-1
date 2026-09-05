@@ -183,6 +183,7 @@ in
         #gtt
         notepad-next
         reader
+	heimdall
         ;
 
       # yubikey integration broken
