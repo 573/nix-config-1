@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@latest
         with:
           ref: ${{ inputs.branch }}
 
@@ -96,12 +96,10 @@ jobs:
       - name: Quick install
         env:
           _system: ${{ matrix.system }}-linux
-        uses: cachix/install-nix-action@v29
+        uses: cachix/install-nix-action@v31.11.1
         with:
-          install_url: 'https://releases.nixos.org/nix/nix-2.24.8/install'
+          install_url: 'https://releases.nixos.org/nix/nix-2.34.8/install'
           extra_nix_config: |
-            substituters = https://cache.garnix.io
-            trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=
             keep-going = true
             show-trace = true
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
@@ -111,7 +109,7 @@ jobs:
       - name: Restore and cache Nix store
         env:
           _system: ${{ matrix.system }}-linux
-        uses: nix-community/cache-nix-action@v5
+        uses: nix-community/cache-nix-action@v7
         with:
           # save a new cache every time ci file changes
           primary-key: cache-${{ matrix.os }}-${{ hashFiles('.github/workflows/ci_experimental.yaml') }}
@@ -130,7 +128,7 @@ jobs:
       - name: Setup cachix
         env:
           _system: ${{ matrix.system }}-linux
-        uses: cachix/cachix-action@v15
+        uses: cachix/cachix-action@v17
         with:
           name: 573-bc
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -140,7 +138,7 @@ jobs:
           _system: ${{ matrix.system }}-linux
           NIXPKGS_ALLOW_INSECURE: ${{ matrix.legacy-openssl == true && 1 || 0 }}
           NIXPKGS_ALLOW_BROKEN: ${{ matrix.legacy-openssl == true && 1 || 0 }}
-        uses: nicknovitski/nix-develop@v1.1.0
+        uses: nicknovitski/nix-develop@v1.2.1
         with:
           arguments: .#${{ (matrix.shell == '') && format('formatter.{0}', env._system) || matrix.shell }} --impure
       - run: |
