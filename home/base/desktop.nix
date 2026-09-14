@@ -463,6 +463,63 @@ in
               match_only_by_mime = false;
             }
           )
+          {
+            name = "in2csv_xlsx";
+            version = 1;
+            description = "Uses in2csv to extract text from XLSX files";
+            extensions = [ "xlsx" ];
+            mimetypes = [ "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ];
+            binary = lib.getExe' pkgs.csvkit "in2csv";
+            args = [ "\${input_virtual_path}" ];
+            match_only_by_mime = false;
+          }
+          {
+            name = "tesseract";
+            version = 1;
+            description = "Uses Tesseract OCR to recognize text in image files";
+            extensions = [
+              "jpg"
+              "jpeg"
+              "jpe"
+              "png"
+              "webp"
+              "gif"
+              "tif"
+              "tiff"
+              "jp2"
+              "j2k"
+              "jpf"
+              "jpm"
+              "jpg2"
+              "jpg2000"
+              "jpeg2000"
+              "j2c"
+              "jpc"
+              "jpx"
+              "bmp"
+              "pnm"
+            ];
+            mimetypes = [
+              "image/jpeg"
+              "image/png"
+              "image/webp"
+              "image/gif"
+              "image/tiff"
+              "image/jp2"
+              "image/jpx"
+              "image/jpm"
+              "image/bmp"
+              "image/x-portable-anymap"
+            ];
+            binary = "${lib.getExe pkgs.tesseract}";
+            args = [
+              "--psm"
+              "1"
+              "-"
+              "-"
+            ];
+            match_only_by_mime = false;
+          }
         ];
       };
     };
