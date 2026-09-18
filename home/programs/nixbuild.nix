@@ -109,7 +109,7 @@ in
     {
       # for both NixOS and non-NixOS
       custom.programs.shell.shellAliases.nixbuild-shell =
-        "${lib.getExe pkgs.rlwrap} ssh nixbuild-shell shell";
+        "${lib.getExe pkgs.rlwrap} ssh nixbuild-shell";
 
       # programs.ssh[...] needed both on NixOS as well as non-NixOS:
       # /root/.ssh/config (home.nix) favoured as opposed to /etc/ssh/ssh_config as latter
