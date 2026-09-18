@@ -36,6 +36,7 @@ in
         enable = true;
         nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
       };
+      yazi.enable = true;
     };
 
     development = {

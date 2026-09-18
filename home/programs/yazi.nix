@@ -52,85 +52,97 @@ in
       # analog home.stateVersion = "26.05";
       shellWrapperName = lib.mkForce "y";
 
+      # see also https://github.com/yazi-rs/yazi-rs.github.io/blob/0007618ca5cf144b6fb9634415239ec82a51576b/docs/installation.md?plain=1#L212
       # https://github.com/sxyazi/yazi/issues/1046
       # FIXME https://github.com/sxyazi/yazi/issues/1726 (in upstream main only, use https://yazi-rs.github.io/docs/installation#cache)
       # also tried as in: https://discourse.nixos.org/t/patching-src-fails-and-limiting-hunks-doesnt-work-either/54406
-      package = (
-        pkgs.yazi.override {
-          optionalDeps = with pkgs; [
-            jq
-            _7zz
-            fd
-            ripgrep
-            fzf
-            zoxide
-          ];
-        }
-      );
+      /*
+        package = (
+          pkgs.yazi.override {
+            # do this to shrink the set of optionalDeps - by default optionalDeps is https://github.com/NixOS/nixpkgs/blob/4c7870105e7f1fdf9c48688c8d7efc21abf0688a/pkgs/by-name/ya/yazi/package.nix#L8
+            optionalDeps = lib.attrValues {
+              inherit (pkgs)
+                ripgrep-all
+                _7zz
+                zathura
+                poppler
+                ouch
+                jq
+                poppler-utils
+                ffmpeg-headless
+                fd
+                ripgrep
+                fzf
+                zoxide
+                imagemagick
+                chafa
+                resvg
+                ;
+            };
+          }
+        );
+      */
 
       enableBashIntegration = true;
 
-      initLua = ''
-        require("git"):setup()
-
-        require("yamb"):setup {
-          -- Optional, the cli of fzf.
-          cli = "fzf",
-          -- Optional, a string used for randomly generating keys, where the preceding characters have higher priority.
-          keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-          -- Optional, the path of bookmarks
-          path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
-	    (os.getenv("HOME") .. "/.config/yazi/bookmark"),
-        }
-
-	require("yafg"):setup({
-  toggle_mode_key = "alt-t",          -- fzf key to switch ripgrep/fzf mode (default: "ctrl-t")
-  editor = "nvim",                    -- Editor command (default: "hx")
-  args = { "--noplugin" },            -- Additional editor arguments (default: {})
-  file_arg_format = "+{row} {file}",  -- File argument format (default: "{file}:{row}:{col}")
-})
-      '';
+      # Rest is in already, see yazi --debug
+      extraPackages = lib.attrValues {
+        inherit (pkgs)
+          ripgrep-all
+          zathura
+          poppler
+          ouch
+          git
+          exiftool
+          glow
+          rich-cli
+	  w3m-nox
+          ;
+      };
 
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
-	  {
-	  # https://github.com/XYenon/yafg.yazi#usage
-on  = [ "F" "G" ];
-run = "plugin yafg";
-}
-	  # https://github.com/sxyazi/yazi/discussions/2928
-	  {
-	    on = "s";
-	    run = [ "tab_create ~" "search --via=fd" ];
-	    desc = "Search in $HOME";
-	  }
-	  # https://github.com/sxyazi/yazi/discussions/3022#discussioncomment-14196133
-	  {
-	    on = [ "ß" ];
-	    # copied https://github.com/lpnh/fr.yazi/blob/3d32e55b7367334abaa91f36798ef723098d0a6b/main.lua#L48
-	    # see also https://github.com/phiresky/ripgrep-all/issues/151#issuecomment-1823138420
-	    # default (via htop) seems --pre-glob *.{epub,EPUB,odt,ODT,docx,DOCX,fb2,FB2,ipynb,IPYNB,html,HTML,htm,HTM,pdf,PDF,asciipagebreaks,ASCIIPAGEBREAKS,mkv,MKV,mp4,MP4,avi,AVI,mp3,MP3,ogg,OGG,flac,FLAC,webm,WEBM,zip,ZIP,jar,JAR,xpi,XPI,kra,KRA,snagx,SNAGX,als,ALS,bz2,BZ2,gz,GZ,tbz,TBZ,tbz2,TBZ2,tgz,TGZ,xz,XZ,zst,ZST,tar,TAR,db,DB,db3,DB3,sqlite,SQLITE,sqlite3,SQLITE3}
-	    run = ''search --via=rga --args="-g '!~$*'"'';
-	    desc = "Search via rga";
-	  }
+          {
+            on = "T";
+            run = "plugin toggle-pane max-preview";
+            desc = "Maximize or restore the preview pane";
+          }
+          {
+            # https://github.com/XYenon/yafg.yazi#usage
+            on = [
+              "F"
+              "G"
+            ];
+            run = "plugin yafg";
+          }
+          # https://github.com/sxyazi/yazi/discussions/2928
+          {
+            on = "s";
+            run = [
+              "tab_create ~"
+              "search --via=fd"
+            ];
+            desc = "Search in $HOME";
+          }
+          # https://github.com/sxyazi/yazi/discussions/3022#discussioncomment-14196133
+          {
+            on = [ "ß" ];
+            # copied https://github.com/lpnh/fr.yazi/blob/3d32e55b7367334abaa91f36798ef723098d0a6b/main.lua#L48
+            # see also https://github.com/phiresky/ripgrep-all/issues/151#issuecomment-1823138420
+            # default (via htop) seems --pre-glob *.{epub,EPUB,odt,ODT,docx,DOCX,fb2,FB2,ipynb,IPYNB,html,HTML,htm,HTM,pdf,PDF,asciipagebreaks,ASCIIPAGEBREAKS,mkv,MKV,mp4,MP4,avi,AVI,mp3,MP3,ogg,OGG,flac,FLAC,webm,WEBM,zip,ZIP,jar,JAR,xpi,XPI,kra,KRA,snagx,SNAGX,als,ALS,bz2,BZ2,gz,GZ,tbz,TBZ,tbz2,TBZ2,tgz,TGZ,xz,XZ,zst,ZST,tar,TAR,db,DB,db3,DB3,sqlite,SQLITE,sqlite3,SQLITE3}
+            run = ''search --via=rga --args="-g '!~$*'"'';
+            desc = "Search via rga";
+          }
           {
             run = "plugin ouch --args=zip";
             on = [ "C" ];
             desc = "Compress with ouch";
           }
-	  {
-	    run = "search --via=fd --args='-HI'";
-	    on = [ "s" ];
-	    desc = "Search files by name via fd";
-	  }
           {
-            on = [
-              "c"
-              "p"
-            ];
-            run = "plugin command";
-            desc = "Yazi command prompt";
+            run = "search --via=fd --args='-HI'";
+            on = [ "s" ];
+            desc = "Search files by name via fd";
           }
           {
             on = [
@@ -221,161 +233,111 @@ run = "plugin yafg";
       plugins = with pkgs.yaziPlugins; {
         inherit
           ouch
-          git
-	  yafg
+          #git
+          toggle-pane
+          piper
+          rich-preview
           ;
         #bat = inputs.yazi-plugin-bat;
-        command = inputs.command-yazi;
-        yamb = inputs.yamb-yazi;
-	# TODO
-	# https://codeberg.org/Hanker/augment-command.yazi#pager-pager
-	# https://devctrl.blog/posts/search-yazi-unifying-fzf-ripgrep-fd-and-zoxide-in-the-terminal/
+        # FIXME keybind c conflicting and ya.mgr_emit deprecated in https://github.com/KKV9/command.yazi/blob/523e6a57a4605013c99bda75174f344ec3460599/main.lua#L120
+        #command = {
+        #  package = inputs.command-yazi;
+        #};
+
+        yafg = {
+          package = yafg;
+          setup = true;
+          settings = {
+            toggle_mode_key = "alt-t"; # fzf key to switch ripgrep/fzf mode (default: "ctrl-t")
+            editor = "nvim"; # Editor command (default: "hx")
+            args = ''{ "--noplugin" }''; # Additional editor arguments (default: {})
+            file_arg_format = "+{row} {file}"; # File argument format (default: "{file}:{row}:{col}")
+          };
+        };
+
+        yamb = {
+          package = inputs.yamb-yazi;
+          setup = true;
+          settings = {
+            # Optional, the cli of fzf.
+            cli = "fzf";
+            # Optional, a string used for randomly generating keys, where the preceding characters have higher priority.
+            keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            # Optional, the path of bookmarks
+            path = ''
+              (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmark") or
+                      	    (os.getenv("HOME") .. "/.config/yazi/bookmark")'';
+          };
+        };
+
+        # TODO
+        # https://codeberg.org/Hanker/augment-command.yazi#pager-pager
+        # https://devctrl.blog/posts/search-yazi-unifying-fzf-ripgrep-fd-and-zoxide-in-the-terminal/
       };
 
-#      theme = builtins.fromTOML (
-#        builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml"
-#      );
+      #      theme = builtins.fromTOML (
+      #        builtins.readFile "${inputs.catppuccin-yazi}/themes/latte/catppuccin-latte-lavender.toml"
+      #      );
 
       # https://yazi-rs.github.io/docs/resources
       # https://sourcegraph.com/search?q=context:global+file:%5E*yazi.toml%24+content:zathura&patternType=standard&sm=1
       # https://github.com/sxyazi/yazi/blob/f42a0df4df829b3c774e8f6dd03e10353269a23b/yazi-config/preset/yazi-default.toml#L109
       # https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset
-      settings = {
-        log = {
-          enabled = false;
+      settings = lib.importTOML "${inputs.yazi}/yazi-config/preset/yazi-default.toml" // {
+        preview = {
+          # Change them to your desired values
+          max_width = 3000;
+          max_height = 3000;
         };
-
         opener = {
-          extract = [
+          zathura = [
             {
-              run = ''ouch d -y "%*"'';
-              desc = "Extract here with ouch";
-              for = "windows";
-            }
-            {
-              run = ''ouch d -y "$@"'';
-              desc = "Extract here with ouch";
-              for = "unix";
-            }
-          ];
-          # FIXME preview not working, run="pdff"; wants .config/yazi/plugins/pdf.lua https://github.com/sxyazi/yazi/issues/110
-          pdf = [
-            {
-              run = ''zathura "$@"'';
+              run = ''zathura "$@" || echo "X11 needed"'';
               block = true;
-              desc = "Open with zathura";
-              for = "unix";
-            }
-          ];
-          edit = [
-            {
-              run = ''$EDITOR "$@"'';
-              block = true;
+              orphan = true;
+              desc = "Open with zathura (on non-X11 use preview)";
               for = "unix";
             }
           ];
         };
         open = {
-          rules = [
-            # https://yazi-rs.github.io/docs/configuration/yazi#open
-            # You can spot on a file to check it's mime-type with the default Tab key.
+          prepend_rules = [
             {
-              mime = "text/*";
-              use = "edit";
-            }
-            {
-              mime = "application/pdf";
-              use = [
-                "pdf"
-                "reveal"
-              ];
+              url = "*.pdf";
+              use = "zathura";
             }
           ];
         };
         plugin = {
-          preloaders = [
-            # PDF
-            {
-              mime = "application/pdf";
-              run = "pdf";
-            } # ?
-          ];
-          previewers = [
-            # PDF
-            {
-              mime = "application/pdf";
-              run = "pdf";
-            } # ?
-            {
-              url = "*/";
-              run = "folder";
-              sync = true;
-            }
-	    {
-              mime = "text/*";
-              run = "code";
-            }
-            {
-              mime = "*/xml";
-              run = "code";
-            }
-            {
-              mime = "*/cs";
-              run = "code";
-            }
-            {
-              mime = "*/javascript";
-              run = "code";
-            }
-            {
-              mime = "*/x-wine-extension-ini";
-              run = "code";
-            }
-          ];
-
           prepend_previewers = [
-            # Archive previewer
             {
-              mime = "application/*zip";
-              run = "ouch";
+              url = "*.md";
+              run = ''piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"'';
             }
             {
-              mime = "application/x-tar";
-              run = "ouch";
-            }
+              url = "*.csv";
+              run = "rich-preview";
+            } # for csv files
             {
-              mime = "application/x-bzip2";
-              run = "ouch";
-            }
+              url = "*.md";
+              run = "rich-preview";
+            } # for markdown (.md) files
             {
-              mime = "application/x-7z-compressed";
-              run = "ouch";
-            }
+              url = "*.rst";
+              run = "rich-preview";
+            } # for restructured text (.rst) files
             {
-              mime = "application/x-rar";
-              run = "ouch";
-            }
+              url = "*.ipynb";
+              run = "rich-preview";
+            } # for jupyter notebooks (.ipynb)
             {
-              mime = "application/x-xz";
-              run = "ouch";
-            }
-            # pdf previewer
+              url = "*.json";
+              run = "rich-preview";
+            } # for json (.json) files
+            #    { url = "*.lang_type", run = "rich-preview"} # for particular language files eg. .py, .go., .lua, etc.
             {
-              mime = "application/pdf";
-              run = "pdf";
-            }
-          ];
-
-          prepend_fetchers = [
-            {
-              url = "*";
-              run = "git";
-	      group = "git";
-            }
-            {
-              url = "*/";
-              run = "git";
-	      group = "git";
+              url = "*.html";
+              run = ''piper -- w3m -dump -T text/html "$1"'';
             }
           ];
         };
@@ -391,19 +353,35 @@ run = "plugin yafg";
 
     programs.gitui.enable = true;
 
+    programs.zathura = {
+      enable = true;
+      package = pkgs.zathura.override {
+        useMupdf = true;
+      };
+    };
+
     # https://github.com/GianniBYoung/rsync.yazi https://github.com/KKV9/compress.yazi https://github.com/ndtoan96/ouch.yazi
-    home.packages =
-      builtins.attrValues {
+
+    /*
+      home.packages = builtins.attrValues {
         inherit (pkgs)
+          ripgrep-all
           _7zz
           zathura
           poppler
-          
-          ripgrep-all
+          ouch
+          jq
+          poppler-utils
+          ffmpeg-headless
+          fd
+          ripgrep
+          fzf
+          zoxide
+          imagemagick
+          chafa
+          resvg
           ;
-      }
-      ++ [
-        (lib.hiPrio pkgs.ouch)
-      ];
+      };
+    */
   };
 }

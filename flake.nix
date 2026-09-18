@@ -321,7 +321,8 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     yazi = {
       # tag shipped for stable yazi
       # tag nightly for unstable yazi
-      url = "github:sxyazi/yazi?ref=refs/tags/shipped";
+      url = "github:sxyazi/yazi?ref=refs/tags/v26.5.6";
+      #url = "github:sxyazi/yazi?ref=refs/tags/shipped";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
       #inputs.nixpkgs.follows = "unstable";
