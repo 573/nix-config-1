@@ -411,6 +411,7 @@ in
       photoprism = {
         image = "photoprism/photoprism:latest";
 
+      # https://docs.photoprism.app/getting-started/updates/#pure-docker
 autoUpdate = "local";
         extraConfig = {
           Service = {
@@ -428,7 +429,7 @@ autoUpdate = "local";
       };
 
       ${name} = {
-        image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15";
+        image = "ghcr.io/paperless-ngx/paperless-ngx:latest";
 
         extraConfig = {
           Unit = {
