@@ -244,6 +244,15 @@ in
         #  package = inputs.command-yazi;
         #};
 
+	term-cwd = {
+	  package = "${inputs.yazi-plugins}/term-cwd.yazi";
+	  setup = true;
+	  settings = {
+	    # Available values: OSC7 (default on unix), OSC9_9 (default on windows)
+	    osc = "OSC7";
+	  };
+	};
+
         yafg = {
           package = yafg;
           setup = true;

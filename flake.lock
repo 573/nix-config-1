@@ -3337,6 +3337,7 @@
         "yazi": "yazi",
         "yazi-compress": "yazi-compress",
         "yazi-plugin-bat": "yazi-plugin-bat",
+        "yazi-plugins": "yazi-plugins",
         "yt-dlp": "yt-dlp",
         "zen-browser": "zen-browser",
         "zig2nix": "zig2nix"
@@ -4171,6 +4172,22 @@
       "original": {
         "owner": "mgumz",
         "repo": "yazi-plugin-bat",
+        "type": "github"
+      }
+    },
+    "yazi-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1789736971,
+        "narHash": "sha256-O1yYAhsf7xMqUrTTSLac06WSxCvUQqedH3DWqGwn/Ok=",
+        "owner": "yazi-rs",
+        "repo": "plugins",
+        "rev": "f703392df78b5fba5e8f9f1ad0b1cb6d3def9736",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yazi-rs",
+        "repo": "plugins",
         "type": "github"
       }
     },

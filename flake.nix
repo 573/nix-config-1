@@ -328,6 +328,11 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       #inputs.nixpkgs.follows = "unstable";
     };
 
+    yazi-plugins = {
+      url = "github:yazi-rs/plugins";
+      flake = false;
+    };
+
     command-yazi = {
       url = "github:KKV9/command.yazi";
       flake = false;
