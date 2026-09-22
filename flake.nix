@@ -128,8 +128,8 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
-sops-nix.url = "github:Mic92/sops-nix";
-sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -261,7 +261,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Wansmer/symbol-usage.nvim";
     };
 
-    eyes-wide-bright = { 
+    eyes-wide-bright = {
       url = "github:FractalCodeRicardo/eyes-wide-bright";
       flake = false;
     };
@@ -347,7 +347,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/nixGL";
       inputs.nixpkgs.follows = "nixpkgs";
       # follows nixpkgs (master)
-    #  inputs.nixpkgs.follows = "nixpkgs";
+      #  inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # follows nixpkgs (master)
@@ -374,20 +374,20 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       flake = false;
     };
 
-/*
-    # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
-    #  cause not exactly clear but error disappears when I'm not using a remote builder, see issue's last comment
+    /*
+        # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
+        #  cause not exactly clear but error disappears when I'm not using a remote builder, see issue's last comment
 
-    e-nixpkgs-stable.url = "github:NixOS/nixpkgs/50ab793786d9de88ee30ec4e4c24fb4236fc2674?narHash=sha256-/bVBlRpECLVzjV19t5KMdMFWSwKLtb5RyXdjz3LJT%2Bg%3D";
-    e-nixpkgs.url = "github:NixOS/nixpkgs/85dbfc7aaf52ecb755f87e577ddbe6dbbdbc1054?narHash=sha256-iAcj9T/Y%2B3DBy2J0N%2ByF9XQQQ8IEb5swLFzs23CdP88%3D";
+        e-nixpkgs-stable.url = "github:NixOS/nixpkgs/50ab793786d9de88ee30ec4e4c24fb4236fc2674?narHash=sha256-/bVBlRpECLVzjV19t5KMdMFWSwKLtb5RyXdjz3LJT%2Bg%3D";
+        e-nixpkgs.url = "github:NixOS/nixpkgs/85dbfc7aaf52ecb755f87e577ddbe6dbbdbc1054?narHash=sha256-iAcj9T/Y%2B3DBy2J0N%2ByF9XQQQ8IEb5swLFzs23CdP88%3D";
 
-    emacs-overlay = {
-      # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
-      url = "github:nix-community/emacs-overlay/a8f1ef391d688e3287095e44589278381756bea7?narHash=sha256-SnBESJKoVg/W9CSHEPCWM9khl1sNWnC2UCRJJYgdFng%3D";
-      inputs.nixpkgs-stable.follows = "e-nixpkgs-stable";
-      inputs.nixpkgs.follows = "e-nixpkgs";
-      #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
-    };
+        emacs-overlay = {
+          # FIXME workaround https://github.com/nix-community/emacs-overlay/issues/518
+          url = "github:nix-community/emacs-overlay/a8f1ef391d688e3287095e44589278381756bea7?narHash=sha256-SnBESJKoVg/W9CSHEPCWM9khl1sNWnC2UCRJJYgdFng%3D";
+          inputs.nixpkgs-stable.follows = "e-nixpkgs-stable";
+          inputs.nixpkgs.follows = "e-nixpkgs";
+          #url = "github:nix-community/emacs-overlay/20492c753b4f3b30fda02056f507e29ef38d3fa6";
+        };
     */
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -482,7 +482,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     firefox = {
       url = "github:nix-community/flake-firefox-nightly";
-      # the firefox-nightlies nixos-unstable-small reference is updated daily/nightly anyways, so I make them follow my nixos-unstable reference at least that way I get a 
+      # the firefox-nightlies nixos-unstable-small reference is updated daily/nightly anyways, so I make them follow my nixos-unstable reference at least that way I get a
       # firefox as fresh as my unstable installed everytime I flake update unstable and do remind myself to also flake update firefox then
       # TODO note: this is only due to that firefox-nightlies seem to built anyway on my nix-powered arch at least where I'm forced to use sandbox false as long as I have not
       # fixed the sandbox issue I have there
@@ -563,10 +563,10 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       #inputs.nixpkgs.follows = "nixpkgs";
       /*
-      evaluation warning: nixos profile: The `home-manager.users.nixos.programs.nixvim.nixpkgs.source` default value has been affected by your flake input `follows`.
-                    Nixvim's inputs pin Nixpkgs to `a0374025a863d007d98e3297f6aa46cc3141c2f0`. Actual Nixpkgs is following `fd1462031fdee08f65fd0b4c6b64e22239a77870`.
-                    Please remove your `inputs.nixvim.inputs.nixpkgs.follows` or explicitly define `home-manager.users.nixos.programs.nixvim.nixpkgs.source` to suppress this warning.
-		    */
+        evaluation warning: nixos profile: The `home-manager.users.nixos.programs.nixvim.nixpkgs.source` default value has been affected by your flake input `follows`.
+                      Nixvim's inputs pin Nixpkgs to `a0374025a863d007d98e3297f6aa46cc3141c2f0`. Actual Nixpkgs is following `fd1462031fdee08f65fd0b4c6b64e22239a77870`.
+                      Please remove your `inputs.nixvim.inputs.nixpkgs.follows` or explicitly define `home-manager.users.nixos.programs.nixvim.nixpkgs.source` to suppress this warning.
+      */
       #inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -672,7 +672,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
       formatterPackArgsFor = forEachSystem (system: {
         inherit nixpkgs;
-	inherit (nixpkgs.legacyPackages.${system}.hostPlatform) system;
+        inherit (nixpkgs.legacyPackages.${system}.hostPlatform) system;
         checkFiles = [ self ];
 
         config.tools = {
@@ -719,7 +719,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
         mkDevenvPlaywright2
         mkDevShellGhcwasm
         mkDevenvHaskell2
-	mkDevShellNixPath
+        mkDevShellNixPath
         ;
 
       # NOTE https://discourse.nixos.org/t/installing-only-a-single-package-from-unstable/5598/30
@@ -1028,8 +1028,8 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
               mkShell
               ;
           })
-	  # see https://discourse.nixos.org/t/angle-brackets-in-a-nix-flake-world/67855/12
-	  (mkDevShellNixPath system "nixpath" {})
+          # see https://discourse.nixos.org/t/angle-brackets-in-a-nix-flake-world/67855/12
+          (mkDevShellNixPath system "nixpath" { })
         ]
         /*
           // {
@@ -1059,9 +1059,11 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
           cachixSpecBuilder = pkgs: spec: pkgs.writeText "cachix-deploy.json" (builtins.toJSON spec);
 
           cachixDeployOutput = builder: name: module: {
-            ${module.pkgs.stdenv.hostPlatform.system}."cachix-deploy-spec-${name}" = cachixSpecBuilder module.pkgs {
-              agents.${name} = builder module;
-            };
+            ${module.pkgs.stdenv.hostPlatform.system}."cachix-deploy-spec-${name}" =
+              cachixSpecBuilder module.pkgs
+                {
+                  agents.${name} = builder module;
+                };
           };
 
           cachixDeployOutputHomeManager = cachixDeployOutput (module: module.activationPackage);
@@ -1138,11 +1140,11 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
           }
           (
             nixpkgs.lib.mapAttrsToList cachixDeployOutputNixos self.nixosConfigurations
-  #          ++ [
-	# FIXME unbreak nps : error: a 'x86_64-linux' with features {} is required to build '/nix/store/glhw8ks590s18wa34a5niaa25f0qyggl-await-podman-unshare.drv'
-              #(cachixDeployOutputNixondroid "sams" self.nixOnDroidConfigurations.sams)
-    #          (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato")
-   #         ]
+            #          ++ [
+            # FIXME unbreak nps : error: a 'x86_64-linux' with features {} is required to build '/nix/store/glhw8ks590s18wa34a5niaa25f0qyggl-await-podman-unshare.drv'
+            #(cachixDeployOutputNixondroid "sams" self.nixOnDroidConfigurations.sams)
+            #          (cachixDeployOutputHomeManager "maiziedemacchiato" self.homeConfigurations."dani@maiziedemacchiato")
+            #         ]
           );
     };
 
@@ -1153,7 +1155,7 @@ sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     #];
     #extra-trusted-public-keys = [
     #    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-#];
+    #];
     # only for bootstrap
     #extra-experimental-features = [ "nix-command" "flakes" "pipe-operators" ];
   };
