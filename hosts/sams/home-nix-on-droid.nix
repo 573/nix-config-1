@@ -41,9 +41,9 @@ in
       sops-nix.enable = true;
 
       shell = {
-      envExtra = lib.mkBefore ''
-        . "/etc/profiles/per-user/${config.home.username}/etc/profile.d/nix-on-droid-session-init.sh"
-      '';
+        envExtra = lib.mkBefore ''
+          . "/etc/profiles/per-user/${config.home.username}/etc/profile.d/nix-on-droid-session-init.sh"
+        '';
 
         logoutExtra = ''
           count="$(ps -e | grep proot-static | wc -l)"
@@ -68,24 +68,24 @@ in
 
       nixbuild.enable = true;
 
-      neovim = {
+      nixvim = {
         enable = true;
-      #	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixOnDroidConfigurations.sams.options.home-manager.config.type.getSubOptions [ ]'';
+        #	nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixOnDroidConfigurations.sams.options.home-manager.config.type.getSubOptions [ ]'';
       };
     };
- 
+
     # FIXME still needs the android app
     #services.tailscale.enable = true;
   };
 
   #services.restic.backups.localbackup = {
-    
+
   #  dailySnapshotsToKeep = 2;
   #};
 
   home = {
     # for compat with ../../home/programs/nixbuild.nix
-    homeDirectory = homeDir; #config.home-manager.config.home.
+    homeDirectory = homeDir; # config.home-manager.config.home.
     packages = attrValues {
       # with pkgs; [
       /*
@@ -111,25 +111,25 @@ in
         ;
     };
 
-#    activation =
-#      let
-#        inherit config;
-#      in
-#      {
-#        copyFont =
-#          let
-#            font_src = "${pkgs.carlito}/share/fonts/truetype/.";
-#            font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
-#          in
-#          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-#            	       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
-#            	if [ $? -ne 0 ]
-#            	then
-#            	  mkdir -p "${font_dst}"
-#            	  cp -R "${font_src}" "${font_dst}"
-#            	fi
-#                  '';
-#      };
+    #    activation =
+    #      let
+    #        inherit config;
+    #      in
+    #      {
+    #        copyFont =
+    #          let
+    #            font_src = "${pkgs.carlito}/share/fonts/truetype/.";
+    #            font_dst = "${config.home.homeDirectory}/texmf/fonts/truetype/Carlito";
+    #          in
+    #          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    #            	       test -e "${font_dst}" && comm -1 -3 <(sha1sum ${font_src}/*.ttf|cut -d' ' -f1) <(sha1sum ${font_dst}/*.ttf|cut -d' ' -f1) &>/dev/null
+    #            	if [ $? -ne 0 ]
+    #            	then
+    #            	  mkdir -p "${font_dst}"
+    #            	  cp -R "${font_src}" "${font_dst}"
+    #            	fi
+    #                  '';
+    #      };
   };
 
   # FIXME: without overrides produces warnings

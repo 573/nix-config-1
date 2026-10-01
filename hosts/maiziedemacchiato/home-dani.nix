@@ -80,7 +80,7 @@ in
 
       nixbuild.enable = true;
 
-      neovim = {
+      nixvim = {
         enable = true;
         # TODO should user- and hostname be rather module params
         nixd.expr.home-manager = ''
@@ -183,7 +183,7 @@ in
         #gtt
         notepad-next
         reader
-	heimdall
+        heimdall
         ;
 
       # yubikey integration broken
@@ -399,20 +399,20 @@ in
           ports = [ "2375:2375" ];
         };
       */
-     fredy = {
-       image = "ghcr.io/orangecoding/fredy:master";
+      fredy = {
+        image = "ghcr.io/orangecoding/fredy:master";
         volumes = [
           "${config.home.homeDirectory}/stacks/fredy_conf:/conf"
           "${config.home.homeDirectory}/stacks/fredy_db:/db"
         ];
         ports = [ "9998:9998" ];
-     };
+      };
 
       photoprism = {
         image = "photoprism/photoprism:latest";
 
-      # https://docs.photoprism.app/getting-started/updates/#pure-docker
-autoUpdate = "local";
+        # https://docs.photoprism.app/getting-started/updates/#pure-docker
+        autoUpdate = "local";
         extraConfig = {
           Service = {
             Restart = "always";

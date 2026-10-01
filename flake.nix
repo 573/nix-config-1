@@ -469,7 +469,7 @@
     };
 
     nixd = {
-      url = "github:nix-community/nixd?ref=2.9.2";
+      url = "github:nix-community/nixd?ref=2.9.3";
       #url = "github:nix-community/nixd";
       inputs.nixpkgs.follows = "nixos-unstable";
       inputs.flake-parts.follows = "flake-parts";
@@ -559,7 +559,7 @@
     };
 
     nixvim = {
-      url = "github:nix-community/nixvim/nixos-26.05";
+      url = "github:nix-community/nixvim";
       inputs.flake-parts.follows = "flake-parts";
       #inputs.nixpkgs.follows = "nixpkgs";
       /*

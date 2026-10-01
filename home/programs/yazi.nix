@@ -96,13 +96,42 @@ in
           exiftool
           glow
           rich-cli
-	  w3m-nox
+          w3m-nox
+          sshfs
           ;
       };
 
       keymap = {
         # F1 or ~ for help
         mgr.prepend_keymap = [
+          {
+            on = [
+              "M"
+              "s"
+            ];
+            run = "plugin sshfs -- menu";
+            desc = "Open SSHFS options";
+          }
+          {
+            on = "<A-c>";
+            run = "plugin command";
+            desc = "Open command palette";
+          }
+          {
+            on = "F";
+            run = "plugin smart-filter";
+            desc = "Smart filter";
+          }
+          {
+            on = "+";
+            run = "plugin zoom 1";
+            desc = "Zoom in hovered file";
+          }
+          {
+            on = "-";
+            run = "plugin zoom -1";
+            desc = "Zoom out hovered file";
+          }
           {
             on = "T";
             run = "plugin toggle-pane max-preview";
@@ -233,25 +262,23 @@ in
       plugins = with pkgs.yaziPlugins; {
         inherit
           ouch
-          #git
           toggle-pane
           piper
           rich-preview
+          sshfs
           ;
         #bat = inputs.yazi-plugin-bat;
         # FIXME keybind c conflicting and ya.mgr_emit deprecated in https://github.com/KKV9/command.yazi/blob/523e6a57a4605013c99bda75174f344ec3460599/main.lua#L120
-        #command = {
-        #  package = inputs.command-yazi;
-        #};
+        command = {
+          package = inputs.command-yazi;
+        };
 
-	term-cwd = {
-	  package = "${inputs.yazi-plugins}/term-cwd.yazi";
-	  setup = true;
-	  settings = {
-	    # Available values: OSC7 (default on unix), OSC9_9 (default on windows)
-	    osc = "OSC7";
-	  };
-	};
+        smart-filter = {
+          package = "${inputs.yazi-plugins}/smart-filter.yazi";
+        };
+        zoom = {
+          package = "${inputs.yazi-plugins}/zoom.yazi";
+        };
 
         yafg = {
           package = yafg;

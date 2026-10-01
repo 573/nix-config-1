@@ -72,7 +72,7 @@ in
         #helix.enable = true;
         #yazi.enable = true;
         #xplr.enable = true;
-        neovim = {
+        nixvim = {
           #          enable = true;
           # not inherit not same attr
           lightWeight = cfg.lightWeight;
@@ -125,8 +125,8 @@ in
 
         packages = attrValues {
           inherit (pkgs)
-	    pptx2md
-	    desed
+            pptx2md
+            desed
             # TODO Put into home/programs/neovim ASAP
             # https://discourse.nixos.org/t/how-can-i-distinguish-between-two-packages-who-has-the-same-name-for-the-binary/39770/2
             #(inputs.nixvim.packages."${system}".default)
@@ -187,7 +187,7 @@ in
             #qrencode
             nixfmt
 
-	    sendme
+            sendme
             ;
 
           # see https://jvns.ca/til/vim-osc52/
@@ -224,7 +224,7 @@ in
           SHELL = "bash";
           # TODO how does that interfere with same attr in neovim.nix
           EDITOR = "nvim";
-          VISUAL = "nvim"; #config.home.sessionVariables.EDITOR;
+          VISUAL = "nvim"; # config.home.sessionVariables.EDITOR;
           # (ft-man-plugin),
           # https://neovim.io/doc/user/starting.html#starting,
           # https://www.chrisdeluca.me/2022/03/07/use-neovim-as.html
@@ -298,9 +298,9 @@ in
       custom.programs = {
         #tmux.enable = true;
         # comment this out to enable:
-	# nix build --eval-store auto --store ssh-ng://root@eu.nixbuild.net -L -v --show-trace --impure .#nixosConfigurations.guitar.config.system.build.toplevel
-	# works then, tested it
-	emacs-configured.enable = true;
+        # nix build --eval-store auto --store ssh-ng://root@eu.nixbuild.net -L -v --show-trace --impure .#nixosConfigurations.guitar.config.system.build.toplevel
+        # works then, tested it
+        emacs-configured.enable = true;
         #helix.enable = true;
         #yazi.enable = true;
       };

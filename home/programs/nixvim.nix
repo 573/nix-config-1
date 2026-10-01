@@ -1,0 +1,795 @@
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
+
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
+
+  cfg = config.custom.programs.nixvim;
+
+  # keymaps
+  #keymaps = [];
+in
+{
+
+  #  using inputs.nixvim.homeModules.nixvim, for a Home Manager installation
+  imports = [ inputs.nixvim.homeModules.nixvim ];
+
+  ###### interface
+
+  options = {
+    custom.programs.nixvim = {
+
+      enable = mkEnableOption "nixvim config";
+
+      nixd = {
+        expr = {
+          nixos = mkOption {
+            type = types.str;
+            default = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options'';
+            description = "see home-manager here";
+          };
+          nixvim = mkOption {
+            type = types.str;
+            default = "";
+            description = "see home-manager here";
+          };
+          home-manager = mkOption {
+            type = types.str;
+            default = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+            description =
+              let
+                flake = ''(builtins.getFlake "${inputs.self}")'';
+              in
+              ''
+                                                	    Either like ${flake}.homeConfigurations.nonnixos.options or like ${flake}.nixosConfigurations.nixosmachine.options.home-manager.users.type.getSubOptions [ 
+                					    see also https://github.com/nix-community/nixvim/issues/2290#issuecomment-2445114532
+                                			    Example nix repl session:
+                                			    :lf .
+                                			    myOptions = nixosConfigurations.DANIELKNB1.options
+                                			    usersSub = myOptions.home-manager.users.type.getSubOptions [ ]
+                                                            usersSub.programs.nixvim.type.getSubOptions []
+                                                	    '';
+          };
+        };
+      };
+
+      lightWeight = mkEnableOption "light weight neovim (vi) config for low performance hosts" // {
+        default = true;
+      };
+
+      #lightweight = mkEnableOption "light weight config for low performance hosts";
+      minimalPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of minimal neovim.
+        '';
+      };
+
+      finalPackage = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        internal = true;
+        description = ''
+          Package of final neovim.
+        '';
+      };
+
+    };
+
+  };
+
+  ###### implementation
+
+  # FIXME add nvim-lsp as in https://github.com/nix-community/nixd/blob/main/nixd/docs/editors/nvim-lsp.nix
+  config = mkIf cfg.enable {
+
+    # https://nix-community.github.io/nixvim/26.05/lib/nixvim/index.html
+    programs.nixvim =
+      { lib, config, ... }:
+      {
+        enable = true;
+
+        dependencies.tree-sitter.enable = true;
+
+        # https://nix-community.github.io/nixvim/keymaps/index.html
+        # keymaps = [];
+        # putting here instead of lsp.keymaps (error there)
+
+        # https://nix-community.github.io/nixvim/lsp/index.html
+        # this replaces plugins.lsp here, TODO move config from there here
+
+        # https://github.com/nix-community/nixvim/discussions/4479
+        lsp = {
+
+          luaConfig.pre = ''
+            vim.lsp.config('superhtml', { filetypes = { 'html' } })
+          '';
+          # from https://github.com/nix-community/nixvim/blob/85d64907a9c132ecf2e8ebe46d0ad842381516ec/modules/lsp/keymaps.nix#L44
+          keymaps = [
+            {
+              key = "gD";
+              lspBufAction = "references";
+            }
+            {
+              key = "gt";
+              lspBufAction = "type_definition";
+            }
+            {
+              key = "gi";
+              lspBufAction = "implementation";
+            }
+            {
+              key = "K";
+              lspBufAction = "hover";
+            }
+            {
+              action = lib.nixvim.mkRaw "function() vim.diagnostic.jump({ count=-1, float=true }) end";
+              key = "<leader>k";
+            }
+            {
+              action = lib.nixvim.mkRaw "function() vim.diagnostic.jump({ count=1, float=true }) end";
+              key = "<leader>j";
+            }
+            {
+              action = "<CMD>LspStop<Enter>";
+              key = "<leader>lx";
+            }
+            {
+              action = "<CMD>LspStart<Enter>";
+              key = "<leader>ls";
+            }
+            {
+              action = "<CMD>LspRestart<Enter>";
+              key = "<leader>lr";
+            }
+            {
+              action = lib.nixvim.mkRaw "require('telescope.builtin').lsp_definitions";
+              key = "gd";
+            }
+            #{
+            #  action = "<CMD>Lspsaga hover_doc<Enter>";
+            #  key = "K";
+            #}
+          ];
+
+          # see https://lazy.folke.io/spec/lazy_loading#%EF%B8%8F-lazy-key-mappings
+          #lazyLoad.settings.ft = [
+          #  "nix"
+          #  "java"
+          #  "html"
+          #];
+
+          servers = {
+            superhtml = {
+              enable = true;
+            };
+
+            nixd = {
+              # Nix LS
+              enable = true; # FIXME re-enable when crashes on termux are fixed
+
+              package = inputs.nixd.packages.x86_64-linux.default;
+
+              config =
+                let
+                  flake = ''(builtins.getFlake "${inputs.self}")'';
+                in
+                {
+                  nixpkgs.expr = "import ${flake}.inputs.nixpkgs { }";
+                  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/formatting.html
+                  formatting.command = [ "nixfmt" ];
+                  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/diagnostic.html
+                  diagnostic.suppress = [
+                    "sema-escaping-with"
+                    "var-bind-to-this"
+                  ];
+                  # See https://nix-community.github.io/nixvim/plugins/lsp/servers/nixd/settings/index.html#pluginslspserversnixdsettingsoptions
+                  # And https://github.com/nix-community/nixd/blame/77bb1cacfa8a947134bb3589a3c761caa3132c79/nixd/docs/configuration.md#L141
+                  # And for the issue (:e /home/nixos/.local/state/nvim/lsp.log) https://github.com/nix-community/nixd/issues/629
+                  options = {
+                    # config and esp. config.custom probably shadowed by "programs.nixvim = { lib, config, ... }:" above
+                    nixos.expr = cfg.nixd.expr.nixos;
+                    # as in https://github.com/nix-community/NixOS-WSL/blob/d34d9412556d3a896e294534ccd25f53b6822e80/modules/wsl-conf.nix#L21
+                    #nixos-wsl.expr = "${nixos.expr}.wsl.wslConf.type.getSubOptions [ ]";
+                    # as in https://github.com/nix-community/home-manager/blob/e8c19a3cec2814c754f031ab3ae7316b64da085b/nixos/common.nix#L112
+                    # FIXME see options up here, better to overwrite there bc depends on if nonnixos or nixos, otherwise statically might work as well
+                    # in nix repl this is: nixosConfigurations.DANIELKNB1.config.home-manager.users.nixos.custom.programs.neovim.nixd.expr.nixvim
+                    # to identity the correct config.custom.. invocation search by "cfg = config.custom" in the code base
+                    home-manager.expr = cfg.nixd.expr.home-manager;
+                    # TODO split up by making *.expr configurable by host in that neovim.nix module here
+                    #home_manager.expr = ''
+                    #  ${flake}.homeConfigurations."dani@maiziedemacchiato".options
+                    #'';
+                    #nixondroid.expr = ''
+                    #  ${flake}.nixOnDroidConfigurations.sams9.options
+                    #'';
+                    nixvim.expr = cfg.nixd.expr.nixvim;
+                  };
+                };
+
+            };
+          };
+        };
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L298
+        plugins = {
+          cmp = {
+            enable = true;
+
+            autoEnableSources = true;
+            settings = {
+              # see https://stackoverflow.com/a/74714258 and https://stackoverflow.com/a/74730907
+              completion = {
+                keyword_length = 3;
+              };
+              sources = [
+                # alternative would only be not enable cmp and using C-x C-o - probably not how it is supposed to work,
+                # see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
+                # and here under lsp = ...
+                { name = "buffer"; }
+                { name = "cmdline"; }
+                { name = "cmdline-history"; }
+                #             { name = "nvim_lsp"; }
+                #             { name = "nvim_lsp_document_symbol"; }
+                { name = "nvim-lsp-signature-help"; }
+                { name = "omni"; }
+                { name = "path"; }
+                { name = "rg"; }
+                { name = "treesitter"; }
+              ];
+              mapping = {
+                "<C-Space>" = "cmp.mapping.complete()";
+                "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+                "<C-e>" = "cmp.mapping.close()";
+                "<C-f>" = "cmp.mapping.scroll_docs(4)";
+                # see https://stackoverflow.com/a/74714258
+                "<CR>" = "cmp.mapping.confirm({ select = false })";
+                "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+                "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+              };
+            };
+
+          };
+
+          cmp-buffer.enable = true;
+          cmp-cmdline.enable = true;
+          cmp-cmdline-history.enable = true;
+          #        cmp-nvim-lsp.enable = true;
+          #        cmp-nvim-lsp-document-symbol.enable = true;
+          cmp-nvim-lsp-signature-help.enable = true;
+          cmp-omni.enable = true;
+          cmp-path.enable = true;
+          cmp-rg.enable = true;
+          cmp-treesitter.enable = true;
+
+          conform-nvim = {
+            enable = true;
+            settings = {
+              formatters_by_ft = {
+                nix = [ "nixfmt" ];
+              };
+            };
+          };
+
+          #        faster.enable = true;
+
+          # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
+          fzf-lua = {
+            enable = true;
+            profile = "telescope";
+            keymaps = {
+              "<leader>fg" = "live_grep";
+              "<C-p>" = {
+                action = "git_files";
+                settings = {
+                  previewers.cat.cmd = lib.getExe' pkgs.coreutils "cat";
+                  winopts.height = 0.5;
+                };
+                options = {
+                  silent = true;
+                  desc = "Fzf-Lua Git Files";
+                };
+              };
+            };
+            settings = {
+              files = {
+                color_icons = true;
+                file_icons = true;
+                find_opts = {
+                  __raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
+                };
+                multiprocess = true;
+                prompt = "Files❯ ";
+              };
+              winopts = {
+                col = 0.3;
+                height = 0.4;
+                row = 0.99;
+                width = 0.93;
+              };
+            };
+          };
+
+          # https://github.com/ruifm/gitlinker.nvim, <lk>gy
+          gitlinker.enable = true;
+
+          gitsigns = {
+            enable = true;
+            settings = {
+              current_line_blame = false;
+              current_line_blame_opts = {
+                virt_text = true;
+                virt_text_pos = "eol";
+              };
+              signcolumn = true;
+              signs = {
+                add = {
+                  text = "│";
+                };
+                change = {
+                  text = "│";
+                };
+                changedelete = {
+                  text = "~";
+                };
+                delete = {
+                  text = "_";
+                };
+                topdelete = {
+                  text = "‾";
+                };
+                untracked = {
+                  text = "┆";
+                };
+              };
+              watch_gitdir = {
+                follow_files = true;
+              };
+              status_formatter = ''
+                function(status)
+                  local added, changed, removed = status.added, status.changed, status.removed
+                  local status_txt = {}
+                  if added and added > 0 then
+                    table.insert(status_txt, '+' .. added)
+                  end
+                  if changed and changed > 0 then
+                    table.insert(status_txt, '~' .. changed)
+                  end
+                  if removed and removed > 0 then
+                    table.insert(status_txt, '-' .. removed)
+                  end
+                  return table.concat(status_txt, ' ')
+                end
+              '';
+            };
+          };
+
+          lsp = {
+            #       enable = true;
+
+            # https://nix-community.github.io/nixvim/26.05/plugins/lsp/keymaps/index.html and as an example https://nix-community.github.io/nixvim/26.05/plugins/lsp/keymaps/index.html#pluginslspkeymapslspbuf, it is either this or [] mixing not allowed
+            keymaps.lspBuf = {
+              K = "hover";
+              gD = "references";
+              gi = "implementation";
+              gt = "type_definition";
+            };
+
+            # https://nix-community.github.io/nixvim/26.05/plugins/lsp/keymaps/extra/index.html
+            #keymaps = [
+            #  {
+            #    action = "<CMD>LspStop<Enter>";
+            #    key = "<leader>lx";
+            #  }
+            #  # etc.
+            #];
+          };
+
+          # see "Note" at https://nix-community.github.io/nixvim/25.11/plugins/lspconfig/index.html#lspconfig
+          # but on 25.11 no Lsp server is found without it, so left it enabled.
+          # but recommended still here https://nix-community.github.io/nixvim/26.05/lsp/servers/index.html
+          lspconfig.enable = true;
+
+          lsp-format.enable = true;
+
+          lsp-lines = {
+            enable = true;
+          };
+
+          lspsaga = {
+            #enable = true;
+
+            settings = {
+              implement = {
+                enable = true;
+              };
+              lightbulb = {
+                enable = false;
+              };
+              symbol_in_winbar = {
+                enable = true;
+              };
+              ui = {
+                border = "single";
+              };
+            };
+          };
+
+          lz-n = {
+            enable = true;
+
+            keymaps = [
+              {
+                action = lib.nixvim.mkRaw "function() require('telescope.builtin').find_files() end";
+                key = "<leader>ff";
+                options = {
+                  desc = "Find files";
+                };
+                plugin = "telescope.nvim";
+              }
+              {
+                action = lib.nixvim.mkRaw "function() require('lsp_lines').toggle() end";
+                key = "<leader>l";
+                options = {
+                  desc = "Toggle lsp_lines";
+                };
+                plugin = "lsp-lines";
+              }
+            ];
+
+            # see https://nix-community.github.io/nixvim/plugins/lz-n/index.html#pluginslz-nimports
+            # and see https://nix-community.github.io/nixvim/plugins/lz-n/plugins.html
+            # plugins = [];
+          };
+
+          indent-blankline = {
+            enable = true;
+            settings = {
+              exclude = {
+                buftypes = [
+                  "terminal"
+                  "quickfix"
+                ];
+                filetypes = [
+                  ""
+                  "checkhealth"
+                  "help"
+                  "lspinfo"
+                  "packer"
+                  "TelescopePrompt"
+                  "TelescopeResults"
+                  "yaml"
+                ];
+              };
+              indent = {
+                char = "│";
+              };
+              scope = {
+                show_end = false;
+                show_exact_scope = true;
+                show_start = false;
+              };
+            };
+          };
+
+          no-neck-pain.enable = true;
+
+          nvim-autopairs.enable = true;
+
+          # nvim-lightbulb.enable = true;
+
+          nvim-bqf = {
+            enable = true;
+            settings = {
+              preview = {
+                border = "double";
+                show_scroll_bar = false;
+                show_title = false;
+                winblend = 0;
+              };
+            };
+          };
+
+          telescope = {
+            enable = true;
+
+            # https://nix-community.github.io/nixvim/25.11/plugins/telescope/index.html#pluginstelescopeenabledextensions
+            extensions = {
+              advanced-git-search = {
+                enable = true;
+                settings = {
+                  diff_plugin = "diffview";
+                  git_flags = [
+                    "-c"
+                    "delta.side-by-side=false"
+                  ];
+                };
+              };
+              fzf-native.enable = true;
+              live-grep-args = {
+                enable = true;
+                settings = {
+                  auto_quoting = true;
+                  mappings = {
+                    # These are meant to be used when the telescope dialog is open, i.e., not in the "regular" neovim buffer
+                    # For more keys in the preview, result etc, see https://github.com/nvim-telescope/telescope.nvim/blob/e6cdb4d/README.md#default-mappings
+                    i = {
+                      "<C-i>" = {
+                        __raw = "require(\"telescope-live-grep-args.actions\").quote_prompt({ postfix = \" --iglob \" })";
+                      };
+                      "<C-k>" = {
+                        __raw = "require(\"telescope-live-grep-args.actions\").quote_prompt()";
+                      };
+                      "<C-space>" = {
+                        __raw = "require(\"telescope.actions\").to_fuzzy_refine";
+                      };
+                    };
+                  };
+                  theme = "dropdown";
+                };
+              };
+              project.enable = true;
+            };
+
+            # Found out via :Telescope keymaps or simply :Telescope <TAB>
+            keymaps = {
+              "<C-p>" = {
+                action = "git_files";
+                options = {
+                  desc = "Telescope Git Files";
+                };
+              };
+              "<leader>bb" = {
+                action = "buffers";
+                options = {
+                  desc = "Telescope Buffers";
+                };
+              };
+              "<leader>gs" = {
+                action = "grep_string";
+                options = {
+                  desc = "Telescope grep for the word under the cursor";
+                };
+              };
+              "<leader>fg" = "live_grep";
+            };
+
+            settings = {
+              defaults = {
+                file_ignore_patterns = [
+                  "^.git/"
+                  "^.mypy_cache/"
+                  "^__pycache__/"
+                  "^output/"
+                  "^data/"
+                  "%.ipynb"
+                ];
+                layout_config = {
+                  prompt_position = "top";
+                };
+                mappings = {
+                  i = {
+                    "<A-j>" = {
+                      __raw = "require('telescope.actions').move_selection_next";
+                    };
+                    "<A-k>" = {
+                      __raw = "require('telescope.actions').move_selection_previous";
+                    };
+                  };
+                  /*
+                    n = {
+                    	    # IDK where that belongs, definitly not in settings.defaults.mappings as the shortcut is not visible then
+                                # The example from https://github.com/nvim-telescope/telescope-live-grep-args.nvim/blob/d600409/README.md#shortcut-functions
+                                # just demo, as it seems to be redundant with :Telescope grep_string ?
+                                "<leader>gc" = {
+                                  __raw = "require('telescope-live-grep-args.shortcuts').grep_word_under_cursor";
+                                };
+                              };
+                  */
+                };
+                selection_caret = "> ";
+                set_env = {
+                  COLORTERM = "truecolor";
+                };
+                sorting_strategy = "ascending";
+              };
+            };
+          };
+
+          toggleterm = {
+            enable = true;
+            settings = {
+              direction = "float";
+              float_opts = {
+                border = "curved";
+                height = 30;
+                width = 130;
+              };
+              open_mapping = "[[<c-\\>]]";
+            };
+          };
+
+          treesitter = {
+            enable = true;
+
+            # https://github.com/nix-community/nixvim/issues/4208#issuecomment-3970109440
+            grammarPackages = with config.plugins.treesitter.package.builtGrammars; [
+              bash
+              json
+              lua
+              make
+              markdown
+              nix
+              regex
+              toml
+              vim
+              vimdoc
+              xml
+              yaml
+              ziggy # https://ziggy-lang.io/docs/diagrams/
+              ziggy_schema
+            ];
+
+            # zR / zM - https://neovim.io/doc/user/fold/#_2.-fold-commands
+            folding.enable = true;
+
+          };
+
+          trouble.enable = true;
+
+          # reason:
+          # evaluation warning: nixos profile: Nixvim (plugins.web-devicons): This plugin was enabled automatically because the following plugins are enabled.
+          #                  This behaviour is deprecated. Please explicitly define `plugins.web-devicons.enable` or alternatively
+          #                  enable `plugins.mini.enable` with `plugins.mini.modules.icons` and `plugins.mini.mockDevIcons`, or
+          #                  `plugins.mini-icons.enable` with `plugins.mini-icons.mockDevIcons`.
+          #                  plugins.telescope
+          #                  plugins.trouble
+          #                  plugins.fzf-lua
+          web-devicons.enable = true;
+
+          which-key = {
+            enable = true;
+            settings = {
+              delay = 200;
+              expand = 1;
+              notify = false;
+              preset = false;
+              replace = {
+                desc = [
+                  [
+                    "<space>"
+                    "SPACE"
+                  ]
+                  [
+                    "<leader>"
+                    "SPACE"
+                  ]
+                  [
+                    "<[cC][rR]>"
+                    "RETURN"
+                  ]
+                  [
+                    "<[tT][aA][bB]>"
+                    "TAB"
+                  ]
+                  [
+                    "<[bB][sS]>"
+                    "BACKSPACE"
+                  ]
+                ];
+              };
+              spec = [
+                {
+                  __unkeyed-1 = "<leader>b";
+                  group = "Buffers";
+                  icon = "󰓩 ";
+                }
+                {
+                  __unkeyed-1 = "<leader>bs";
+                  group = "Sort";
+                  icon = "󰒺 ";
+                }
+                {
+                  __unkeyed-1 = [
+                    {
+                      __unkeyed-1 = "<leader>f";
+                      group = "Normal Visual Group";
+                    }
+                    {
+                      __unkeyed-1 = "<leader>f<tab>";
+                      group = "Normal Visual Group in Group";
+                    }
+                  ];
+                  mode = [
+                    "n"
+                    "v"
+                  ];
+                }
+                {
+                  __unkeyed-1 = "<leader>w";
+                  group = "windows";
+                  proxy = "<C-w>";
+                }
+              ];
+              win = {
+                border = "single";
+              };
+            };
+          };
+        };
+
+        # https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/modules/output.nix#L53
+        extraPackages = [ inputs.nixfmt-rs.packages.${pkgs.system}.default ];
+
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L315
+        #	extraPlugins = builtins.attrValues {};
+
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L365
+        #opts = {};
+
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L385
+        #inherit keymaps;
+
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L452
+        #globals.mapleader = "";
+
+        # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/output.nix#L83
+        # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#extraconfigluapre
+        #inherit extraConfigLuaPre;
+
+        # see https://github.com/nix-community/nixvim/blob/948b6c0125b35eab7b37e7f7edc79552027075a1/README.md?plain=1#L464
+        # TODO my old setup https://github.com/573/nix-config-1/blob/dc2da3bc963aeba2c6616a993e6973041120fd3d/home/programs/neovim.nix
+        #extraConfigLua = '''';
+
+        # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/doc.nix#L3
+        # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#enableman
+        enableMan = false;
+
+        # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/output.nix#L19
+        # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#vialias
+        viAlias = true;
+        vimAlias = true;
+
+        env = {
+          EDITOR = "nvim";
+          VISUAL = "nvim";
+        };
+
+        # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L41
+        # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgspkgs
+        #nixpkgs.pkgs = pkgs;
+
+        # see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/nixpkgs.nix#L133 (via
+        # https://nix-community.github.io/nixvim/25.11/NeovimOptions/nixpkgs/index.html#nixpkgsoverlays)
+        # Override neovim-unwrapped with one from a flake input
+        # Using `stdenv.hostPlatform` to access `system`
+
+        # TODO https://nix-community.github.io/nixvim/25.11/plugins/gitlinker/index.html?highlight=osc5#pluginsgitlinkersettings
+        # https://nix-community.github.io/nixvim/25.11/clipboard/index.html?highlight=clipboar#clipboardregister
+        # https://nix-community.github.io/nixvim/25.11/clipboard/providers/index.html?highlight=clipboar#clipboardproviders
+        # and see :h clipboard and :h clipboard-osc52
+        # TODO https://jvns.ca/til/vim-osc52/
+        globals = {
+          clipboard = "osc52";
+        };
+      };
+
+    # see also viAlias, see https://github.com/nix-community/nixvim/blob/nixos-25.11/modules/top-level/output.nix#L19
+    # via https://nix-community.github.io/nixvim/25.11/NeovimOptions/index.html#vialias
+    home.sessionVariables = {
+      EDITOR = lib.mkDefault "nvim";
+      VISUAL = lib.mkDefault "nvim";
+    };
+  };
+}
