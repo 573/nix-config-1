@@ -469,7 +469,7 @@
     };
 
     nixd = {
-      url = "github:nix-community/nixd?ref=2.9.3";
+      url = "github:nix-community/nixd?ref=2.9.1";
       #url = "github:nix-community/nixd";
       inputs.nixpkgs.follows = "nixos-unstable";
       inputs.flake-parts.follows = "flake-parts";

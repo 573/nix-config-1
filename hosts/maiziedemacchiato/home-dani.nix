@@ -79,14 +79,6 @@ in
       yazi.enable = true;
 
       nixbuild.enable = true;
-
-      nixvim = {
-        enable = true;
-        # TODO should user- and hostname be rather module params
-        nixd.expr.home-manager = ''
-          	(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options
-        '';
-      };
     };
   };
 

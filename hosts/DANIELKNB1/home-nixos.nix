@@ -32,19 +32,21 @@ in
       #      zellij.enable = true;
       #      alacritty.enable = true;
       nixbuild.enable = true;
-      nixvim = {
-        enable = true;
-        nixd.expr = {
-          #home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
-          home-manager = ''(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options'';
-          # still not working TODO
-          # https://github.com/MattSturgeon/nix-config/blob/5dd1b19bc69fa33bfc950c10083490187c3d58a2/nvim/config/lsp.nix#L24-L48
-          # https://github.com/traxys/Nixfiles/blob/aff7f6d8b22cd48877929c46618c02d61eea19ff/neovim/lsp.nix#L147-L161
-          nixvim = ''((builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options.programs.nixvim.type.getSubOptions []'';
-          #nixvim = ''((builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions []).programs.nixvim.type.getSubOptions []'';
-          nixos = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options'';
+      /*
+        nixvim = {
+          #enable = true;
+          nixd.expr = {
+            #home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
+            home-manager = ''(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options'';
+            # still not working TODO
+            # https://github.com/MattSturgeon/nix-config/blob/5dd1b19bc69fa33bfc950c10083490187c3d58a2/nvim/config/lsp.nix#L24-L48
+            # https://github.com/traxys/Nixfiles/blob/aff7f6d8b22cd48877929c46618c02d61eea19ff/neovim/lsp.nix#L147-L161
+            nixvim = ''((builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options.programs.nixvim.type.getSubOptions []'';
+            #nixvim = ''((builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions []).programs.nixvim.type.getSubOptions []'';
+            nixos = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options'';
+          };
         };
-      };
+      */
       yazi.enable = true;
     };
 

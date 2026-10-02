@@ -38,11 +38,6 @@ in
       # flake/builders/mkNixos.nix, they go there directly.
       extraSpecialArgs = {
         inherit inputs rootPath;
-        inherit (inputs.nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system})
-          makeNixvim
-          makeNixvimWithModule
-          ;
-        #inherit (inputs.unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}) yazi;
         zellij =
           if isLinux && isAarch64 then
             inputs.nixos-2405.legacyPackages.${pkgs.stdenv.hostPlatform.system}.zellij

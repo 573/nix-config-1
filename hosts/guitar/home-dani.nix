@@ -27,7 +27,6 @@ in
 
     programs = {
       nixbuild.enable = true;
-      nixvim.enable = true;
     };
 
     development = {

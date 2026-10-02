@@ -8,6 +8,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   #unstable,
   hostname,
   ...
@@ -33,6 +34,8 @@ let
 in
 {
   ###### interface
+  #  using inputs.nixvim.homeModules.nixvim, for a Home Manager installation
+  imports = [ inputs.nixvim.homeModules.nixvim ];
 
   options = {
     custom.base.general = {
@@ -72,14 +75,509 @@ in
         #helix.enable = true;
         #yazi.enable = true;
         #xplr.enable = true;
-        nixvim = {
-          #          enable = true;
-          # not inherit not same attr
-          lightWeight = cfg.lightWeight;
-        };
+        /*
+          nixvim = {
+            #          enable = true;
+            # not inherit not same attr
+            lightWeight = cfg.lightWeight;
+          };
+        */
       };
 
       programs = {
+        # replaces my module as of https://github.com/573/nix-config-1/commit/5450342df3690d8d464c286952c977f1701dbeb5 (last rev of module)
+        nixvim = {
+          enable = true;
+          lsp = {
+            keymaps = [
+              {
+                key = "K";
+                lspBufAction = "hover";
+              }
+            ];
+            servers = {
+              nixd = {
+                enable = true;
+                package = inputs.nixd.packages.x86_64-linux.default;
+                config = {
+                  nixpkgs.expr = ''import $(builtins.getFlake "${inputs.self}").inputs.nixpkgs { }'';
+                  formatting.command = [ "nixfmt" ];
+                  diagnostic.suppress = [
+                    "sema-escaping-with"
+                    "var-bind-to-this"
+                  ];
+                  options = {
+                    home-manager.expr = ''(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options'';
+                    nixvim.expr = ''((builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options.programs.nixvim.type.getSubOptions [ ]'';
+                    nixos.expr = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options'';
+                  };
+                };
+              };
+            };
+          };
+          plugins = {
+
+            cmp = {
+              enable = true;
+
+              autoEnableSources = true;
+              settings = {
+                # see https://stackoverflow.com/a/74714258 and https://stackoverflow.com/a/74730907
+                completion = {
+                  keyword_length = 3;
+                };
+                sources = [
+                  # alternative would only be not enable cmp and using C-x C-o - probably not how it is supposed to work,
+                  # see https://gpanders.com/blog/whats-new-in-neovim-0-11/#builtin-auto-completion
+                  # and here under lsp = ...
+                  { name = "buffer"; }
+                  { name = "cmdline"; }
+                  { name = "cmdline-history"; }
+                  #             { name = "nvim_lsp"; }
+                  #             { name = "nvim_lsp_document_symbol"; }
+                  { name = "nvim-lsp-signature-help"; }
+                  { name = "omni"; }
+                  { name = "path"; }
+                  { name = "rg"; }
+                  { name = "treesitter"; }
+                ];
+                mapping = {
+                  "<C-Space>" = "cmp.mapping.complete()";
+                  "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+                  "<C-e>" = "cmp.mapping.close()";
+                  "<C-f>" = "cmp.mapping.scroll_docs(4)";
+                  # see https://stackoverflow.com/a/74714258
+                  "<CR>" = "cmp.mapping.confirm({ select = false })";
+                  "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+                  "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+                };
+              };
+
+            };
+
+            cmp-buffer.enable = true;
+            cmp-cmdline.enable = true;
+            cmp-cmdline-history.enable = true;
+            #        cmp-nvim-lsp.enable = true;
+            #        cmp-nvim-lsp-document-symbol.enable = true;
+            cmp-nvim-lsp-signature-help.enable = true;
+            cmp-omni.enable = true;
+            cmp-path.enable = true;
+            cmp-rg.enable = true;
+            cmp-treesitter.enable = true;
+
+            conform-nvim = {
+              enable = true;
+              settings = {
+                formatters_by_ft = {
+                  nix = [ "nixfmt" ];
+                };
+              };
+            };
+
+            # TODO https://xnacly.me/posts/2023/configure-fzf-nvim/ :FZF there is :FzfLua here
+            fzf-lua = {
+              enable = true;
+              profile = "telescope";
+              keymaps = {
+                "<leader>fg" = "live_grep";
+                "<C-p>" = {
+                  action = "git_files";
+                  settings = {
+                    previewers.cat.cmd = lib.getExe' pkgs.coreutils "cat";
+                    winopts.height = 0.5;
+                  };
+                  options = {
+                    silent = true;
+                    desc = "Fzf-Lua Git Files";
+                  };
+                };
+              };
+              settings = {
+                files = {
+                  color_icons = true;
+                  file_icons = true;
+                  find_opts = {
+                    __raw = "[[-type f -not -path '*.git/objects*' -not -path '*.env*']]";
+                  };
+                  multiprocess = true;
+                  prompt = "Files❯ ";
+                };
+                winopts = {
+                  col = 0.3;
+                  height = 0.4;
+                  row = 0.99;
+                  width = 0.93;
+                };
+              };
+            };
+
+            # https://github.com/ruifm/gitlinker.nvim, <lk>gy
+            gitlinker.enable = true;
+
+            gitsigns = {
+              enable = true;
+              settings = {
+                current_line_blame = false;
+                current_line_blame_opts = {
+                  virt_text = true;
+                  virt_text_pos = "eol";
+                };
+                signcolumn = true;
+                signs = {
+                  add = {
+                    text = "│";
+                  };
+                  change = {
+                    text = "│";
+                  };
+                  changedelete = {
+                    text = "~";
+                  };
+                  delete = {
+                    text = "_";
+                  };
+                  topdelete = {
+                    text = "‾";
+                  };
+                  untracked = {
+                    text = "┆";
+                  };
+                };
+                watch_gitdir = {
+                  follow_files = true;
+                };
+                status_formatter = ''
+                  function(status)
+                    local added, changed, removed = status.added, status.changed, status.removed
+                    local status_txt = {}
+                    if added and added > 0 then
+                      table.insert(status_txt, '+' .. added)
+                    end
+                    if changed and changed > 0 then
+                      table.insert(status_txt, '~' .. changed)
+                    end
+                    if removed and removed > 0 then
+                      table.insert(status_txt, '-' .. removed)
+                    end
+                    return table.concat(status_txt, ' ')
+                  end
+                '';
+              };
+            };
+
+            lsp.enable = true;
+
+            lsp-format.enable = true;
+
+            lsp-lines = {
+              enable = true;
+              # Removed this due to the evaluation warning, see lz-n plugin further down
+              #lazyLoad.settings = {
+              #  keys = [
+              #    {
+              #      __unkeyed-1 = "<leader>l";
+              #      __unkeyed-3 = "function() require('lsp_lines').toggle() end";
+              #      desc = "Toggle lsp_lines";
+              #    }
+              #  ];
+              #};
+            };
+
+            # installed this due to
+            # evaluation warning: Nixvim (lazy loading): You have enabled lazy loading support for the following plugins but have not enabled a lazy loading provider.
+            #          1. plugins.lsp-lines
+            #
+            #        Currently supported lazy providers:
+            #          - lz-n
+            lz-n = {
+              enable = true;
+
+              keymaps = [
+                {
+                  action = config.lib.nixvim.mkRaw "function() require('lsp_lines').toggle() end";
+                  key = "<leader>l";
+                  options = {
+                    desc = "Toggle lsp_lines";
+                  };
+                  plugin = "lsp-lines";
+                }
+              ];
+
+              # see https://nix-community.github.io/nixvim/plugins/lz-n/index.html#pluginslz-nimports
+              # and see https://nix-community.github.io/nixvim/plugins/lz-n/plugins.html
+              # plugins = [];
+            };
+
+            indent-blankline = {
+              enable = true;
+              settings = {
+                exclude = {
+                  buftypes = [
+                    "terminal"
+                    "quickfix"
+                  ];
+                  filetypes = [
+                    ""
+                    "checkhealth"
+                    "help"
+                    "lspinfo"
+                    "packer"
+                    "TelescopePrompt"
+                    "TelescopeResults"
+                    "yaml"
+                  ];
+                };
+                indent = {
+                  char = "│";
+                };
+                scope = {
+                  show_end = false;
+                  show_exact_scope = true;
+                  show_start = false;
+                };
+              };
+            };
+
+            no-neck-pain.enable = true;
+
+            nvim-autopairs.enable = true;
+
+            # nvim-lightbulb.enable = true;
+
+            nvim-bqf = {
+              enable = true;
+              settings = {
+                preview = {
+                  border = "double";
+                  show_scroll_bar = false;
+                  show_title = false;
+                  winblend = 0;
+                };
+              };
+            };
+
+            telescope = {
+              enable = true;
+
+              # https://nix-community.github.io/nixvim/25.11/plugins/telescope/index.html#pluginstelescopeenabledextensions
+              extensions = {
+                advanced-git-search = {
+                  enable = true;
+                  settings = {
+                    diff_plugin = "diffview";
+                    git_flags = [
+                      "-c"
+                      "delta.side-by-side=false"
+                    ];
+                  };
+                };
+                fzf-native.enable = true;
+                live-grep-args = {
+                  enable = true;
+                  settings = {
+                    auto_quoting = true;
+                    mappings = {
+                      # These are meant to be used when the telescope dialog is open, i.e., not in the "regular" neovim buffer
+                      # For more keys in the preview, result etc, see https://github.com/nvim-telescope/telescope.nvim/blob/e6cdb4d/README.md#default-mappings
+                      i = {
+                        "<C-i>" = {
+                          __raw = "require(\"telescope-live-grep-args.actions\").quote_prompt({ postfix = \" --iglob \" })";
+                        };
+                        "<C-k>" = {
+                          __raw = "require(\"telescope-live-grep-args.actions\").quote_prompt()";
+                        };
+                        "<C-space>" = {
+                          __raw = "require(\"telescope.actions\").to_fuzzy_refine";
+                        };
+                      };
+                    };
+                    theme = "dropdown";
+                  };
+                };
+                project.enable = true;
+              };
+
+              # Found out via :Telescope keymaps or simply :Telescope <TAB>
+              keymaps = {
+                "<C-p>" = {
+                  action = "git_files";
+                  options = {
+                    desc = "Telescope Git Files";
+                  };
+                };
+                "<leader>bb" = {
+                  action = "buffers";
+                  options = {
+                    desc = "Telescope Buffers";
+                  };
+                };
+                "<leader>gs" = {
+                  action = "grep_string";
+                  options = {
+                    desc = "Telescope grep for the word under the cursor";
+                  };
+                };
+                "<leader>fg" = "live_grep";
+                "<leader>ff" = {
+                  action = "find_files";
+                  options = {
+                    desc = "Find files";
+                  };
+                };
+              };
+
+              settings = {
+                defaults = {
+                  file_ignore_patterns = [
+                    "^.git/"
+                    "^.mypy_cache/"
+                    "^__pycache__/"
+                    "^output/"
+                    "^data/"
+                    "%.ipynb"
+                  ];
+                  layout_config = {
+                    prompt_position = "top";
+                  };
+                  mappings = {
+                    i = {
+                      "<A-j>" = {
+                        __raw = "require('telescope.actions').move_selection_next";
+                      };
+                      "<A-k>" = {
+                        __raw = "require('telescope.actions').move_selection_previous";
+                      };
+                    };
+                    /*
+                      n = {
+                      	    # IDK where that belongs, definitly not in settings.defaults.mappings as the shortcut is not visible then
+                                  # The example from https://github.com/nvim-telescope/telescope-live-grep-args.nvim/blob/d600409/README.md#shortcut-functions
+                                  # just demo, as it seems to be redundant with :Telescope grep_string ?
+                                  "<leader>gc" = {
+                                    __raw = "require('telescope-live-grep-args.shortcuts').grep_word_under_cursor";
+                                  };
+                                };
+                    */
+                  };
+                  selection_caret = "> ";
+                  set_env = {
+                    COLORTERM = "truecolor";
+                  };
+                  sorting_strategy = "ascending";
+                };
+              };
+            };
+
+            toggleterm = {
+              enable = true;
+              settings = {
+                direction = "float";
+                float_opts = {
+                  border = "curved";
+                  height = 30;
+                  width = 130;
+                };
+                open_mapping = "[[<c-\\>]]";
+              };
+            };
+
+            trouble.enable = true;
+
+            # reason:
+            # evaluation warning: nixos profile: Nixvim (plugins.web-devicons): This plugin was enabled automatically because the following plugins are enabled.
+            #                  This behaviour is deprecated. Please explicitly define `plugins.web-devicons.enable` or alternatively
+            #                  enable `plugins.mini.enable` with `plugins.mini.modules.icons` and `plugins.mini.mockDevIcons`, or
+            #                  `plugins.mini-icons.enable` with `plugins.mini-icons.mockDevIcons`.
+            #                  plugins.telescope
+            #                  plugins.trouble
+            #                  plugins.fzf-lua
+            web-devicons.enable = true;
+
+            # FIXME without this which-key config strangely the leader key is not working
+            which-key = {
+              enable = true;
+              settings = {
+                delay = 200;
+                expand = 1;
+                notify = false;
+                preset = false;
+                replace = {
+                  desc = [
+                    [
+                      "<space>"
+                      "SPACE"
+                    ]
+                    [
+                      "<leader>"
+                      "SPACE"
+                    ]
+                    [
+                      "<[cC][rR]>"
+                      "RETURN"
+                    ]
+                    [
+                      "<[tT][aA][bB]>"
+                      "TAB"
+                    ]
+                    [
+                      "<[bB][sS]>"
+                      "BACKSPACE"
+                    ]
+                  ];
+                };
+                spec = [
+                  {
+                    __unkeyed-1 = "<leader>b";
+                    group = "Buffers";
+                    icon = "󰓩 ";
+                  }
+                  {
+                    __unkeyed-1 = "<leader>bs";
+                    group = "Sort";
+                    icon = "󰒺 ";
+                  }
+                  {
+                    __unkeyed-1 = [
+                      {
+                        __unkeyed-1 = "<leader>f";
+                        group = "Normal Visual Group";
+                      }
+                      {
+                        __unkeyed-1 = "<leader>f<tab>";
+                        group = "Normal Visual Group in Group";
+                      }
+                    ];
+                    mode = [
+                      "n"
+                      "v"
+                    ];
+                  }
+                  {
+                    __unkeyed-1 = "<leader>w";
+                    group = "windows";
+                    proxy = "<C-w>";
+                  }
+                ];
+                win = {
+                  border = "single";
+                };
+              };
+            };
+          };
+
+          enableMan = false;
+          viAlias = true;
+          vimAlias = true;
+          env = {
+            EDITOR = "nvim";
+            VISUAL = "nvim";
+          };
+          globals = {
+            clipboard = "osc52";
+          };
+        };
+
         bash = {
           sessionVariables =
             # https://unix.stackexchange.com/a/18443/102072 and https://github.com/nix-community/home-manager/blob/83665c39fa688bd6a1f7c43cf7997a70f6a109f9/modules/home-environment.nix#L296 - ''... ''\${PROMPT_COMMAND}'' did not work on Arch+nix

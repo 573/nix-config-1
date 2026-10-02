@@ -31,10 +31,6 @@ in
       #tex.enable = true;
       #      zellij.enable = true;
       #alacritty.enable = true;
-      nixvim = {
-        enable = true;
-        nixd.expr.home-manager = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.nixos.options.home-manager.users.type.getSubOptions [ ]'';
-      };
     };
 
     development = {
