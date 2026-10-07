@@ -107,7 +107,7 @@ in
                     "var-bind-to-this"
                   ];
                   options = {
-                    home-manager.expr = ''(builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options'';
+                    home-manager.expr = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options.home-manager.users.type.getSubOptions [ ]'';
                     nixvim.expr = ''((builtins.getFlake "${inputs.self}").homeConfigurations."dani@maiziedemacchiato".options.programs.nixvim.type.getSubOptions [ ]'';
                     nixos.expr = ''(builtins.getFlake "${inputs.self}").nixosConfigurations.DANIELKNB1.options'';
                   };
