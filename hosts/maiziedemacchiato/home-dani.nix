@@ -413,9 +413,27 @@ in
           };
         };
 
+	environment = {
+	  # because initially user admin seems to have no password at all in the
+	  # fresh container, I provide it one here, that is then overridden by the
+	  # one in the yml file
+	  # https://github.com/photoprism/photoprism/commit/71164b344734d6bc2f29141d73e259f53bf5d383
+	  # Still roughly needs that sequence of interventions on each secret change:
+	  # In shell after secrets update (only AdminPassword required):
+#nix-shell -p sops --run "sops ***pathto***secrets.yaml"
+#systemctl --user stop podman-photoprism.service
+#rm ~/stacks/photoprism/index.db  # seems crucial ?
+#hm-switch --impure # to reflect secrets.yml change
+#systemctl --user restart podman-photoprism.service
+#podman exec -it photoprism cat /photoprism/storage/config/options.yml
+	  PHOTOPRISM_ADMIN_PASSWORD = "insecure";
+	  PHOTOPRISM_CONFIG_PATH = "/photoprism/storage/config/options.yml";
+	};
+
         volumes = [
           "${config.home.homeDirectory}/stacks/photoprism:/photoprism/storage"
           "${config.home.homeDirectory}/stacks/photoprism/cache:/photoprism/cache"
+          "${config.sops.secrets."photoprism/config".path}:/photoprism/storage/config/options.yml"
         ];
         ports = [ "2342:2342" ];
       };

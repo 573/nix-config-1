@@ -84,6 +84,9 @@ in
         "paperless/admin_password" = { };
         "paperless/secret_key" = { };
         "paperless/db_password" = { };
+	"photoprism/config" = {
+	mode = "0600";
+	};
         # TODO to provoke the error where key leaking is demonstrated, i.e.,
         # secrets.yaml in store as opposed to the recipe spec
         # /nix/store/hash-secrets.yaml
