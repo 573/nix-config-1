@@ -94,6 +94,7 @@ in
           ;
 
         users = genAttrs ([ "root" ] ++ optional (!cfg.wsl) "dani" ++ optional cfg.wsl "nixos") (
+	  # see also https://github.com/Gerschtli/nix-config/commit/12e3d485d553e19d67a411353385dbaf4410f448
           commonConfig.homeManager.userConfig cfg.hostname
         );
       };
