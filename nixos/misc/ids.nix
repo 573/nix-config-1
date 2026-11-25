@@ -47,11 +47,11 @@ in
 
   config = {
 
-    custom.ids = {
+    custom.ids = { } // lib.optionalAttrs (config.wsl.enable or false) {
       uids = mapIds {
         #syncthing = 237;
-
-        # WORKAROUND After first installation needs fix bc had uid 1000 earlier, see https://github.com/NixOS/nixpkgs/issues/12170
+        
+	# WORKAROUND After first installation needs fix bc had uid 1000 earlier, see https://github.com/NixOS/nixpkgs/issues/12170
         # i. e. uid 1000 gid 1000 or gid 100
         # https://github.com/nix-community/NixOS-WSL/pull/85
         # default user gets 1000 in modules/wsl-distro.nix
@@ -61,8 +61,8 @@ in
 
         # https://github.com/nix-community/NixOS-WSL/blob/0fa9268bf9a903498cb567e6d4d01eb945f36f6e/modules/wsl-distro.nix#L120
         nixos = 1000;
-        dani = 1001;
         #funktionstester = 1000;
+        dani = 1001;
       };
 
       gids = mapIds {

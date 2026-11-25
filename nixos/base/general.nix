@@ -187,10 +187,11 @@ in
         lib.optionalAttrs (!cfg.wsl) {
           # for NixOS-WSL in case of own user, see https://github.com/nix-community/NixOS-WSL/blob/4840f5d/modules/wsl-distro.nix#L89C5-L93C7
           dani = {
-            uid = config.custom.ids.uids.dani;
             extraGroups = [ "wheel" ];
             isNormalUser = true;
-          };
+          } // lib.optionalAttrs (config.wsl.enable or false) {
+            uid = config.custom.ids.uids.dani;
+	  };
         }
       );
     }

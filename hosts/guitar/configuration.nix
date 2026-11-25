@@ -112,15 +112,22 @@
       owner = config.users.users."root".name;
       mode = "0600";
       # makes a symlink to the secret itself
-      #path = "/root/.ssh/id_ed25519";
+      path = "/root/.ssh/id_ed25519";
     };
     "nixbuild/my_nixbuild_shell_key" = {
       # TODO needs the specific owner for now hardcoded but should rather
       #  home.username or such, i.e., via config
       owner = config.users.users."dani".name;
       mode = "0600";
-      # makes a symlink to the secret itself
-      #path = "/home/nixos/.ssh/id_ed25519";
+      # makes a symlink to the secret itself => this makes running nix build (as opposed to nix-build) but also nix copy and so on without sudo possible (is that really needed ?)
+      # NOTE potential pitfall: nixos-rebuild does not remove these symlinks, i.e., if that line here is commented or removed
+      #  also, that symlink alone did not suffice to mitigate the sudo requirement as only did either moving the public key out of the way as
+      #  well, only then the new symlink was taken into account by the daemon
+      #  But, this could just mean, that as soon as there is a id_ed25519 and / or id_ed25519.pub file at the standard place, the nix-daemon
+      #  will consider using exactly id_ed25519 regardless of another key file was provided in the config as I prior did.
+      #  This might also mean that all my config changes regarding the use of fqdn eu.nixbuild.net instead of nixbuild where the latter was
+      #  default, might have been redundant as unrelated to the original issue presented here.
+      path = "/home/dani/.ssh/id_ed25519";
     };
   };
 }

@@ -75,8 +75,8 @@ in
       # - home sops-nix
       nix.buildMachines = [
         {
-          #hostName = "eu.nixbuild.net";
-          hostName = "nixbuild";
+          hostName = "eu.nixbuild.net";
+          #hostName = "nixbuild";
           maxJobs = 100;
           protocol = "ssh-ng";
           publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSVBJUUNaYzU0cG9KOHZxYXdkOFRyYU5yeVFlSm52SDFlTHBJRGdiaXF5bU0K";

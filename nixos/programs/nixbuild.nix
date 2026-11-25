@@ -100,7 +100,7 @@ in
             # TODO see man nix.conf (/machines), can use ssh match block's host here instead full hostname,
             # but tests on NixOS-WSL needed
             # WARNING new contrarian evidence: With eu.nixbuild.net set here the -vvvvv log shows that /etc/ssh/ssh_config is eread but only section * is actually applied aka section nixbuild ignored, thus using nixbuild again here:
-            hostName = "nixbuild";
+            hostName = "eu.nixbuild.net";
             systems = [
               "x86_64-linux"
               "aarch64-linux"
