@@ -117,7 +117,9 @@ in
       # secrets ought still to be handled different as sops-nix is not available on nix-on-droid.
       programs.ssh.settings =
         lib.optionalAttrs ((config.home.username == "root") || (!onNixos)) {
-          nixbuild = lib.optionalAttrs ((config.home.username == "root") || (!onNixos)) (
+	  # changing attribute name to fqdn as on NixOS (nix-daemon) sudo ssh eu.nixbuild.net failed without
+	  # fingers crossed that non-NixOS does not break here then
+          "eu.nixbuild.net" = lib.optionalAttrs ((config.home.username == "root") || (!onNixos)) (
             (
               {
                 hostname = "eu.nixbuild.net";

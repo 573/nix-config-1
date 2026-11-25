@@ -59,6 +59,8 @@
 
     Copy to ~/.ssh/my-nixbuild-key the my-nixbuild-key (chmod 0600) to have eu.nixbuild.net access
 
+    See \e[0;32mhttps://i3wm.org/docs/refcard.html\e[0m for i3 keybinds
+
     Issue \e[0;32mcat /etc/issue\e[0m to show these messages again
   '';
 
